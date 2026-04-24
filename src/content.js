@@ -1,0 +1,83 @@
+/**
+ * NotebookLM++ 内容脚本主入口
+ * 根据用户设置有条件地启动各功能模块
+ */
+
+(async () => {
+  const LOG = '[NLM++]';
+  console.log(LOG, '扩展已加载，正在初始化...');
+
+  try {
+    const settings = await NLM.Storage.getAll();
+
+    // 功能模块启动
+    if (settings.quoteReplyEnabled) {
+      NLM.QuoteReply.init();
+    }
+
+    if (settings.formulaCopyEnabled) {
+      await NLM.FormulaCopy.init();
+    }
+
+    if (settings.timelineEnabled) {
+      NLM.Timeline.init();
+    }
+
+    if (settings.exportEnabled) {
+      NLM.Export.init();
+    }
+
+    if (settings.promptVaultEnabled) {
+      await NLM.PromptVault.init();
+    }
+
+    if (settings.mermaidEnabled) {
+      NLM.MermaidRender.init();
+    }
+
+    // 以下模块自行管理 enabled 状态
+    await NLM.DraftSave.init();
+    await NLM.SendBehavior.init();
+      if (NLM.UiTweaks) NLM.UiTweaks.init();
+      if (NLM.PreventScroll) NLM.PreventScroll.init();
+
+    // 监听设置变更以动态启用/禁用模块
+    NLM.Storage.onChange((changes, area) => {
+      if (area !== 'sync') return;
+
+      if (changes.quoteReplyEnabled) {
+        if (changes.quoteReplyEnabled.newValue) NLM.QuoteReply.init();
+        else NLM.QuoteReply.destroy();
+      }
+
+      if (changes.formulaCopyEnabled) {
+        if (changes.formulaCopyEnabled.newValue) NLM.FormulaCopy.init();
+        else NLM.FormulaCopy.destroy();
+      }
+
+      if (changes.timelineEnabled) {
+        if (changes.timelineEnabled.newValue) NLM.Timeline.init();
+        else NLM.Timeline.destroy();
+      }
+
+      if (changes.exportEnabled) {
+        if (changes.exportEnabled.newValue) NLM.Export.init();
+        else NLM.Export.destroy();
+      }
+
+      if (changes.promptVaultEnabled) {
+        if (changes.promptVaultEnabled.newValue) NLM.PromptVault.init();
+        else NLM.PromptVault.destroy();
+      }
+
+      if (changes.mermaidEnabled) {
+        if (changes.mermaidEnabled.newValue) NLM.MermaidRender.init();
+        else NLM.MermaidRender.destroy();
+      }
+    });
+
+    console.log(LOG, '✅ 全部模块初始化完成');
+  } catch (err) {
+    console.error(LOG, '初始化失败:', err);
+  }
+})();

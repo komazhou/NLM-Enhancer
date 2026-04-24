@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotebookLM++ 设置</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- 头部 -->
+    <header class="popup-header">
+      <div class="logo-area">
+        <span class="logo-icon">📓</span>
+        <div>
+          <h1>NotebookLM++</h1>
+          <span class="version">v1.0.0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 功能开关区域 -->
+    <div class="settings-section">
+      <h2 class="section-title">🔧 核心功能</h2>
+
+      <div class="setting-item" id="setting-quoteReply">
+        <div class="setting-info">
+          <span class="setting-icon">💬</span>
+          <div>
+            <div class="setting-name">选中文本引用</div>
+            <div class="setting-desc">选中文本后弹出引用按钮</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="quoteReplyEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-formulaCopy">
+        <div class="setting-info">
+          <span class="setting-icon">📐</span>
+          <div>
+            <div class="setting-name">公式点击复制</div>
+            <div class="setting-desc">点击公式复制 LaTeX 源码</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="formulaCopyEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- 公式格式选择 -->
+      <div class="sub-setting" id="formula-format-group">
+        <div class="setting-name-small">复制格式</div>
+        <div class="radio-group" id="formulaFormatGroup">
+          <label class="radio-option">
+            <input type="radio" name="formulaFormat" value="latex">
+            <span>LaTeX <code>$...$</code></span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="formulaFormat" value="mathml">
+            <span>MathML (Word)</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="formulaFormat" value="no-dollar">
+            <span>纯文本 (无 $)</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="formulaFormat" value="notion">
+            <span>Notion <code>$$...$$</code></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item" id="setting-timeline">
+        <div class="setting-info">
+          <span class="setting-icon">🔘</span>
+          <div>
+            <div class="setting-name">对话时间轴</div>
+            <div class="setting-desc">侧边圆点快速跳转对话</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="timelineEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-export">
+        <div class="setting-info">
+          <span class="setting-icon">📥</span>
+          <div>
+            <div class="setting-name">对话导出</div>
+            <div class="setting-desc">一键导出为 Markdown</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="exportEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-prompt">
+        <div class="setting-info">
+          <span class="setting-icon">⚡</span>
+          <div>
+            <div class="setting-name">提示词库</div>
+            <div class="setting-desc">快捷插入预设提示词</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="promptVaultEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-mermaid">
+        <div class="setting-info">
+          <span class="setting-icon">📊</span>
+          <div>
+            <div class="setting-name">Mermaid 渲染</div>
+            <div class="setting-desc">自动将代码渲染为图表</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="mermaidEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2 class="section-title">⚙️ 输入与体验</h2>
+
+      <div class="setting-item" id="setting-draft">
+        <div class="setting-info">
+          <span class="setting-icon">💾</span>
+          <div>
+            <div class="setting-name">草稿防丢</div>
+            <div class="setting-desc">自动保存输入框内容</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="draftSaveEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-send">
+        <div class="setting-info">
+          <span class="setting-icon">⌨️</span>
+          <div>
+            <div class="setting-name">Ctrl+Enter 发送</div>
+            <div class="setting-desc">Enter 变换行，防止误发</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="ctrlEnterSend">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item" id="setting-scroll">
+        <div class="setting-info">
+          <span class="setting-icon">🔒</span>
+          <div>
+            <div class="setting-name">防自动滚动</div>
+            <div class="setting-desc">回复生成中上滚不会被拉回</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="preventScrollEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2 class="section-title">🎨 界面自定义</h2>
+
+      <div class="setting-item" id="setting-ui">
+        <div class="setting-info">
+          <span class="setting-icon">📏</span>
+          <div>
+            <div class="setting-name">界面自定义</div>
+            <div class="setting-desc">调整聊天宽度和字号</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="uiTweaksEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="sub-setting" id="ui-tweaks-group">
+        <div class="slider-setting">
+          <div class="slider-header">
+            <span>聊天宽度</span>
+            <span class="slider-value" id="widthValue">70%</span>
+          </div>
+          <input type="range" min="30" max="100" step="5" id="chatWidthSlider" class="slider">
+        </div>
+
+        <div class="slider-setting">
+          <div class="slider-header">
+            <span>字体大小</span>
+            <span class="slider-value" id="fontValue">100%</span>
+          </div>
+          <input type="range" min="80" max="150" step="5" id="fontSizeSlider" class="slider">
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="popup-footer">
+      <span>Made with ❤️ for NotebookLM</span>
+    </footer>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
