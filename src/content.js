@@ -32,10 +32,6 @@
       await NLM.PromptVault.init();
     }
 
-    if (settings.mermaidEnabled) {
-      NLM.MermaidRender.init();
-    }
-
     // 以下模块自行管理 enabled 状态
     await NLM.DraftSave.init();
     await NLM.SendBehavior.init();
@@ -74,11 +70,6 @@
       if (changes.promptVaultEnabled) {
         if (changes.promptVaultEnabled.newValue) NLM.PromptVault.init();
         else NLM.PromptVault.destroy();
-      }
-
-      if (changes.mermaidEnabled) {
-        if (changes.mermaidEnabled.newValue) NLM.MermaidRender.init();
-        else NLM.MermaidRender.destroy();
       }
     });
 

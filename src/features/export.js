@@ -58,9 +58,10 @@ NLM.Export = (() => {
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
           <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
           <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
           <style>
             body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1f1f1f; }
-            .toolbar { position: sticky; top: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 12px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+            .toolbar { position: sticky; top: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 12px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
             .toolbar-title { font-size: 16px; font-weight: 600; color: #1a73e8; }
             .btn-group { display: flex; gap: 12px; }
             button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
@@ -87,10 +88,16 @@ NLM.Export = (() => {
             .role { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #5f6368; text-transform: uppercase; }
             .content { font-size: 15px; line-height: 1.7; }
             
-            pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; }
+            pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; position: relative; }
             
+            /* Mermaid 切换按钮 */
+            .mermaid-container { margin: 15px 0; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px; display: flex; justify-content: center; overflow-x: auto; }
+            .mermaid-toggle { position: absolute; right: 10px; top: 10px; padding: 4px 8px; font-size: 11px; background: rgba(26,115,232,0.1); color: #1a73e8; border: 1px solid rgba(26,115,232,0.2); border-radius: 4px; z-index: 5; }
+            .mermaid-toggle:hover { background: rgba(26,115,232,0.2); }
+            .hidden { display: none !important; }
+
             @media print {
-              .toolbar, .delete-btn { display: none !important; }
+              .toolbar, .delete-btn, .mermaid-toggle { display: none !important; }
               .preview-container { box-shadow: none; margin: 0; padding: 20px; width: 100%; max-width: none; }
               .msg-pair { page-break-inside: avoid; }
             }
@@ -130,6 +137,7 @@ NLM.Export = (() => {
             </div>
           </div>
           <script>
+            // KaTeX 渲染
             function startRender() {
               if (window.renderMathInElement) {
                 renderMathInElement(document.body, {
@@ -144,15 +152,77 @@ NLM.Export = (() => {
                 });
                 console.log("KaTeX 渲染完成");
               } else {
-                console.log("等待 KaTeX 加载...");
                 setTimeout(startRender, 200);
               }
             }
-            // 确保 DOMContentLoaded 和 window.onload 都能触发
-            document.addEventListener('DOMContentLoaded', startRender);
-            window.onload = startRender;
-            // 兜底延迟执行
-            setTimeout(startRender, 1000);
+
+            // Mermaid 渲染与切换逻辑
+            async function startMermaid() {
+              if (!window.mermaid) {
+                setTimeout(startMermaid, 200);
+                return;
+              }
+              
+              mermaid.initialize({ startOnLoad: false, theme: 'default' });
+              const codes = document.querySelectorAll('pre');
+              
+              for (const pre of codes) {
+                const codeText = pre.innerText.trim();
+                if (codeText.startsWith('graph ') || codeText.startsWith('sequenceDiagram') || 
+                    codeText.startsWith('gantt') || codeText.startsWith('classDiagram') ||
+                    codeText.startsWith('stateDiagram') || codeText.startsWith('pie') ||
+                    codeText.startsWith('flowchart') || codeText.startsWith('erDiagram')) {
+                  
+                  // 创建切换按钮
+                  const toggleBtn = document.createElement('button');
+                  toggleBtn.className = 'mermaid-toggle';
+                  toggleBtn.innerText = '显示图表';
+                  pre.appendChild(toggleBtn);
+                  
+                  // 创建图表容器
+                  const container = document.createElement('div');
+                  container.className = 'mermaid-container hidden';
+                  const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
+                  container.id = id;
+                  pre.after(container);
+                  
+                  toggleBtn.onclick = async () => {
+                    if (container.classList.contains('hidden')) {
+                      if (!container.getAttribute('data-rendered')) {
+                        try {
+                          const { svg } = await mermaid.render(id + '-svg', codeText);
+                          container.innerHTML = svg;
+                          container.setAttribute('data-rendered', 'true');
+                        } catch (e) {
+                          container.innerText = 'Mermaid 渲染失败: ' + e.message;
+                        }
+                      }
+                      container.classList.remove('hidden');
+                      pre.classList.add('hidden'); // 隐藏代码
+                      toggleBtn.innerText = '显示代码';
+                      // 将按钮移出 pre 以便在隐藏 pre 后仍可见
+                      container.style.position = 'relative';
+                      container.appendChild(toggleBtn);
+                    } else {
+                      container.classList.add('hidden');
+                      pre.classList.remove('hidden');
+                      toggleBtn.innerText = '显示图表';
+                      pre.appendChild(toggleBtn);
+                    }
+                  };
+                }
+              }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+              startRender();
+              startMermaid();
+            });
+            window.onload = () => {
+              startRender();
+              startMermaid();
+            };
+            setTimeout(() => { startRender(); startMermaid(); }, 1500);
           </script>
         </body>
       </html>
