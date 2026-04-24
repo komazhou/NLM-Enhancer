@@ -21,6 +21,7 @@
 
     if (settings.timelineEnabled) {
       NLM.Timeline.init();
+      NLM.TimelineSearch.init();
     }
 
     if (settings.exportEnabled) {
@@ -56,8 +57,13 @@
       }
 
       if (changes.timelineEnabled) {
-        if (changes.timelineEnabled.newValue) NLM.Timeline.init();
-        else NLM.Timeline.destroy();
+        if (changes.timelineEnabled.newValue) {
+          NLM.Timeline.init();
+          NLM.TimelineSearch.init();
+        } else {
+          NLM.Timeline.destroy();
+          NLM.TimelineSearch.destroy();
+        }
       }
 
       if (changes.exportEnabled) {

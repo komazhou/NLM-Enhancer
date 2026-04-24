@@ -39,6 +39,7 @@
         "src/features/uiTweaks.js",
         "src/features/preventScroll.js",
         "src/features/deleteMessage.js",
+        "src/features/timelineSearch.js",
         "src/content.js"
       ],
       "css": [

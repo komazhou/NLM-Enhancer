@@ -68,36 +68,79 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
-  min-height: 40vh;
-  max-height: 80vh;
-  gap: 6px;
-  padding: 12px 4px;
-  border-radius: 12px;
-  background: rgba(40, 40, 40, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  justify-content: center;
+  width: 16px; /* 固定宽度，填满间隙 */
+  gap: 8px;
+  padding: 0;
+  background: rgba(128, 128, 128, 0.05); 
+  border-radius: 8px; 
   transition: opacity 0.3s ease;
 }
 
-.nlm-timeline-bar:hover {
-  background: rgba(40, 40, 40, 0.85);
-}
-
 .nlm-timeline-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 2;
 }
 
 .nlm-timeline-dot:hover {
-  background: rgba(255, 255, 255, 0.65);
-  transform: scale(1.4);
+  background: #fff;
+  transform: scale(1.8);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
+
+.nlm-dot-active {
+  background: var(--mat-sys-primary, #a8c7fa) !important;
+  transform: scale(1.5);
+  box-shadow: 0 0 10px rgba(168, 199, 250, 0.4);
+}
+
+.nlm-timeline-tooltip {
+  position: fixed;
+  z-index: 99995;
+  background: rgba(30, 30, 30, 0.95);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  max-width: 240px;
+  line-height: 1.5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 亮色模式适配 */
+@media (prefers-color-scheme: light) {
+  .nlm-timeline-bar::before {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .nlm-timeline-dot {
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .nlm-timeline-dot:hover {
+    background: var(--mat-sys-primary, #1a73e8);
+    box-shadow: 0 0 8px rgba(26, 115, 232, 0.3);
+  }
+  .nlm-timeline-tooltip {
+    background: #fff;
+    color: #1f1f1f;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+}
+
 
 .nlm-delete-msg-btn {
   position: absolute;
@@ -209,33 +252,31 @@
 /* === 导出按钮 === */
 .nlm-export-btn {
   position: fixed;
-  bottom: 80px;
-  right: 24px;
   z-index: 99990;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 8px 14px;
+  height: 28px;
+  padding: 0 12px;
   border: none;
-  border-radius: 20px;
+  border-radius: 8px 8px 0 0; /* 仅顶部圆角，如果底边紧贴输入框 */
+  /* 或者使用全圆角，根据美观度决定。用户说带圆弧样式。 */
+  border-radius: 6px;
   cursor: pointer;
   font-family: 'Google Sans', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 
-  background: rgba(40, 40, 40, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #e8eaed;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(26, 115, 232, 0.9);
+  color: #fff;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .nlm-export-btn:hover {
-  background: rgba(60, 60, 60, 0.85);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(26, 115, 232, 1);
+  transform: translateY(-1px);
 }
 
 .nlm-export-btn svg {
@@ -260,25 +301,33 @@
 .nlm-prompt-trigger {
   position: fixed;
   z-index: 99990;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s ease;
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
 
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-  box-shadow: 0 2px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 -2px 6px rgba(102, 126, 234, 0.2);
 }
 
 .nlm-prompt-trigger:hover {
-  transform: scale(1.15) rotate(15deg);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.nlm-prompt-trigger::after {
+  content: '提示词库';
+  font-family: 'Google Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 4px;
 }
 
 .nlm-prompt-panel {
@@ -641,7 +690,154 @@ mjx-container:hover::after,
   }
 }
 
-/* === Toast 通知 === */
-.nlm-toast {
-  z-index: 999999;
+
+/* === 提问搜索功能 === */
+.nlm-timeline-search-trigger {
+  position: fixed;
+  z-index: 99992;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 40, 40, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #8ab4f8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: translateY(-50%);
+}
+
+.nlm-timeline-search-trigger:hover {
+  background: rgba(60, 60, 60, 0.9);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(138, 180, 248, 0.3);
+}
+
+.nlm-timeline-search-trigger svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nlm-timeline-search-panel {
+  position: fixed;
+  z-index: 99993;
+  width: 340px;
+  max-height: 500px;
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Google Sans', sans-serif;
+  animation: nlm-slide-in-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes nlm-slide-in-right {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.nlm-search-header {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nlm-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.nlm-search-input:focus {
+  border-color: #8ab4f8;
+}
+
+.nlm-search-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.nlm-search-list::-webkit-scrollbar {
+  width: 4px;
+}
+.nlm-search-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.nlm-search-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-items: flex-start;
+}
+
+.nlm-search-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nlm-search-item-num {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+  width: 16px;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.nlm-search-item-text {
+  font-size: 13px;
+  color: #e8eaed;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.nlm-search-empty {
+  padding: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+}
+
+@media (prefers-color-scheme: light) {
+  .nlm-timeline-search-trigger {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #1a73e8;
+  }
+  .nlm-timeline-search-panel {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #1f1f1f;
+  }
+  .nlm-search-input {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #1f1f1f;
+  }
+  .nlm-search-item-text { color: #1f1f1f; }
+  .nlm-search-item-num { color: rgba(0, 0, 0, 0.2); }
+  .nlm-search-item:hover { background: rgba(0, 0, 0, 0.04); }
 }

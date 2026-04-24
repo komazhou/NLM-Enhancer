@@ -70,22 +70,22 @@ NLM.PromptVault = (() => {
    */
   function updateBtnPosition() {
     if (triggerBtn) {
-      const input = NLM.DOM.findChatInput();
-      if (input) {
-        const rect = input.getBoundingClientRect();
+      const container = NLM.DOM.findChatInputContainer();
+      if (container) {
+        const rect = container.getBoundingClientRect();
         if (rect.width > 0 && rect.top > 0) {
           triggerBtn.style.right = 'auto';
           triggerBtn.style.bottom = 'auto';
-          // 放置在输入框左侧内边界，正上方 12px
-          triggerBtn.style.left = `${rect.left + 8}px`;
-          triggerBtn.style.top = `${rect.top - triggerBtn.offsetHeight - 12}px`;
+          // 左侧按钮对齐输入框容器左边缘，底边贴合容器顶边
+          triggerBtn.style.left = `${rect.left}px`;
+          triggerBtn.style.top = `${rect.top - triggerBtn.offsetHeight}px`;
           
           if (panel && panel.style.display !== 'none') {
             panel.style.right = 'auto';
             panel.style.bottom = 'auto';
-            panel.style.left = `${rect.left + 8}px`;
-            // 面板向上展开
-            panel.style.top = `${rect.top - triggerBtn.offsetHeight - 24 - panel.offsetHeight}px`;
+            panel.style.left = `${rect.left}px`;
+            // 面板向上展开，保留一点间隙
+            panel.style.top = `${rect.top - triggerBtn.offsetHeight - 8 - panel.offsetHeight}px`;
           }
         }
       }

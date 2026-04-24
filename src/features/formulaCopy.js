@@ -443,6 +443,70 @@ NLM.FormulaCopy = (() => {
   }
 
   /**
+   * 将普通 MathML 转换为 Word 兼容的 MathML（添加 mml: 前缀并清理属性）
+   */
+  function toWordMathML(mathml) {
+    if (!mathml) return '';
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(mathml, 'application/xml');
+      const root = doc.documentElement;
+
+      if (doc.getElementsByTagName('parsererror').length > 0 || root.localName !== 'math') {
+        return mathml.replace(/<math/g, '<mml:math').replace(/<\/math>/g, '</mml:math>');
+      }
+
+      // 1. 移除 annotation 和 semantics
+      const annotations = Array.from(root.getElementsByTagName('annotation'));
+      annotations.forEach(a => a.parentNode?.removeChild(a));
+      
+      const semantics = root.querySelector('semantics');
+      if (semantics) {
+        const presentation = semantics.firstElementChild;
+        if (presentation) {
+          while (root.firstChild) root.removeChild(root.firstChild);
+          root.appendChild(presentation);
+        }
+      }
+
+      // 2. 清理样式和类名，递归添加前缀
+      const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
+      const outputDoc = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
+      const outputRoot = outputDoc.documentElement;
+
+      // 复制根属性（如 display）
+      for (const attr of Array.from(root.attributes)) {
+        if (!attr.name.startsWith('xmlns') && attr.name !== 'class' && attr.name !== 'style') {
+          outputRoot.setAttribute(attr.name, attr.value);
+        }
+      }
+
+      function cloneWithPrefix(source, target) {
+        for (const child of Array.from(source.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) {
+            target.appendChild(outputDoc.createTextNode(child.nodeValue));
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            const el = outputDoc.createElementNS(MATHML_NS, `mml:${child.localName}`);
+            for (const attr of Array.from(child.attributes)) {
+              if (attr.name !== 'class' && attr.name !== 'style') {
+                el.setAttribute(attr.name, attr.value);
+              }
+            }
+            target.appendChild(el);
+            cloneWithPrefix(child, el);
+          }
+        }
+      }
+
+      cloneWithPrefix(root, outputRoot);
+      return new XMLSerializer().serializeToString(outputDoc);
+    } catch (e) {
+      console.warn(LOG, 'MathML 转换失败', e);
+      return mathml;
+    }
+  }
+
+  /**
    * 判断公式是否为块级
    */
   function isDisplayMode(element) {
@@ -490,13 +554,12 @@ NLM.FormulaCopy = (() => {
     switch (currentFormat) {
       case 'mathml':
         // MathML 格式主要用于粘贴到 Word。
-        // 为了提高 Word 的识别率，必须包含 xmlns 命名空间。
         result.text = raw;
         if (mathml) {
-          result.html = mathml;
+          result.html = toWordMathML(mathml);
         } else {
-          // 兜底：手动添加命名空间
-          result.html = `<math xmlns="http://www.w3.org/1998/Math/MathML">${raw}</math>`;
+          // 兜底：手动构建极简版
+          result.html = `<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>${raw}</mml:mi></mml:mrow></mml:mml:math>`;
         }
         break;
 
@@ -515,7 +578,7 @@ NLM.FormulaCopy = (() => {
         result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
         // 如果是 LaTeX 格式，我们在 HTML 剪贴板中也带上 MathML，提高 Word 的识别成功率
         if (mathml) {
-          result.html = mathml;
+          result.html = toWordMathML(mathml);
         }
         break;
     }
@@ -531,14 +594,30 @@ NLM.FormulaCopy = (() => {
       if (navigator.clipboard?.write && html) {
         // 如果是 MathML (HTML 格式)，包装在标准 HTML 结构中以提高 Office 软件识别率
         let finalHtml = html;
-        if (html.includes('<math')) {
-          finalHtml = `<html><body><!--StartFragment-->${html}<!--EndFragment--></body></html>`;
+        if (html.includes('<mml:math') || html.includes('<math')) {
+          const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
+          finalHtml = `
+            <html xmlns:mml="${MATHML_NS}">
+            <head><meta charset="utf-8"></head>
+            <body>
+              <!--StartFragment-->
+              ${html}
+              <!--EndFragment-->
+            </body>
+            </html>
+          `.trim();
         }
         
         const items = {
           'text/plain': new Blob([text], { type: 'text/plain' }),
           'text/html': new Blob([finalHtml], { type: 'text/html' }),
         };
+        
+        // 如果包含 MathML，尝试添加专门的 MIME 类型
+        if (html.includes('math')) {
+          items['application/mathml+xml'] = new Blob([text], { type: 'application/mathml+xml' });
+        }
+
         await navigator.clipboard.write([new ClipboardItem(items)]);
         return true;
       }
@@ -729,7 +808,23 @@ NLM.FormulaCopy = (() => {
     htmlWrapper.appendChild(fragment.cloneNode(true));
     // 清理 HTML 中的无用引用上标
     htmlWrapper.querySelectorAll('sup, [data-citation], .citation, .source-annotation').forEach(el => el.remove());
-    const htmlContent = htmlWrapper.innerHTML;
+    
+    let htmlContent = htmlWrapper.innerHTML;
+    
+    // 如果包含 MathML，需要特殊封装以适配 Word
+    if (htmlContent.includes('math')) {
+      const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
+      htmlContent = `
+        <html xmlns:mml="${MATHML_NS}">
+        <head><meta charset="utf-8"></head>
+        <body>
+          <!--StartFragment-->
+          ${htmlContent}
+          <!--EndFragment-->
+        </body>
+        </html>
+      `.trim();
+    }
 
     // 提取纯文本用于纯文本粘贴
     const temp = document.createElement('div');
@@ -756,7 +851,7 @@ NLM.FormulaCopy = (() => {
     event.clipboardData.setData('text/plain', processedText);
     event.clipboardData.setData('text/html', htmlContent);
 
-    console.log(LOG, '增强复制：已将公式转为 LaTeX 文本，并保留原生段落与格式');
+    console.log(LOG, '增强复制：已将公式转为 LaTeX 或 MathML 文本，并保留原生段落与格式');
   }
 
   // ========================================================

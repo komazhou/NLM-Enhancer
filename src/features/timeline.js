@@ -57,24 +57,20 @@ NLM.Timeline = (() => {
    */
   function updatePosition() {
     if (!timelineBar) return;
-    const chatArea = document.querySelector('.chat-panel-content') || document.querySelector('main');
+    
+    // 寻找对话面板容器
+    const chatArea = document.querySelector('.chat-panel-content') || document.querySelector('chat-panel');
     if (chatArea) {
       const rect = chatArea.getBoundingClientRect();
-      const leftPos = rect.right + 10;
-      // 避免超出屏幕边界
-      if (leftPos + 40 < window.innerWidth) {
-        timelineBar.style.left = `${leftPos}px`;
-        timelineBar.style.right = 'auto';
-      } else {
-        timelineBar.style.right = '8px';
-        timelineBar.style.left = 'auto';
-      }
-      timelineBar.style.top = '50%';
-      timelineBar.style.transform = 'translateY(-50%)';
+      
+      // 直接对齐对话面板右边缘
+      timelineBar.style.left = `${rect.right}px`;
+      timelineBar.style.top = `${rect.top}px`;
+      timelineBar.style.height = `${rect.height}px`;
+      timelineBar.style.transform = 'none'; // 移除水平偏移，实现左侧对齐
+      timelineBar.style.display = 'flex';
     } else {
-      timelineBar.style.right = '8px';
-      timelineBar.style.top = '50%';
-      timelineBar.style.transform = 'translateY(-50%)';
+      timelineBar.style.display = 'none';
     }
   }
 
@@ -105,8 +101,10 @@ NLM.Timeline = (() => {
         tooltip.textContent = turn.text;
         tooltip.classList.remove('nlm-hidden');
         const rect = dot.getBoundingClientRect();
+        // 工具提示显示在点的左侧（对话区域内）
         tooltip.style.top = `${rect.top + rect.height / 2}px`;
-        tooltip.style.right = `${window.innerWidth - rect.left + 12}px`;
+        tooltip.style.left = `${rect.left - 250}px`; // 240px 宽度 + 10px 间距
+        tooltip.style.transform = 'translateY(-50%)';
       });
 
       dot.addEventListener('mouseleave', () => {

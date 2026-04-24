@@ -198,12 +198,13 @@ NLM.Export = (() => {
 
   function update() {
     if (exportBtn) {
-      const input = NLM.DOM.findChatInput();
-      if (input) {
-        const rect = input.getBoundingClientRect();
+      const container = NLM.DOM.findChatInputContainer();
+      if (container) {
+        const rect = container.getBoundingClientRect();
         if (rect && rect.width > 0) {
-          exportBtn.style.left = (rect.right - 80) + "px";
-          exportBtn.style.top = (rect.top - 45) + "px";
+          // 右侧按钮对齐输入框容器右边缘
+          exportBtn.style.left = (rect.right - exportBtn.offsetWidth) + "px";
+          exportBtn.style.top = (rect.top - exportBtn.offsetHeight) + "px";
         }
       }
     }
@@ -214,8 +215,14 @@ NLM.Export = (() => {
     if (isInitialized) return;
     exportBtn = document.createElement("button");
     exportBtn.className = "nlm-export-btn";
-    exportBtn.innerHTML = "导出";
-    exportBtn.style.cssText = "position:fixed;z-index:9999;background:#1a73e8;color:white;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-weight:500;box-shadow:0 2px 5px rgba(0,0,0,0.2);";
+    exportBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      <span>导出</span>
+    `;
     exportBtn.onclick = openExportPreview;
     document.body.appendChild(exportBtn);
     update();

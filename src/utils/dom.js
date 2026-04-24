@@ -79,6 +79,23 @@ NLM.DOM = (() => {
   }
 
   /**
+   * 查找输入框的容器（视觉外框）
+   * @returns {HTMLElement|null}
+   */
+  function findChatInputContainer() {
+    const input = findChatInput();
+    if (!input) return null;
+
+    // 向上寻找包含类名 query-box 的容器
+    const container = input.closest('.query-box') || 
+                      input.closest('.query-box-container') ||
+                      input.closest('.input-group') ||
+                      input.parentElement;
+    
+    return container;
+  }
+
+  /**
    * 获取输入框的文本内容
    * @param {HTMLElement} input
    * @returns {string}
@@ -347,5 +364,6 @@ NLM.DOM = (() => {
     findAllMessages,
     createDebouncedObserver,
     showToast,
+    findChatInputContainer,
   };
 })();
