@@ -381,11 +381,19 @@ NLM.FormulaCopy = (() => {
         const wrapped = wrapFormula(latex, isBlock);
         currentFormat = oldFmt;
 
-        // 如果是处理 HTML 剪贴板且格式为 MathML，使用文本占位符替换，规避 DOM 序列化破坏
         if (isHtmlClipboard && wrapped.html && currentFormat === 'mathml') {
           const ph = `___MATHML_PLACEHOLDER_${counter++}___`;
           placeholders[ph] = wrapped.html;
-          el.replaceWith(document.createTextNode(ph));
+          
+          // 【核心修改逻辑】：为块级公式创建独立的段落 (硬回车) 并居中
+          if (isBlock) {
+            const p = document.createElement('p');
+            p.style.textAlign = 'center'; 
+            p.textContent = ph;
+            el.replaceWith(p);
+          } else {
+            el.replaceWith(document.createTextNode(ph));
+          }
         } else {
           const replacementText = isBlock ? `\n${wrapped.text}\n` : wrapped.text;
           el.replaceWith(document.createTextNode(replacementText));
@@ -527,12 +535,7 @@ NLM.FormulaCopy = (() => {
       htmlContent = htmlContent.replace(ph, mmlStr);
     }
 
-    // 针对 MathML (Word) 模式优化：将网页软回车转为 Word 硬回车段落
-    if (effectiveFormat === 'mathml') {
-      // 仅替换 div 内部的 br
-      htmlContent = htmlContent.replace(/<br\s*\/?>/gi, '</p><p>');
-      // 如果 div 内容不含 p 标签但有文字，尝试包裹一下（可选，这里采用较保守策略）
-    }
+
 
     // ==========================================
     // 处理纯文本剪贴板内容
