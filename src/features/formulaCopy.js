@@ -516,18 +516,13 @@ NLM.FormulaCopy = (() => {
       htmlWrapper.querySelectorAll('sup, [data-citation], .citation, .source-annotation').forEach(el => el.remove());
     }
     
-    let htmlContent = htmlWrapper.innerHTML;
+    // 使用 outerHTML 以确保包含 xmlns:mml 属性
+    let htmlContent = htmlWrapper.outerHTML;
     
     // 还原 MathML 占位符
     for (const [ph, mmlStr] of Object.entries(htmlPlaceholders)) {
       htmlContent = htmlContent.replace(ph, mmlStr);
     }
-
-    // 将网页的 <br> 软回车强制转换为 Word 的 <p> 硬回车段落，并保留命名空间
-    const nsAttr = `xmlns:mml="${MATHML_NS}"`;
-    htmlContent = `<p ${nsAttr}>${htmlContent.replace(/<br\s*\/?>/gi, `</p><p ${nsAttr}>`)}</p>`;
-    // 清除可能因为替换产生的无效空段落
-    htmlContent = htmlContent.replace(/<p[^>]*>\s*<\/p>/gi, '');
 
     // ==========================================
     // 处理纯文本剪贴板内容
