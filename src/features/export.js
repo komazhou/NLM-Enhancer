@@ -223,6 +223,74 @@ NLM.Export = (() => {
               startMermaid();
             };
             setTimeout(() => { startRender(); startMermaid(); }, 1500);
+
+            // 公式提取逻辑 (注入到预览页)
+            function extractVisibleMathText(katexHtmlEl) {
+              const parts = [];
+              function walk(node) {
+                if (!node) return;
+                if (node.nodeType === 3) {
+                  let text = node.textContent;
+                  if (text && text.trim()) {
+                    const symbolMap = { '\u2212': '-', '\u22c5': '\\cdot ', '\u2217': '*', '\u00d7': '\\times ', '\u00f7': '\\div ', '\u00b1': '\\pm ', '\u2264': '\\leq ', '\u2265': '\\geq ', '\u2260': '\\neq ', '\u2248': '\\approx ', '\u221e': '\\infty ', '\u2202': '\\partial ', '\u2206': '\\Delta ' };
+                    let p = ''; for (let c of text) p += symbolMap[c] || c;
+                    parts.push(p);
+                  }
+                  return;
+                }
+                if (node.nodeType !== 1) return;
+                const cls = node.className || '';
+                if (cls.includes('hide-tail') || node.style.display === 'none' || cls.includes('strut') || cls.includes('vlist-s')) return;
+                if (cls.includes('mfrac')) {
+                  const rows = Array.from(node.querySelectorAll('.vlist > span[style*="top"]')).sort((a,b)=>parseFloat(a.style.top)-parseFloat(b.style.top));
+                  if (rows.length >= 2) { parts.push('\\\\frac{'); walk(rows[0]); parts.push('}{'); walk(rows[rows.length-1]); parts.push('}'); return; }
+                }
+                if (cls.includes('msupsub')) {
+                  const rows = Array.from(node.querySelectorAll('.vlist > span[style*="top"]')).sort((a,b)=>parseFloat(a.style.top)-parseFloat(b.style.top));
+                  rows.forEach(r => { const t = parseFloat(r.style.top||0); if (t < -3.1) { parts.push('^{'); walk(r); parts.push('}'); } else { parts.push('_{'); walk(r); parts.push('}'); } });
+                  return;
+                }
+                if (cls.includes('msqrt')) { const b = node.querySelector('.mord'); if (b) { parts.push('\\\\sqrt{'); walk(b); parts.push('}'); return; } }
+                if (cls.includes('mopen') || cls.includes('mclose')) { parts.push(node.textContent.trim()); return; }
+                for (let c of node.childNodes) walk(c);
+              }
+              walk(katexHtmlEl);
+              return parts.join('').replace(/\\s+/g, ' ').trim();
+            }
+
+            function extractLatex(el) {
+              const ann = el.querySelector('annotation');
+              if (ann?.textContent?.trim()) return ann.textContent.trim();
+              const kHtml = el.querySelector('.katex-html');
+              if (kHtml) return extractVisibleMathText(kHtml);
+              return null;
+            }
+
+            // 在预览界面拦截复制事件，处理公式
+            document.addEventListener('copy', (event) => {
+              const sel = window.getSelection();
+              if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+              const fragment = sel.getRangeAt(0).cloneContents();
+              if (!fragment.querySelector('.katex')) return;
+              
+              event.preventDefault();
+              const div = document.createElement('div');
+              div.appendChild(fragment);
+              
+              div.querySelectorAll('.katex').forEach(el => {
+                const latex = extractLatex(el);
+                if (latex) {
+                  const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
+                  el.replaceWith(document.createTextNode(isBlock ? "\\n\\\\[" + latex + "\\\\]\\n" : "$" + latex + "$"));
+                } else {
+                  el.remove();
+                }
+              });
+              
+              let text = (div.innerText || div.textContent || '').replace(/[\\u00B0\\u2022\\u2219\\u25CF]/g, '').trim();
+              event.clipboardData.setData('text/plain', text);
+              event.clipboardData.setData('text/html', div.innerHTML);
+            });
           </script>
         </body>
       </html>

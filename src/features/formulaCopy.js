@@ -13,7 +13,6 @@ NLM.FormulaCopy = (() => {
   const LOG = '[NLM++ FormulaCopy]';
   let currentFormat = 'latex';
   let isInitialized = false;
-  let katexLoaded = false;
 
   const I18N = {
     copied: '✓ 公式已复制',
@@ -22,104 +21,155 @@ NLM.FormulaCopy = (() => {
   };
 
   // ========================================================
-  // 公式查找与 LaTeX 提取（核心逻辑）
+  // 公式查找与 LaTeX 提取
   // ========================================================
 
-  /**
-   * 从点击目标向上查找最近的公式容器
-   */
   function findMathElement(target) {
-    // 尝试多种选择器向上查找
-    const selectors = [
-      '.katex',            // KaTeX 渲染根
-      '.katex-display',    // KaTeX 块级公式
-      '[data-math]',       // Gemini 风格
-      'mjx-container',     // MathJax 3
-      '.MathJax',          // MathJax 2
-      '.math-inline',      // 通用行内公式
-      '.math-block',       // 通用块级公式
-    ];
-
+    const selectors = ['.katex', '.katex-display', '[data-math]', 'mjx-container', '.MathJax', '.math-inline', '.math-block'];
     for (const sel of selectors) {
       const found = target.closest(sel);
       if (found) return found;
     }
-
     return null;
   }
 
-  /**
-   * 从公式元素中提取 LaTeX 源码
-   * 采用多种策略兼容不同渲染引擎和 DOM 结构
-   */
-  function extractLatex(element) {
-    // === 策略1: data-math 属性 ===
-    const dataMath = element.getAttribute('data-math');
-    if (dataMath) return dataMath;
-
-    // === 策略2: KaTeX annotation 元素 ===
-    const annotationSelectors = [
-      'annotation[encoding="application/x-tex"]',
-      'annotation[encoding="application/x-latex"]',
-      'annotation',
-    ];
-
-    for (const sel of annotationSelectors) {
-      try {
-        const ann = element.querySelector(sel);
-        if (ann?.textContent?.trim()) {
-          return ann.textContent.trim();
+  function extractVisibleMathText(katexHtmlEl) {
+    const parts = [];
+    function walk(node) {
+      if (!node) return;
+      if (node.nodeType === Node.TEXT_NODE) {
+        let text = node.textContent;
+        if (text && text.trim()) {
+          const symbolMap = {
+            '\u2212': '-', '\u22c5': '\\cdot ', '\u2217': '*', '\u00d7': '\\times ',
+            '\u00f7': '\\div ', '\u00b1': '\\pm ', '\u2264': '\\leq ', '\u2265': '\\geq ',
+            '\u2260': '\\neq ', '\u2248': '\\approx ', '\u221e': '\\infty ', '\u2202': '\\partial ',
+            '\u2206': '\\Delta ', '\u03b1': '\\alpha ', '\u03b2': '\\beta ', '\u03b3': '\\gamma ',
+            '\u03c0': '\\pi ', '\u03c3': '\\sigma ', '\u03bc': '\\mu ', '\u03c9': '\\omega ',
+            '\u03a9': '\\Omega ', '\u2192': '\\rightarrow ', '\u222b': '\\int ', '\u2211': '\\sum ',
+            '\u220f': '\\prod ',
+          };
+          let processed = '';
+          for (const char of text) processed += symbolMap[char] || char;
+          parts.push(processed);
         }
-      } catch { /* 跳过选择器错误 */ }
-    }
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const el = node;
+      const className = el.className || '';
+      
+      // 兼容离线 DOM（DocumentFragment）：获取 computedStyle 或 inline style
+      let isHidden = false;
+      if (el.isConnected) {
+        const style = window.getComputedStyle(el);
+        isHidden = style.display === 'none' || style.visibility === 'hidden';
+      } else {
+        isHidden = className.includes('hide-tail') || el.style.display === 'none';
+      }
+      if (isHidden) return;
+      
+      if (className.includes('strut') || className.includes('pstrut') || className.includes('vlist-s')) return;
 
-    // === 策略3: 通过 .katex-mathml 内的 math 元素 ===
-    const katexMathml = element.querySelector('.katex-mathml');
-    if (katexMathml) {
-      const mathEl = katexMathml.querySelector('math');
-      if (mathEl) {
-        const allChildren = mathEl.getElementsByTagName('*');
-        for (const child of allChildren) {
-          if (child.tagName.toLowerCase() === 'annotation' ||
-              child.localName === 'annotation') {
-            const encoding = child.getAttribute('encoding') || '';
-            if (encoding.includes('tex') || encoding.includes('latex') || !encoding) {
-              const text = child.textContent?.trim();
-              if (text) return text;
-            }
-          }
-        }
-        const semantics = mathEl.querySelector('semantics');
-        if (semantics) {
-          const lastChild = semantics.lastElementChild;
-          if (lastChild && lastChild.textContent?.trim()) {
-            const text = lastChild.textContent.trim();
-            if (text.includes('\\') || text.includes('^') || text.includes('_') ||
-                text.includes('{') || text.length > 1) {
-              return text;
-            }
+      if (className.includes('mfrac')) {
+        const rows = Array.from(el.querySelectorAll('.vlist > span[style*="top"]'));
+        if (rows.length >= 2) {
+          rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+          const numerRow = rows[0]; const denomRow = rows[rows.length - 1];
+          if (numerRow && denomRow && numerRow !== denomRow) {
+            parts.push('\\frac{'); walk(numerRow); parts.push('}{'); walk(denomRow); parts.push('}');
+            return;
           }
         }
       }
+
+      if (className.includes('msupsub')) {
+        const rows = Array.from(el.querySelectorAll('.vlist > span[style*="top"]'));
+        if (rows.length > 0) {
+          rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+          rows.forEach(row => {
+            const top = parseFloat(row.style.top || '0');
+            const rowText = row.innerText?.trim() || row.textContent?.trim() || '';
+            if (!rowText) return;
+            if (top < -3.1) { parts.push('^{'); walk(row); parts.push('}'); } 
+            else { parts.push('_{'); walk(row); parts.push('}'); }
+          });
+          return;
+        }
+      }
+
+      if (className.includes('msqrt')) {
+        const body = el.querySelector('.mord');
+        if (body) { parts.push('\\sqrt{'); walk(body); parts.push('}'); return; }
+      }
+      
+      if (className.includes('mopen') || className.includes('mclose')) {
+        const text = el.textContent.trim();
+        if (text) { parts.push(text); return; }
+      }
+
+      for (const child of el.childNodes) walk(child);
     }
 
-    // === 策略4: MathJax script 元素 ===
-    const script = element.querySelector(
-      'script[type="math/tex"], script[type="math/tex; mode=display"]'
-    );
-    if (script?.textContent) return script.textContent.trim();
+    walk(katexHtmlEl);
+    return parts.join('').replace(/\s+/g, ' ').trim() || null;
+  }
 
-    // === 策略5: data-latex 属性（MathJax 3） ===
-    const dataLatex = element.getAttribute('data-latex') ||
-                      element.querySelector('[data-latex]')?.getAttribute('data-latex');
-    if (dataLatex) return dataLatex;
+  function extractLatex(element) {
+    if (!element) return null;
+    const attrLatex = element.getAttribute('data-math') || element.getAttribute('data-latex') ||
+                     element.querySelector('[data-math]')?.getAttribute('data-math') ||
+                     element.querySelector('[data-latex]')?.getAttribute('data-latex');
+    if (attrLatex) return attrLatex;
+
+    try {
+      const annotations = element.querySelectorAll('annotation');
+      for (const ann of annotations) {
+        const text = ann.textContent?.trim();
+        if (text) {
+          const encoding = ann.getAttribute('encoding') || '';
+          if (encoding.includes('tex') || encoding.includes('latex') || !encoding) return text;
+        }
+      }
+    } catch (e) {}
+
+    if (element.tagName.toLowerCase() === 'mjx-container' || element.querySelector('mjx-container')) {
+      const mjx = element.tagName.toLowerCase() === 'mjx-container' ? element : element.querySelector('mjx-container');
+      const script = mjx.querySelector('script[type^="math/tex"]');
+      if (script?.textContent) return script.textContent.trim();
+      const assist = mjx.querySelector('[aria-label]');
+      if (assist) {
+        const label = assist.getAttribute('aria-label');
+        if (label && (label.includes('\\') || label.includes('^'))) return label;
+      }
+    }
+
+    const mathml = element.querySelector('.katex-mathml math') || element.querySelector('math');
+    if (mathml) {
+      try {
+        const parsed = convertMathmlToLatex(mathml);
+        if (parsed && parsed.length > 1) return parsed;
+      } catch (e) {}
+    }
+
+    const katexHtml = element.querySelector('.katex-html');
+    if (katexHtml) {
+      try {
+        const visibleText = extractVisibleMathText(katexHtml);
+        if (visibleText) return visibleText;
+      } catch (e) {}
+    }
+
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let node;
+    while (node = walker.nextNode()) {
+      const t = node.textContent.trim();
+      if (t.startsWith('\\') || (t.includes('^') && t.includes('_')) || t.includes('\\frac')) return t;
+    }
 
     return null;
   }
 
-  /**
-   * 将 MathML 节点转换为 LaTeX 字符串（简化版）
-   */
   function convertMathmlToLatex(node) {
     if (node.nodeType === Node.TEXT_NODE) return node.textContent;
     if (node.nodeType !== Node.ELEMENT_NODE) return '';
@@ -128,9 +178,7 @@ NLM.FormulaCopy = (() => {
     const parse = (n) => convertMathmlToLatex(n);
     switch (tag) {
       case 'math': case 'mrow': case 'mstyle': return children.map(parse).join('');
-      case 'mi': return node.textContent.trim();
-      case 'mn': return node.textContent.trim();
-      case 'mo': return node.textContent.trim();
+      case 'mi': case 'mn': case 'mo': return node.textContent.trim();
       case 'msub': return `${parse(children[0])}_{${parse(children[1])}}`;
       case 'msup': return `${parse(children[0])}^{${parse(children[1])}}`;
       case 'mfrac': return `\\frac{${parse(children[0])}}{${parse(children[1])}}`;
@@ -146,27 +194,15 @@ NLM.FormulaCopy = (() => {
   const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
 
   function latexToMathML(latex, isBlock) {
-    if (!window.temml) {
-      console.warn(LOG, 'temml 未加载');
-      return null;
-    }
+    const temmlObj = typeof temml !== 'undefined' ? temml : window.temml;
+    if (!temmlObj) return null;
     try {
-      return window.temml.renderToString(latex, {
-        displayMode: isBlock,
-        xml: true,
-        annotate: false,
-        throwOnError: true,
-      });
-    } catch (e) {
-      console.warn(LOG, 'temml 渲染失败', e);
-      return null;
-    }
+      return temmlObj.renderToString(latex, { displayMode: isBlock, xml: true, annotate: false, throwOnError: true });
+    } catch (e) { return null; }
   }
 
   function stripMathMLAnnotations(mathml) {
-    return mathml
-      .replace(/<annotation(?:-xml)?[\s\S]*?<\/annotation(?:-xml)?>/g, '')
-      .replace(/<semantics>\s*([\s\S]*?)\s*<\/semantics>/g, '$1');
+    return mathml.replace(/<annotation(?:-xml)?[\s\S]*?<\/annotation(?:-xml)?>/g, '').replace(/<semantics>\s*([\s\S]*?)\s*<\/semantics>/g, '$1');
   }
 
   function ensureMathMLNamespace(mathml) {
@@ -179,101 +215,64 @@ NLM.FormulaCopy = (() => {
     if (parsed.getElementsByTagName('parsererror').length > 0) return stripMathMLAnnotations(mathml);
     const root = parsed.documentElement;
     if (root.localName !== 'math') return stripMathMLAnnotations(mathml);
-    
-    // 清理
     for (const ann of Array.from(root.getElementsByTagName('annotation'))) ann.parentNode?.removeChild(ann);
-    for (const annXml of Array.from(root.getElementsByTagName('annotation-xml'))) annXml.parentNode?.removeChild(annXml);
-    
     const semantics = Array.from(root.getElementsByTagName('semantics')).find(node => node.parentElement === root);
     if (semantics) {
-      const presentation = semantics.firstElementChild;
-      if (presentation) {
-        while (root.firstChild) root.removeChild(root.firstChild);
-        root.appendChild(presentation);
-      }
+      const pres = semantics.firstElementChild;
+      if (pres) { while (root.firstChild) root.removeChild(root.firstChild); root.appendChild(pres); }
     }
-
-    if (root.hasAttribute('class')) root.removeAttribute('class');
-    if (root.hasAttribute('style')) root.removeAttribute('style');
-    for (const el of Array.from(root.getElementsByTagName('*'))) {
-      if (el.hasAttribute('class')) el.removeAttribute('class');
-      if (el.hasAttribute('style')) el.removeAttribute('style');
-    }
-
     const output = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
-    const outputRoot = output.documentElement;
-    for (const attr of Array.from(root.attributes)) {
-      if (attr.name.startsWith('xmlns')) continue;
-      outputRoot.setAttribute(attr.name, attr.value);
-    }
-    for (const child of Array.from(root.childNodes)) {
-      outputRoot.appendChild(cloneNodeWithMmlPrefix(output, child));
-    }
-    return new XMLSerializer().serializeToString(outputRoot);
+    const outRoot = output.documentElement;
+    for (const attr of Array.from(root.attributes)) { if (!attr.name.startsWith('xmlns')) outRoot.setAttribute(attr.name, attr.value); }
+    for (const child of Array.from(root.childNodes)) { outRoot.appendChild(cloneNodeWithMmlPrefix(output, child)); }
+    return new XMLSerializer().serializeToString(outRoot);
   }
 
-  function cloneNodeWithMmlPrefix(targetDoc, sourceNode) {
-    if (sourceNode.nodeType === Node.TEXT_NODE) return targetDoc.createTextNode(sourceNode.nodeValue ?? '');
-    if (sourceNode.nodeType !== Node.ELEMENT_NODE) return targetDoc.importNode(sourceNode, true);
-    const ns = sourceNode.namespaceURI;
-    const localName = sourceNode.localName;
-    const isMathML = (ns === MATHML_NS || ns === null);
-    const qualifiedName = isMathML ? `mml:${localName}` : sourceNode.tagName;
-    const el = isMathML ? targetDoc.createElementNS(MATHML_NS, qualifiedName) : targetDoc.createElement(qualifiedName);
-    for (const attr of Array.from(sourceNode.attributes)) {
-      if (attr.name.startsWith('xmlns')) continue;
-      el.setAttribute(attr.name, attr.value);
-    }
-    for (const child of Array.from(sourceNode.childNodes)) {
-      el.appendChild(cloneNodeWithMmlPrefix(targetDoc, child));
-    }
+  function cloneNodeWithMmlPrefix(doc, node) {
+    if (node.nodeType === Node.TEXT_NODE) return doc.createTextNode(node.nodeValue ?? '');
+    if (node.nodeType !== Node.ELEMENT_NODE) return doc.importNode(node, true);
+    const isMML = (node.namespaceURI === MATHML_NS || node.namespaceURI === null);
+    const el = isMML ? doc.createElementNS(MATHML_NS, `mml:${node.localName}`) : doc.createElement(node.tagName);
+    for (const attr of Array.from(node.attributes)) { if (!attr.name.startsWith('xmlns')) el.setAttribute(attr.name, attr.value); }
+    for (const child of Array.from(node.childNodes)) { el.appendChild(cloneNodeWithMmlPrefix(doc, child)); }
     return el;
   }
 
   function wrapMathMLForWordHtml(mathml) {
-    return [
-      `<html xmlns:mml="${MATHML_NS}">`,
-      '<head><meta charset="utf-8"></head>',
-      '<body><!--StartFragment-->',
-      mathml,
-      '<!--EndFragment--></body></html>',
-    ].join('');
+    return `<html xmlns:mml="${MATHML_NS}"><head><meta charset="utf-8"></head><body><!--StartFragment-->${mathml}<!--EndFragment--></body></html>`;
   }
 
-  function isDisplayMode(element) {
-    if (element.closest('.katex-display')) return true;
-    if (element.closest('.math-block')) return true;
-    if (element.querySelector('math[display="block"]')) return true;
-    return false;
-  }
-
-  function stripDelimiters(formula) {
-    const t = formula.trim();
-    if (t.startsWith('$$') && t.endsWith('$$')) return t.slice(2, -2);
-    if (t.startsWith('$') && t.endsWith('$')) return t.slice(1, -1);
-    return formula;
+  function isDisplayMode(el) {
+    if (!el) return false;
+    if (el.classList?.contains('katex-display') || el.classList?.contains('math-block')) return true;
+    if (el.tagName?.toLowerCase() === 'math' && el.getAttribute('display') === 'block') return true;
+    try {
+      if (el.closest('.katex-display') || el.closest('.math-block')) return true;
+    } catch (e) {}
+    return !!el.querySelector('math[display="block"]');
   }
 
   function wrapFormula(formula, isBlock) {
-    const raw = stripDelimiters(formula);
+    const raw = formula.trim().replace(/^\$\$?|\$\$?$/g, '');
     const result = { text: '', html: '' };
     switch (currentFormat) {
-      case 'mathml': {
-        const rawMathML = latexToMathML(raw, isBlock);
-        if (rawMathML) {
-          const sanitized = stripMathMLAnnotations(rawMathML);
-          const namespaced = ensureMathMLNamespace(sanitized);
-          const wordMathML = toWordMathML(namespaced);
-          result.text = wordMathML;
-          result.html = wordMathML;
-        } else {
-          result.text = isBlock ? `$$${raw}$$` : `$${raw}$`;
-        }
+      case 'mathml':
+        const mml = latexToMathML(raw, isBlock);
+        if (mml) {
+          const processed = toWordMathML(ensureMathMLNamespace(stripMathMLAnnotations(mml)));
+          result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
+          result.html = processed;
+        } else { result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`; }
         break;
-      }
       case 'no-dollar': result.text = raw; break;
       case 'notion': result.text = `$$${raw}$$`; break;
-      case 'latex': default: result.text = isBlock ? `$$${raw}$$` : `$${raw}$`; break;
+      default: 
+        result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
+        const fallbackMml = latexToMathML(raw, isBlock);
+        if (fallbackMml) {
+           result.html = toWordMathML(ensureMathMLNamespace(stripMathMLAnnotations(fallbackMml)));
+        }
+        break;
     }
     return result;
   }
@@ -283,164 +282,99 @@ NLM.FormulaCopy = (() => {
       if (navigator.clipboard?.write) {
         const items = { 'text/plain': new Blob([text], { type: 'text/plain' }) };
         if (html) {
-          let finalHtml = html;
-          if (html.includes('mml:') || html.includes('<math')) finalHtml = wrapMathMLForWordHtml(html);
+          const finalHtml = (html.includes('mml:') || html.includes('<math')) ? wrapMathMLForWordHtml(html) : html;
           items['text/html'] = new Blob([finalHtml], { type: 'text/html' });
-          if (finalHtml.includes(`xmlns:mml="${MATHML_NS}"`)) {
-            items['application/mathml+xml'] = new Blob([text], { type: 'application/mathml+xml' });
-          }
         }
-        try {
-          await navigator.clipboard.write([new ClipboardItem(items)]);
-          return true;
-        } catch (e) {
-          return copyToClipboardLegacy(text);
-        }
+        await navigator.clipboard.write([new ClipboardItem(items)]);
+        return true;
       }
-      return copyToClipboardLegacy(text);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function copyToClipboardLegacy(text) {
-    try {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.cssText = 'position:fixed;opacity:0;';
-      document.body.appendChild(textarea);
-      textarea.select();
-      const ok = document.execCommand('copy');
-      textarea.remove();
-      return ok;
-    } catch (e) {
-      return false;
-    }
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      return true;
+    } catch (e) { return false; }
   }
 
   async function handleClick(event) {
-    const target = event.target;
-    const mathEl = findMathElement(target);
+    const mathEl = findMathElement(event.target);
     if (!mathEl) return;
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault(); event.stopPropagation();
     const latex = extractLatex(mathEl);
-    if (!latex) {
-      NLM.DOM.showToast(I18N.noLatex, event.clientX, event.clientY, false);
-      return;
-    }
+    if (!latex) { NLM.DOM.showToast(I18N.noLatex, event.clientX, event.clientY, false); return; }
+    
     const isBlock = isDisplayMode(mathEl);
     const { text, html } = wrapFormula(latex, isBlock);
-    const success = await copyToClipboard(text, html);
-    if (success) {
-      mathEl.classList.add('nlm-formula-clicked');
-      setTimeout(() => mathEl.classList.remove('nlm-formula-clicked'), 600);
-    }
+    
+    let plainText = text;
+    if (currentFormat === 'mathml' && html) plainText = html;
+    
+    const success = await copyToClipboard(plainText, html);
+    if (success) { mathEl.classList.add('nlm-formula-clicked'); setTimeout(() => mathEl.classList.remove('nlm-formula-clicked'), 600); }
     NLM.DOM.showToast(success ? I18N.copied : I18N.failed, event.clientX, event.clientY, success);
   }
 
-  function replaceFormulasWithLatex(container) {
-    container.querySelectorAll('mat-icon, .mat-icon, .google-symbols, .mat-mdc-button-touch-target, .mat-mdc-button-persistent-ripple').forEach(el => el.remove());
-    container.querySelectorAll('.mat-mdc-card-actions, .suggestions-container, .action-button, .pin-button').forEach(el => el.remove());
+  function replaceFormulasWithLatex(container, forceLatex = false) {
+    const garbage = ['mat-icon', '.mat-icon', '.google-symbols', '.material-icons', '.material-symbols-outlined', 'button', '.mat-mdc-button-touch-target', '.mat-mdc-button-persistent-ripple', '.mat-mdc-card-actions', '.suggestions-container', '.action-button', '.pin-button', '.source-annotation', 'svg', 'hr', '.citation-marker'];
+    garbage.forEach(sel => container.querySelectorAll(sel).forEach(el => el.remove()));
+    container.querySelectorAll('sup, [data-citation], .citation').forEach(el => { if (/^[\d,\s·]+$/.test(el.textContent.trim()) || el.textContent.trim().length <= 2) el.remove(); });
 
-    container.querySelectorAll('.katex').forEach((katexEl) => {
-      const latex = extractLatex(katexEl);
+    const mathSels = '.katex, [data-math], mjx-container, .MathJax, math, .math-inline, .math-block';
+    container.querySelectorAll(mathSels).forEach(el => {
+      if (el.parentElement?.closest(mathSels)) return;
+      const latex = extractLatex(el);
       if (latex) {
-        const isBlock = katexEl.closest('.katex-display') !== null;
+        const isBlock = isDisplayMode(el);
+        const oldFmt = currentFormat;
+        if (forceLatex) currentFormat = 'latex';
         const wrapped = wrapFormula(latex, isBlock);
-        if (wrapped.html) {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = wrapped.html;
-          if (tempDiv.firstElementChild) katexEl.replaceWith(tempDiv.firstElementChild);
-          else katexEl.replaceWith(document.createTextNode(wrapped.text));
+        currentFormat = oldFmt;
+
+        const replacementText = isBlock ? `\n${wrapped.text}\n` : wrapped.text;
+        
+        if (!forceLatex && wrapped.html && currentFormat === 'mathml') {
+          const div = document.createElement('div'); div.innerHTML = wrapped.html;
+          if (div.firstElementChild) el.replaceWith(div.firstElementChild); else el.replaceWith(document.createTextNode(replacementText));
         } else {
-          katexEl.replaceWith(document.createTextNode(wrapped.text || (isBlock ? `$$${latex}$$` : `$${latex}$`)));
+          el.replaceWith(document.createTextNode(replacementText));
         }
+      } else {
+        const txt = el.textContent.trim();
+        if (txt.length > 0 && !/^[\s·°]+$/.test(txt)) el.replaceWith(document.createTextNode(txt)); else el.remove();
       }
     });
-
-    container.querySelectorAll('[data-math]').forEach((el) => {
-      const latex = el.getAttribute('data-math');
-      if (latex) {
-        const isBlock = el.closest('.math-block') !== null;
-        const wrapped = wrapFormula(latex, isBlock);
-        if (wrapped.html) {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = wrapped.html;
-          if (tempDiv.firstElementChild) el.replaceWith(tempDiv.firstElementChild);
-          else el.replaceWith(document.createTextNode(wrapped.text));
-        } else {
-          el.replaceWith(document.createTextNode(wrapped.text || (isBlock ? `$$${latex}$$` : `$${latex}$`)));
-        }
-      }
-    });
-  }
-
-  function cleanExtractedText(text) {
-    return text.replace(/[ \t]+\n/g, '\n').replace(/\n[ \t]+/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   }
 
   function handleCopy(event) {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
-    const range = selection.getRangeAt(0);
-    const fragment = range.cloneContents();
-    const hasMath = fragment.querySelector('.katex, [data-math], mjx-container, .MathJax');
-    if (!hasMath) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const fragment = sel.getRangeAt(0).cloneContents();
+    if (!fragment.querySelector('.katex, [data-math], mjx-container, .MathJax, math')) return;
 
     event.preventDefault();
-    const htmlFragment = fragment.cloneNode(true);
-    const textFragment = fragment.cloneNode(true);
+    const htmlFrag = fragment.cloneNode(true);
+    const textFrag = fragment.cloneNode(true);
 
-    replaceFormulasWithLatex(htmlFragment);
-    const htmlWrapper = document.createElement('div');
-    htmlWrapper.appendChild(htmlFragment);
-    htmlWrapper.querySelectorAll('sup, [data-citation], .citation, .source-annotation').forEach(el => el.remove());
+    replaceFormulasWithLatex(htmlFrag, false);
+    const htmlWrapper = document.createElement('div'); htmlWrapper.appendChild(htmlFrag);
     let htmlContent = htmlWrapper.innerHTML;
     if (htmlContent.includes('mml:') || htmlContent.includes('<math')) htmlContent = wrapMathMLForWordHtml(htmlContent);
 
-    const oldFormat = currentFormat;
-    currentFormat = 'latex';
-    replaceFormulasWithLatex(textFragment);
-    currentFormat = oldFormat;
-
-    const textWrapper = document.createElement('div');
-    textWrapper.style.cssText = 'position:fixed;left:-9999px;opacity:0;';
-    textWrapper.appendChild(textFragment);
-    
-    textWrapper.querySelectorAll('strong, b').forEach(el => {
-      const s = document.createElement('span'); s.textContent = `**${el.textContent}**`; el.replaceWith(s);
-    });
-    textWrapper.querySelectorAll('em, i').forEach(el => {
-      const s = document.createElement('span'); s.textContent = `*${el.textContent}*`; el.replaceWith(s);
-    });
-    
+    replaceFormulasWithLatex(textFrag, true);
+    const textWrapper = document.createElement('div'); textWrapper.style.cssText = 'position:fixed;left:-9999px;opacity:0;'; textWrapper.appendChild(textFrag);
     document.body.appendChild(textWrapper);
-    const processedText = textWrapper.innerText || textWrapper.textContent || '';
+    const text = (textWrapper.innerText || textWrapper.textContent || '').replace(/[\u00B0\u2022\u2219\u25CF]/g, '').trim();
     document.body.removeChild(textWrapper);
 
-    event.clipboardData.setData('text/plain', cleanExtractedText(processedText));
+    event.clipboardData.setData('text/plain', text);
     event.clipboardData.setData('text/html', htmlContent);
   }
 
   async function init() {
     if (isInitialized) return;
     currentFormat = await NLM.Storage.get('formulaCopyFormat') || 'latex';
-    NLM.Storage.onChange((changes, area) => {
-      if (area === 'sync' && changes.formulaCopyFormat) currentFormat = changes.formulaCopyFormat.newValue || 'latex';
-    });
+    NLM.Storage.onChange((changes, area) => { if (area === 'sync' && changes.formulaCopyFormat) currentFormat = changes.formulaCopyFormat.newValue || 'latex'; });
     document.addEventListener('click', handleClick, true);
     document.addEventListener('copy', handleCopy, true);
     isInitialized = true;
-    console.log(LOG, '已启动');
   }
 
-  function destroy() {
-    if (!isInitialized) return;
-    document.removeEventListener('click', handleClick, true);
-    document.removeEventListener('copy', handleCopy, true);
-    isInitialized = false;
-  }
-
-  return { init, destroy, extractLatex, findMathElement, replaceFormulasWithLatex };
+  return { init, destroy: () => { document.removeEventListener('click', handleClick, true); document.removeEventListener('copy', handleCopy, true); isInitialized = false; } };
 })();
