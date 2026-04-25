@@ -201,40 +201,63 @@ NLM.FormulaCopy = (() => {
     } catch (e) { return null; }
   }
 
-  function stripMathMLAnnotations(mathml) {
-    return mathml.replace(/<annotation(?:-xml)?[\s\S]*?<\/annotation(?:-xml)?>/g, '').replace(/<semantics>\s*([\s\S]*?)\s*<\/semantics>/g, '$1');
-  }
 
-  function ensureMathMLNamespace(mathml) {
-    if (mathml.includes('xmlns=')) return mathml;
-    return mathml.replace('<math', `<math xmlns="${MATHML_NS}"`);
-  }
 
   function toWordMathML(mathml) {
-    const parsed = new DOMParser().parseFromString(mathml, 'application/xml');
-    if (parsed.getElementsByTagName('parsererror').length > 0) return stripMathMLAnnotations(mathml);
-    const root = parsed.documentElement;
-    if (root.localName !== 'math') return stripMathMLAnnotations(mathml);
-    for (const ann of Array.from(root.getElementsByTagName('annotation'))) ann.parentNode?.removeChild(ann);
-    const semantics = Array.from(root.getElementsByTagName('semantics')).find(node => node.parentElement === root);
-    if (semantics) {
-      const pres = semantics.firstElementChild;
-      if (pres) { while (root.firstChild) root.removeChild(root.firstChild); root.appendChild(pres); }
+    try {
+      const parsed = new DOMParser().parseFromString(mathml, 'application/xml');
+      if (parsed.getElementsByTagName('parsererror').length > 0) return mathml;
+      const root = parsed.documentElement;
+      
+      // 1. 递归移除所有 annotation 和 semantics (只保留演示内容)
+      const annotations = Array.from(root.querySelectorAll('annotation, annotation-xml'));
+      annotations.forEach(a => a.parentNode?.removeChild(a));
+      
+      const semantics = Array.from(root.querySelectorAll('semantics'));
+      semantics.forEach(s => {
+        const pres = s.firstElementChild;
+        if (pres) s.replaceWith(pres);
+        else s.parentNode?.removeChild(s);
+      });
+
+      // 2. 创建带 mml 前缀的新文档
+      const output = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
+      const outRoot = output.documentElement;
+      
+      // 复制根属性 (过滤 class, style 和 xmlns)
+      for (const attr of Array.from(root.attributes)) {
+        if (!attr.name.startsWith('xmlns') && attr.name !== 'class' && attr.name !== 'style') {
+          outRoot.setAttribute(attr.name, attr.value);
+        }
+      }
+      
+      for (const child of Array.from(root.childNodes)) {
+        const cloned = cloneNodeWithMmlPrefix(output, child);
+        if (cloned) outRoot.appendChild(cloned);
+      }
+      
+      return new XMLSerializer().serializeToString(outRoot);
+    } catch (e) {
+      return mathml;
     }
-    const output = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
-    const outRoot = output.documentElement;
-    for (const attr of Array.from(root.attributes)) { if (!attr.name.startsWith('xmlns')) outRoot.setAttribute(attr.name, attr.value); }
-    for (const child of Array.from(root.childNodes)) { outRoot.appendChild(cloneNodeWithMmlPrefix(output, child)); }
-    return new XMLSerializer().serializeToString(outRoot);
   }
 
   function cloneNodeWithMmlPrefix(doc, node) {
     if (node.nodeType === Node.TEXT_NODE) return doc.createTextNode(node.nodeValue ?? '');
-    if (node.nodeType !== Node.ELEMENT_NODE) return doc.importNode(node, true);
-    const isMML = (node.namespaceURI === MATHML_NS || node.namespaceURI === null);
-    const el = isMML ? doc.createElementNS(MATHML_NS, `mml:${node.localName}`) : doc.createElement(node.tagName);
-    for (const attr of Array.from(node.attributes)) { if (!attr.name.startsWith('xmlns')) el.setAttribute(attr.name, attr.value); }
-    for (const child of Array.from(node.childNodes)) { el.appendChild(cloneNodeWithMmlPrefix(doc, child)); }
+    if (node.nodeType !== Node.ELEMENT_NODE) return null;
+    
+    const el = doc.createElementNS(MATHML_NS, `mml:${node.localName}`);
+    // 过滤属性，Word 不喜欢 MathML 带有 class 或 style
+    for (const attr of Array.from(node.attributes)) {
+      if (!attr.name.startsWith('xmlns') && attr.name !== 'class' && attr.name !== 'style') {
+        el.setAttribute(attr.name, attr.value);
+      }
+    }
+    
+    for (const child of Array.from(node.childNodes)) {
+      const cloned = cloneNodeWithMmlPrefix(doc, child);
+      if (cloned) el.appendChild(cloned);
+    }
     return el;
   }
 
@@ -253,25 +276,46 @@ NLM.FormulaCopy = (() => {
   }
 
   function wrapFormula(formula, isBlock) {
-    const raw = formula.trim().replace(/^\$\$?|\$\$?$/g, '');
+    // 强化正则：彻底剥离可能存在的包装符，兼容首尾附带的空格
+    const raw = formula.trim().replace(/^(\$\$?|\\\[|\\\()\s*|\s*(\$\$?|\\\]|\\\))$/g, '').trim();
+    if (!raw) return { text: '', html: '' };
+
     const result = { text: '', html: '' };
+    
+    // 模式识别与转换
     switch (currentFormat) {
+      case 'notion':
+        // Notion 语法强制要求所有块/行公式均使用 $$ 包裹
+        result.text = `$$${raw}$$`;
+        break;
+
+      case 'no-dollar':
+        // 纯源码输出
+        result.text = raw;
+        break;
+
       case 'mathml':
         const mml = latexToMathML(raw, isBlock);
         if (mml) {
-          const processed = toWordMathML(ensureMathMLNamespace(stripMathMLAnnotations(mml)));
+          const wordMml = toWordMathML(mml);
+          // 纯文本：使用 Word MML，适配普通粘贴选项
+          result.text = wordMml; 
+          
+          // HTML：强行插入 xmlns 属性，防止 Word 剥离未声明的 <math> 标签
+          let standardMml = mml;
+          if (!standardMml.includes('xmlns=')) {
+            standardMml = standardMml.replace('<math', `<math xmlns="${MATHML_NS}"`);
+          }
+          result.html = standardMml;
+        } else {
           result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
-          result.html = processed;
-        } else { result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`; }
-        break;
-      case 'no-dollar': result.text = raw; break;
-      case 'notion': result.text = `$$${raw}$$`; break;
-      default: 
-        result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
-        const fallbackMml = latexToMathML(raw, isBlock);
-        if (fallbackMml) {
-           result.html = toWordMathML(ensureMathMLNamespace(stripMathMLAnnotations(fallbackMml)));
         }
+        break;
+
+      case 'latex':
+      default:
+        // 修正为标准 LaTeX 语法：行内 $...$, 块级 \[...\]
+        result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
         break;
     }
     return result;
@@ -297,26 +341,36 @@ NLM.FormulaCopy = (() => {
     const mathEl = findMathElement(event.target);
     if (!mathEl) return;
     event.preventDefault(); event.stopPropagation();
+    
     const latex = extractLatex(mathEl);
     if (!latex) { NLM.DOM.showToast(I18N.noLatex, event.clientX, event.clientY, false); return; }
     
     const isBlock = isDisplayMode(mathEl);
     const { text, html } = wrapFormula(latex, isBlock);
     
-    let plainText = text;
-    if (currentFormat === 'mathml' && html) plainText = html;
+    // 如果是 MathML 模式且生成成功，我们将 MathML 字符串作为 plainText 的一部分（或根据 copyToClipboard 处理）
+    // 但通常用户希望点击复制的是渲染后的“可粘贴”内容
+    const success = await copyToClipboard(text, html);
     
-    const success = await copyToClipboard(plainText, html);
-    if (success) { mathEl.classList.add('nlm-formula-clicked'); setTimeout(() => mathEl.classList.remove('nlm-formula-clicked'), 600); }
+    if (success) { 
+      mathEl.classList.add('nlm-formula-clicked'); 
+      setTimeout(() => mathEl.classList.remove('nlm-formula-clicked'), 600); 
+    }
     NLM.DOM.showToast(success ? I18N.copied : I18N.failed, event.clientX, event.clientY, success);
   }
 
-  function replaceFormulasWithLatex(container, forceLatex = false) {
+  function replaceFormulasWithLatex(container, options = {}) {
+    const forceLatex = typeof options === 'boolean' ? options : !!options.forceLatex;
+    const isHtmlClipboard = !!options.isHtmlClipboard;
+
     const garbage = ['mat-icon', '.mat-icon', '.google-symbols', '.material-icons', '.material-symbols-outlined', 'button', '.mat-mdc-button-touch-target', '.mat-mdc-button-persistent-ripple', '.mat-mdc-card-actions', '.suggestions-container', '.action-button', '.pin-button', '.source-annotation', 'svg', 'hr', '.citation-marker'];
     garbage.forEach(sel => container.querySelectorAll(sel).forEach(el => el.remove()));
     container.querySelectorAll('sup, [data-citation], .citation').forEach(el => { if (/^[\d,\s·]+$/.test(el.textContent.trim()) || el.textContent.trim().length <= 2) el.remove(); });
 
     const mathSels = '.katex, [data-math], mjx-container, .MathJax, math, .math-inline, .math-block';
+    const placeholders = {};
+    let counter = 0;
+
     container.querySelectorAll(mathSels).forEach(el => {
       if (el.parentElement?.closest(mathSels)) return;
       const latex = extractLatex(el);
@@ -327,17 +381,87 @@ NLM.FormulaCopy = (() => {
         const wrapped = wrapFormula(latex, isBlock);
         currentFormat = oldFmt;
 
-        const replacementText = isBlock ? `\n${wrapped.text}\n` : wrapped.text;
-        
-        if (!forceLatex && wrapped.html && currentFormat === 'mathml') {
-          const div = document.createElement('div'); div.innerHTML = wrapped.html;
-          if (div.firstElementChild) el.replaceWith(div.firstElementChild); else el.replaceWith(document.createTextNode(replacementText));
+        // 如果是处理 HTML 剪贴板且格式为 MathML，使用文本占位符替换，规避 DOM 序列化破坏
+        if (isHtmlClipboard && wrapped.html && currentFormat === 'mathml') {
+          const ph = `___MATHML_PLACEHOLDER_${counter++}___`;
+          placeholders[ph] = wrapped.html;
+          el.replaceWith(document.createTextNode(ph));
         } else {
+          const replacementText = isBlock ? `\n${wrapped.text}\n` : wrapped.text;
           el.replaceWith(document.createTextNode(replacementText));
         }
       } else {
         const txt = el.textContent.trim();
         if (txt.length > 0 && !/^[\s·°]+$/.test(txt)) el.replaceWith(document.createTextNode(txt)); else el.remove();
+      }
+    });
+    return placeholders;
+  }
+
+  function cleanExtractedText(text) {
+    return text
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n[ \t]+/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\s*\$\s*/g, ' $')
+      .replace(/\$\s+/g, '$')
+      .replace(/\s+\$/g, '$')
+      .replace(/\$ \$/g, '$$')
+      .trim();
+  }
+
+  function replaceFormulasWithLatexOld(container) {
+    ['sup', '[data-citation]', '.citation', '.source-annotation',
+     'button[class*="citation"]', '[class*="footnote"]', '[class*="superscript"]',
+     'mat-icon', '.mat-icon', '.google-symbols'
+    ].forEach((sel) => {
+      try {
+        container.querySelectorAll(sel).forEach((el) => {
+          const text = (el.textContent || '').trim();
+          if (/^[\d,\s·]+$/.test(text) || text.length <= 3) { el.remove(); return; }
+          const iconTexts = ['more_horiz', 'expand_more', 'expand_less', 'content_copy', 'keep_pin', 'chat_bubble', 'more_vert', 'thumb_up', 'thumb_down', 'keep', 'copy_all', 'good_response', 'bad_response', 'check', 'landscape_2', 'photo_spark'];
+          if (iconTexts.includes(text)) {
+            const parent = el.closest('button') || el.closest('.citation-marker') || el.closest('.source-annotation') || el.closest('.mat-mdc-card-actions') || el.closest('.suggestions-container') || el;
+            parent.remove();
+          }
+        });
+      } catch { /* skip */ }
+    });
+
+    container.querySelectorAll('mat-icon, .mat-icon, .google-symbols, .mat-mdc-button-touch-target, .mat-mdc-button-persistent-ripple').forEach(el => el.remove());
+    container.querySelectorAll('.mat-mdc-card-actions, .suggestions-container, .action-button, .pin-button').forEach(el => el.remove());
+
+    container.querySelectorAll('.katex').forEach((katexEl) => {
+      const latex = extractLatex(katexEl);
+      if (latex) {
+        const isBlock = isDisplayMode(katexEl);
+        const wrapped = wrapFormula(latex, isBlock);
+        if (wrapped.html) {
+          const span = document.createElement('span');
+          span.innerHTML = wrapped.html;
+          katexEl.replaceWith(span);
+        } else {
+          katexEl.replaceWith(document.createTextNode(wrapped.text));
+        }
+      }
+    });
+
+    container.querySelectorAll('[data-math]').forEach((el) => {
+      const latex = el.getAttribute('data-math');
+      if (latex) {
+        const isBlock = isDisplayMode(el);
+        const wrapped = wrapFormula(latex, isBlock);
+        el.replaceWith(document.createTextNode(wrapped.text));
+      }
+    });
+
+    container.querySelectorAll('mjx-container').forEach((mjx) => {
+      const texEl = mjx.querySelector('script[type="math/tex"], script[type="math/tex; mode=display"]');
+      if (texEl?.textContent) {
+        const isBlock = mjx.getAttribute('display') === 'true';
+        mjx.replaceWith(document.createTextNode(
+          isBlock ? ` \\[${texEl.textContent.trim()}\\] ` : ` $${texEl.textContent.trim()}$ `
+        ));
       }
     });
   }
@@ -348,29 +472,98 @@ NLM.FormulaCopy = (() => {
     const fragment = sel.getRangeAt(0).cloneContents();
     if (!fragment.querySelector('.katex, [data-math], mjx-container, .MathJax, math')) return;
 
+    // 拦截并阻止浏览器的默认复制行为
     event.preventDefault();
+    event.stopPropagation();
+
     const htmlFrag = fragment.cloneNode(true);
     const textFrag = fragment.cloneNode(true);
 
-    replaceFormulasWithLatex(htmlFrag, false);
-    const htmlWrapper = document.createElement('div'); htmlWrapper.appendChild(htmlFrag);
-    let htmlContent = htmlWrapper.innerHTML;
-    if (htmlContent.includes('mml:') || htmlContent.includes('<math')) htmlContent = wrapMathMLForWordHtml(htmlContent);
+    // ==========================================
+    // 策略调整：整段复制时的格式重载
+    // ==========================================
+    let effectiveFormat = currentFormat;
+    // 纯文本格式在整段复制时，强制降级为 latex（保留 $ 包裹），以免丢失公式边界
+    if (effectiveFormat === 'no-dollar') {
+      effectiveFormat = 'latex'; 
+    }
 
-    replaceFormulasWithLatex(textFrag, true);
-    const textWrapper = document.createElement('div'); textWrapper.style.cssText = 'position:fixed;left:-9999px;opacity:0;'; textWrapper.appendChild(textFrag);
+    const originalFormat = currentFormat;
+    currentFormat = effectiveFormat; // 临时覆盖全局格式，让下层逻辑按新策略执行
+
+    let htmlPlaceholders = {};
+
+    if (effectiveFormat === 'latex') {
+      // LaTeX 模式：HTML 剪贴板保留旧版清理逻辑，纯文本使用强制 LaTeX
+      replaceFormulasWithLatexOld(htmlFrag); 
+      replaceFormulasWithLatex(textFrag, { forceLatex: true }); 
+    } else {
+      // Notion / MathML 模式：正常执行各自的包裹逻辑
+      htmlPlaceholders = replaceFormulasWithLatex(htmlFrag, { isHtmlClipboard: true });
+      replaceFormulasWithLatex(textFrag, { forceLatex: false });
+    }
+
+    currentFormat = originalFormat; // 逻辑执行完毕，恢复全局格式设置
+
+    // ==========================================
+    // 处理 HTML 剪贴板内容
+    // ==========================================
+    const htmlWrapper = document.createElement('div');
+    // 根节点补充 MML 声明，满足 Word 解析器的规范
+    htmlWrapper.setAttribute('xmlns:mml', MATHML_NS);
+    htmlWrapper.appendChild(htmlFrag);
+    if (effectiveFormat === 'latex') {
+      htmlWrapper.querySelectorAll('sup, [data-citation], .citation, .source-annotation').forEach(el => el.remove());
+    }
+    
+    // 使用 outerHTML 以确保包含 xmlns:mml 属性
+    let htmlContent = htmlWrapper.outerHTML;
+    
+    // 还原 MathML 占位符
+    for (const [ph, mmlStr] of Object.entries(htmlPlaceholders)) {
+      htmlContent = htmlContent.replace(ph, mmlStr);
+    }
+
+    // ==========================================
+    // 处理纯文本剪贴板内容
+    // ==========================================
+    const textWrapper = document.createElement('div');
+    textWrapper.style.cssText = 'position:fixed;left:-9999px;opacity:0;';
+    textWrapper.appendChild(textFrag);
     document.body.appendChild(textWrapper);
-    const text = (textWrapper.innerText || textWrapper.textContent || '').replace(/[\u00B0\u2022\u2219\u25CF]/g, '').trim();
+    
+    // 提取文本，并移除圆点符号
+    let text = (textWrapper.innerText || textWrapper.textContent || '').replace(/[\u00B0\u2022\u2219\u25CF]/g, '');
     document.body.removeChild(textWrapper);
 
+    if (effectiveFormat === 'latex') {
+      text = cleanExtractedText(text);
+    } else {
+      text = text.trim();
+    }
+
+    // 恢复严格的同步写入，规避异步丢包及格式篡改
     event.clipboardData.setData('text/plain', text);
     event.clipboardData.setData('text/html', htmlContent);
   }
 
   async function init() {
     if (isInitialized) return;
-    currentFormat = await NLM.Storage.get('formulaCopyFormat') || 'latex';
-    NLM.Storage.onChange((changes, area) => { if (area === 'sync' && changes.formulaCopyFormat) currentFormat = changes.formulaCopyFormat.newValue || 'latex'; });
+    
+    // 加载初始格式
+    const savedFormat = await NLM.Storage.get('formulaCopyFormat');
+    if (savedFormat) {
+      currentFormat = savedFormat;
+    }
+    
+    // 监听变更
+    NLM.Storage.onChange((changes, area) => { 
+      if (area === 'sync' && changes.formulaCopyFormat) {
+        currentFormat = changes.formulaCopyFormat.newValue || 'latex';
+        console.log(LOG, 'Format updated to:', currentFormat);
+      } 
+    });
+
     document.addEventListener('click', handleClick, true);
     document.addEventListener('copy', handleCopy, true);
     isInitialized = true;
