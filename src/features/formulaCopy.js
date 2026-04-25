@@ -505,6 +505,9 @@ NLM.FormulaCopy = (() => {
 
     currentFormat = originalFormat; // 逻辑执行完毕，恢复全局格式设置
 
+    // 打印当前复制格式，协助调试（建议用户在控制台查看）
+    console.log(LOG, 'Copy execution - Effective Format:', effectiveFormat);
+
     // ==========================================
     // 处理 HTML 剪贴板内容
     // ==========================================
@@ -522,6 +525,13 @@ NLM.FormulaCopy = (() => {
     // 还原 MathML 占位符
     for (const [ph, mmlStr] of Object.entries(htmlPlaceholders)) {
       htmlContent = htmlContent.replace(ph, mmlStr);
+    }
+
+    // 针对 MathML (Word) 模式优化：将网页软回车转为 Word 硬回车段落
+    if (effectiveFormat === 'mathml') {
+      // 仅替换 div 内部的 br
+      htmlContent = htmlContent.replace(/<br\s*\/?>/gi, '</p><p>');
+      // 如果 div 内容不含 p 标签但有文字，尝试包裹一下（可选，这里采用较保守策略）
     }
 
     // ==========================================
