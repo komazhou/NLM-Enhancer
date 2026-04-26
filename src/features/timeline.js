@@ -23,12 +23,15 @@ NLM.Timeline = (() => {
     const turns = [];
     
     messages.forEach((msg, index) => {
-      turns.push({
-        index: index,
-        element: msg.element,
-        text: (msg.text || '').substring(0, 60).trim() || (msg.type === 'user' ? `对话 ${index+1}` : `回复 ${index+1}`),
-        type: msg.type
-      });
+      // 【核心修改】：仅筛选 type 为 'user' 的消息，完全忽略 NotebookLM 的回答
+      if (msg.type === 'user') {
+        turns.push({
+          index: index,
+          element: msg.element,
+          text: (msg.text || '').substring(0, 60).trim() || `提问 ${turns.length + 1}`,
+          type: msg.type
+        });
+      }
     });
 
     return turns;
@@ -96,7 +99,7 @@ NLM.Timeline = (() => {
     const turns = findConversationTurns();
     timelineBar.innerHTML = '';
 
-    if (turns.length < 2) {
+    if (turns.length === 0) {
       timelineBar.style.display = 'none';
       return;
     }
@@ -106,7 +109,8 @@ NLM.Timeline = (() => {
 
     turns.forEach((turn) => {
       const dot = document.createElement('div');
-      dot.className = `nlm-timeline-dot ${turn.type === 'user' ? 'nlm-dot-user' : 'nlm-dot-model'}`;
+      // 因为已经过滤了只剩下 user，所以强制赋予 nlm-dot-user 类名即可
+      dot.className = `nlm-timeline-dot nlm-dot-user`;
       dot.dataset.index = turn.index;
 
       // 悬停显示预览
