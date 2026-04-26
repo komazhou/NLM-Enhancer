@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 防止自动滚动模块
+ * NLM Enhancer 防止自动滚动模块
  * 当 AI 回复生成中用户主动上滚时，暂停自动滚动到底部的行为
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.PreventScroll = (() => {
-  const LOG = '[NLM++ PreventScroll]';
+  const LOG = '[NLM Enhancer PreventScroll]';
   let isEnabled = false;
   let userHasScrolledUp = false;
   let isAIGenerating = false;

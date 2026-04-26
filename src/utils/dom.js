@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ DOM 工具模块
+ * NLM Enhancer DOM 工具模块
  * 提供 MutationObserver、元素查找等通用 DOM 操作辅助
  */
 
@@ -225,7 +225,7 @@ NLM.DOM = (() => {
 
       setTimeout(() => {
         observer.disconnect();
-        reject(new Error(`[NLM++] 等待元素超时: ${selector}`));
+        reject(new Error(`[NLM Enhancer] 等待元素超时: ${selector}`));
       }, timeout);
     });
   }

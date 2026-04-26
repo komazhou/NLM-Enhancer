@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 对话时间轴导航模块
+ * NLM Enhancer 对话时间轴导航模块
  * 在页面右侧显示圆点时间轴，每个圆点对应一轮对话，点击可快速跳转
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.Timeline = (() => {
-  const LOG = '[NLM++ Timeline]';
+  const LOG = '[NLM Enhancer Timeline]';
 
   let timelineBar = null;
   let tooltip = null;

@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 删除/隐藏特定对话轮次模块
+ * NLM Enhancer 删除/隐藏特定对话轮次模块
  * 允许用户点击垃圾桶图标将某些不要的对话从本地页面隐藏
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.DeleteMessage = (() => {
-  const LOG = '[NLM++ DeleteMessage]';
+  const LOG = '[NLM Enhancer DeleteMessage]';
   let observer = null;
   let isInitialized = false;
 

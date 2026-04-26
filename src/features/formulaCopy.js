@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 公式点击复制模块
+ * NLM Enhancer 公式点击复制模块
  * 点击页面中渲染 of 数学公式，按用户选择的格式复制到剪贴板
  * 支持格式：LaTeX ($...$)、MathML (Word)、纯文本 (无$)、Notion ($$...$$)
  */
@@ -8,7 +8,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.FormulaCopy = (() => {
-  const LOG = '[NLM++ FormulaCopy]';
+  const LOG = '[NLM Enhancer FormulaCopy]';
   let currentFormat = 'latex';
   let isInitialized = false;
 

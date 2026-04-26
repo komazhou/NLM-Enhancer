@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 存储工具模块
+ * NLM Enhancer 存储工具模块
  * 封装 chrome.storage API，提供统一的设置读写接口
  */
 
@@ -43,7 +43,7 @@ NLM.Storage = (() => {
           resolve(result);
         });
       } catch (e) {
-        console.warn('[NLM++] Storage getAll failed:', e);
+        console.warn('[NLM Enhancer] Storage getAll failed:', e);
         resolve({ ...DEFAULTS });
       }
     });
@@ -62,7 +62,7 @@ NLM.Storage = (() => {
           resolve(result[key]);
         });
       } catch (e) {
-        console.warn('[NLM++] Storage get failed:', e);
+        console.warn('[NLM Enhancer] Storage get failed:', e);
         resolve(DEFAULTS[key]);
       }
     });

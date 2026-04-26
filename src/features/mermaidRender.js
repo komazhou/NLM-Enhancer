@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ Mermaid 图表渲染模块
+ * NLM Enhancer Mermaid 图表渲染模块
  * 拦截 Mermaid 代码块并渲染为可视化 SVG 图表
  * Mermaid 库按需动态加载以减小初始包体积
  */
@@ -8,7 +8,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.MermaidRender = (() => {
-  const LOG = '[NLM++ Mermaid]';
+  const LOG = '[NLM Enhancer Mermaid]';
   let mermaidInstance = null;
   let mermaidLoadFailed = false;
   let observer = null;

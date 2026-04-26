@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 对话导出模块
+ * NLM Enhancer 对话导出模块
  * 将当前对话导出为 Markdown 文件，并提供纯净的 LaTeX 预览复制
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.Export = (() => {
-  const LOG = "[NLM++ Export]";
+  const LOG = '[NLM Enhancer Export]';
 
   function cleanExtractedText(text) {
     return text.replace(/[ \t]+\n/g, "\n").replace(/\n[ \t]+/g, "\n").replace(/\n{3,}/g, "\n\n").trim();

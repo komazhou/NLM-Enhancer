@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 发送行为自定义模块
+ * NLM Enhancer 发送行为自定义模块
  * 允许将发送快捷键从 Enter 改为 Ctrl+Enter
  * Enter 键将变为换行，防止误触发送
  */
@@ -8,7 +8,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.SendBehavior = (() => {
-  const LOG = '[NLM++ SendBehavior]';
+  const LOG = '[NLM Enhancer SendBehavior]';
   let isEnabled = false;
   let isListenersActive = false;
   let observer = null;

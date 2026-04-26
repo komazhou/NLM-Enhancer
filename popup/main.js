@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ Popup 设置界面逻辑
+ * NLM Enhancer Popup 设置界面逻辑
  * 管理所有功能的开关、格式选择和滑块配置
  */
 

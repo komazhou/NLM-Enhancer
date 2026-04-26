@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 输入草稿自动保存模块
+ * NLM Enhancer 输入草稿自动保存模块
  * 自动保存输入框内容，页面刷新或意外关闭后自动恢复
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.DraftSave = (() => {
-  const LOG = '[NLM++ DraftSave]';
+  const LOG = '[NLM Enhancer DraftSave]';
   const DRAFT_PREFIX = 'nlmDraft_';
   const MAX_DRAFTS = 5;
   const SAVE_DEBOUNCE_MS = 1000;

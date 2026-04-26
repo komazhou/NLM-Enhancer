@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 提示词库模块
+ * NLM Enhancer 提示词库模块
  * 在输入框附近注入快捷图标，点击展开提示词库面板，一键插入预设提示词
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.PromptVault = (() => {
-  const LOG = '[NLM++ PromptVault]';
+  const LOG = '[NLM Enhancer PromptVault]';
 
   // 内置默认提示词
   const BUILTIN_PROMPTS = [

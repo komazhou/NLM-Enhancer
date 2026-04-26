@@ -1,10 +1,10 @@
 /**
- * NotebookLM++ 内容脚本主入口
+ * NLM Enhancer 内容脚本主入口
  * 根据用户设置有条件地启动各功能模块
  */
 
 (async () => {
-  const LOG = '[NLM++]';
+  const LOG = '[NLM Enhancer]';
   console.log(LOG, '扩展已加载，正在初始化...');
 
   try {

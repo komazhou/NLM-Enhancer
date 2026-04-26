@@ -1,5 +1,5 @@
 /**
- * NotebookLM++ 对话提问搜索模块
+ * NLM Enhancer 对话提问搜索模块
  * 在面板左侧提供搜索图标，展开后可搜索并跳转到历史提问
  */
 
@@ -7,7 +7,7 @@ var NLM = window.NLM || {};
 window.NLM = NLM;
 
 NLM.TimelineSearch = (() => {
-  const LOG = '[NLM++ TimelineSearch]';
+  const LOG = '[NLM Enhancer TimelineSearch]';
 
   let triggerIcon = null;
   let searchPanel = null;
