@@ -33,7 +33,6 @@ NLM.Export = (() => {
 
     clone.querySelectorAll("sup, [data-citation], .citation").forEach(el => el.remove());
 
-    // 【核心联动】：利用强大的 FormulaCopy 引擎，为所有公式烙上无损的 LaTeX 源码印记
     if (NLM.FormulaCopy && NLM.FormulaCopy.extractLatex) {
       clone.querySelectorAll('.katex, [data-math], mjx-container, .MathJax, math').forEach(el => {
         const latex = NLM.FormulaCopy.extractLatex(el);
@@ -178,11 +177,10 @@ NLM.Export = (() => {
           const role = isUser ? '👤 **用户**' : '🤖 **NotebookLM**';
           const contentEl = pair.querySelector('.content').cloneNode(true);
           
-          // 利用 data-nlm-latex 属性还原 Markdown，放弃不稳定的 annotation 提取
           contentEl.querySelectorAll('[data-nlm-latex]').forEach(el => {
             const latex = el.getAttribute('data-nlm-latex');
             const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
-            el.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
+            el.replaceWith(doc.createTextNode(isBlock ? '\n$$\n' + latex + '\n$$\n' : '$' + latex + '$'));
           });
           
           lines.push('## ' + role);
@@ -202,7 +200,6 @@ NLM.Export = (() => {
       });
     }
 
-    // 【预览页专属防干扰复制】：直接读取预存的 LaTeX 烙印，无惧 DOM 缺失
     doc.addEventListener('copy', (event) => {
       const sel = win.getSelection();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
@@ -217,7 +214,7 @@ NLM.Export = (() => {
         const latex = el.getAttribute('data-nlm-latex');
         if (latex) {
           const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
-          el.replaceWith(doc.createTextNode(isBlock ? "\n\\[" + latex + "\\]\n" : "$" + latex + "$"));
+          el.replaceWith(doc.createTextNode(isBlock ? "\n\\[ " + latex + " \\]\n" : "$" + latex + "$"));
         } else {
           el.remove();
         }
