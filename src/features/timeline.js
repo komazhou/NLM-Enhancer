@@ -58,19 +58,26 @@ NLM.Timeline = (() => {
   function updatePosition() {
     if (!timelineBar) return;
     
-    // 修正：直接定位最外层的对话面板 section 容器，以包含顶部 Header 的高度
     const chatArea = document.querySelector('section.chat-panel');
+    // 获取输入框的最外层容器
+    const omnibar = document.querySelector('omnibar') || document.querySelector('.omnibar-container');
+
     if (chatArea) {
-      const rect = chatArea.getBoundingClientRect();
+      const chatRect = chatArea.getBoundingClientRect();
       
-      // 与对话面板右边缘保持 2px 的间距
-      timelineBar.style.left = `${rect.right + 2}px`;
+      timelineBar.style.left = `${chatRect.right + 2}px`;
+      timelineBar.style.top = `${chatRect.top}px`;
       
-      // 直接使用 section 的 rect.top，实现与面板顶部绝对齐平
-      timelineBar.style.top = `${rect.top}px`;
-      
-      // 高度与 section 面板保持完全一致
-      timelineBar.style.height = `${rect.height}px`;
+      if (omnibar) {
+        const omnibarRect = omnibar.getBoundingClientRect();
+        // 精确计算高度：输入框顶部坐标 - 面板顶部坐标
+        const calculatedHeight = omnibarRect.top - chatRect.top;
+        // 使用 Math.max 确保在页面极端缩放时高度不会出现负值
+        timelineBar.style.height = `${Math.max(0, calculatedHeight)}px`;
+      } else {
+        // 兼容处理：如果找不到输入框，则回退到与面板等高
+        timelineBar.style.height = `${chatRect.height}px`;
+      }
       
       timelineBar.style.transform = 'none'; 
       timelineBar.style.display = 'flex';
