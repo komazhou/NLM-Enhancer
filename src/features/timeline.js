@@ -58,21 +58,21 @@ NLM.Timeline = (() => {
   function updatePosition() {
     if (!timelineBar) return;
     
-    // 寻找对话面板容器
-    const chatArea = document.querySelector('.chat-panel-content') || document.querySelector('chat-panel');
+    // 修正：直接定位最外层的对话面板 section 容器，以包含顶部 Header 的高度
+    const chatArea = document.querySelector('section.chat-panel');
     if (chatArea) {
       const rect = chatArea.getBoundingClientRect();
       
       // 与对话面板右边缘保持 2px 的间距
       timelineBar.style.left = `${rect.right + 2}px`;
       
-      // 直接使用 rect.top，在 DOM 几何层面上实现与面板顶部绝对齐平
+      // 直接使用 section 的 rect.top，实现与面板顶部绝对齐平
       timelineBar.style.top = `${rect.top}px`;
       
-      // 高度与面板保持完全一致
+      // 高度与 section 面板保持完全一致
       timelineBar.style.height = `${rect.height}px`;
       
-      timelineBar.style.transform = 'none'; // 移除水平偏移
+      timelineBar.style.transform = 'none'; 
       timelineBar.style.display = 'flex';
     } else {
       timelineBar.style.display = 'none';
