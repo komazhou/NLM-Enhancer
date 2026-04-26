@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NotebookLM++ 设置</title>
+  <title>NLM Enhancer 设置</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
       <div class="logo-area">
         <span class="logo-icon">📓</span>
         <div>
-          <h1>NotebookLM++</h1>
+          <h1>NLM Enhancer</h1>
           <span class="version">v1.0.0</span>
         </div>
       </div>
@@ -116,19 +116,7 @@
         </label>
       </div>
 
-      <div class="setting-item" id="setting-mermaid">
-        <div class="setting-info">
-          <span class="setting-icon">📊</span>
-          <div>
-            <div class="setting-name">Mermaid 渲染</div>
-            <div class="setting-desc">自动将代码渲染为图表</div>
-          </div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" data-key="mermaidEnabled">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
+      <!-- Mermaid 功能已隐藏 -->
     </div>
 
     <div class="settings-section">
@@ -177,41 +165,7 @@
       </div>
     </div>
 
-    <div class="settings-section">
-      <h2 class="section-title">🎨 界面自定义</h2>
-
-      <div class="setting-item" id="setting-ui">
-        <div class="setting-info">
-          <span class="setting-icon">📏</span>
-          <div>
-            <div class="setting-name">界面自定义</div>
-            <div class="setting-desc">调整聊天宽度和字号</div>
-          </div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" data-key="uiTweaksEnabled">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div class="sub-setting" id="ui-tweaks-group">
-        <div class="slider-setting">
-          <div class="slider-header">
-            <span>聊天宽度</span>
-            <span class="slider-value" id="widthValue">70%</span>
-          </div>
-          <input type="range" min="30" max="100" step="5" id="chatWidthSlider" class="slider">
-        </div>
-
-        <div class="slider-setting">
-          <div class="slider-header">
-            <span>字体大小</span>
-            <span class="slider-value" id="fontValue">100%</span>
-          </div>
-          <input type="range" min="80" max="150" step="5" id="fontSizeSlider" class="slider">
-        </div>
-      </div>
-    </div>
+    <!-- 界面自定义功能已隐藏 -->
 
     <!-- 底部 -->
     <footer class="popup-footer">

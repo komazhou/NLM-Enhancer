@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "NotebookLM++",
+  "name": "NLM Enhancer - LaTeX Export for NotebookLM",
   "version": "1.0.0",
-  "description": "为 NotebookLM 增加选中引用、公式复制、时间轴导航、提示词库等增强功能",
+  "description": "A productivity tool for NotebookLM: LaTeX math export, timeline navigation, prompt vault, and message hiding.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -49,7 +49,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["lib/*"],
+      "resources": ["lib/*", "lib/fonts/*"],
       "matches": ["https://notebooklm.google.com/*"]
     }
   ]
