@@ -50,15 +50,13 @@ NLM.Export = (() => {
     const date = new Date().toISOString().slice(0, 10);
     const filename = `${safeTitle}_${date}.md`;
     
+    // 1. 构建纯 HTML 模板（彻底移除任何 <script> 标签，规避 CSP 拦截）
     let html = `
       <!DOCTYPE html>
       <html>
         <head>
           <title>导出预览 - ${document.title}</title>
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-          <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-          <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
           <style>
             body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1f1f1f; }
             .toolbar { position: sticky; top: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 12px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
@@ -90,14 +88,8 @@ NLM.Export = (() => {
             
             pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; position: relative; }
             
-            /* Mermaid 切换按钮 */
-            .mermaid-container { margin: 15px 0; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px; display: flex; justify-content: center; overflow-x: auto; }
-            .mermaid-toggle { position: absolute; right: 10px; top: 10px; padding: 4px 8px; font-size: 11px; background: rgba(26,115,232,0.1); color: #1a73e8; border: 1px solid rgba(26,115,232,0.2); border-radius: 4px; z-index: 5; }
-            .mermaid-toggle:hover { background: rgba(26,115,232,0.2); }
-            .hidden { display: none !important; }
-
             @media print {
-              .toolbar, .delete-btn, .mermaid-toggle { display: none !important; }
+              .toolbar, .delete-btn { display: none !important; }
               .preview-container { box-shadow: none; margin: 0; padding: 20px; width: 100%; max-width: none; }
               .msg-pair { page-break-inside: avoid; }
             }
@@ -136,198 +128,114 @@ NLM.Export = (() => {
     html += `
             </div>
           </div>
-          <script>
-            // KaTeX 渲染
-            function startRender() {
-              if (window.renderMathInElement) {
-                renderMathInElement(document.body, {
-                  delimiters: [
-                    {left: "$$", right: "$$", display: true},
-                    {left: "$", right: "$", display: false},
-                    {left: "\\\\[", right: "\\\\]", display: true},
-                    {left: "\\\\(", right: "\\\\)", display: false}
-                  ],
-                  ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "option"],
-                  throwOnError: false
-                });
-                console.log("KaTeX 渲染完成");
-              } else {
-                setTimeout(startRender, 200);
-              }
-            }
-
-            // Mermaid 渲染与切换逻辑
-            async function startMermaid() {
-              if (!window.mermaid) {
-                setTimeout(startMermaid, 200);
-                return;
-              }
-              
-              mermaid.initialize({ startOnLoad: false, theme: 'default' });
-              const codes = document.querySelectorAll('pre');
-              
-              for (const pre of codes) {
-                const codeText = pre.innerText.trim();
-                if (codeText.startsWith('graph ') || codeText.startsWith('sequenceDiagram') || 
-                    codeText.startsWith('gantt') || codeText.startsWith('classDiagram') ||
-                    codeText.startsWith('stateDiagram') || codeText.startsWith('pie') ||
-                    codeText.startsWith('flowchart') || codeText.startsWith('erDiagram')) {
-                  
-                  // 创建切换按钮
-                  const toggleBtn = document.createElement('button');
-                  toggleBtn.className = 'mermaid-toggle';
-                  toggleBtn.innerText = '显示图表';
-                  pre.appendChild(toggleBtn);
-                  
-                  // 创建图表容器
-                  const container = document.createElement('div');
-                  container.className = 'mermaid-container hidden';
-                  const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
-                  container.id = id;
-                  pre.after(container);
-                  
-                  toggleBtn.onclick = async () => {
-                    if (container.classList.contains('hidden')) {
-                      if (!container.getAttribute('data-rendered')) {
-                        try {
-                          const { svg } = await mermaid.render(id + '-svg', codeText);
-                          container.innerHTML = svg;
-                          container.setAttribute('data-rendered', 'true');
-                        } catch (e) {
-                          container.innerText = 'Mermaid 渲染失败: ' + e.message;
-                        }
-                      }
-                      container.classList.remove('hidden');
-                      pre.classList.add('hidden'); // 隐藏代码
-                      toggleBtn.innerText = '显示代码';
-                      // 将按钮移出 pre 以便在隐藏 pre 后仍可见
-                      container.style.position = 'relative';
-                      container.appendChild(toggleBtn);
-                    } else {
-                      container.classList.add('hidden');
-                      pre.classList.remove('hidden');
-                      toggleBtn.innerText = '显示图表';
-                      pre.appendChild(toggleBtn);
-                    }
-                  };
-                }
-              }
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-              startRender();
-              startMermaid();
-            });
-            window.onload = () => {
-              startRender();
-              startMermaid();
-            };
-            setTimeout(() => { startRender(); startMermaid(); }, 1500);
-
-            // 公式提取逻辑 (注入到预览页)
-            function extractVisibleMathText(katexHtmlEl) {
-              const parts = [];
-              function walk(node) {
-                if (!node) return;
-                if (node.nodeType === 3) {
-                  let text = node.textContent;
-                  if (text && text.trim()) {
-                    const symbolMap = { '\u2212': '-', '\u22c5': '\\cdot ', '\u2217': '*', '\u00d7': '\\times ', '\u00f7': '\\div ', '\u00b1': '\\pm ', '\u2264': '\\leq ', '\u2265': '\\geq ', '\u2260': '\\neq ', '\u2248': '\\approx ', '\u221e': '\\infty ', '\u2202': '\\partial ', '\u2206': '\\Delta ' };
-                    let p = ''; for (let c of text) p += symbolMap[c] || c;
-                    parts.push(p);
-                  }
-                  return;
-                }
-                if (node.nodeType !== 1) return;
-                const cls = node.className || '';
-                if (cls.includes('hide-tail') || node.style.display === 'none' || cls.includes('strut') || cls.includes('vlist-s')) return;
-                if (cls.includes('mfrac')) {
-                  const rows = Array.from(node.querySelectorAll('.vlist > span[style*="top"]')).sort((a,b)=>parseFloat(a.style.top)-parseFloat(b.style.top));
-                  if (rows.length >= 2) { parts.push('\\\\frac{'); walk(rows[0]); parts.push('}{'); walk(rows[rows.length-1]); parts.push('}'); return; }
-                }
-                if (cls.includes('msupsub')) {
-                  const rows = Array.from(node.querySelectorAll('.vlist > span[style*="top"]')).sort((a,b)=>parseFloat(a.style.top)-parseFloat(b.style.top));
-                  rows.forEach(r => { const t = parseFloat(r.style.top||0); if (t < -3.1) { parts.push('^{'); walk(r); parts.push('}'); } else { parts.push('_{'); walk(r); parts.push('}'); } });
-                  return;
-                }
-                if (cls.includes('msqrt')) { const b = node.querySelector('.mord'); if (b) { parts.push('\\\\sqrt{'); walk(b); parts.push('}'); return; } }
-                if (cls.includes('mopen') || cls.includes('mclose')) { parts.push(node.textContent.trim()); return; }
-                for (let c of node.childNodes) walk(c);
-              }
-              walk(katexHtmlEl);
-              return parts.join('').replace(/\\s+/g, ' ').trim();
-            }
-
-            function extractLatex(el) {
-              const ann = el.querySelector('annotation');
-              if (ann?.textContent?.trim()) return ann.textContent.trim();
-              const kHtml = el.querySelector('.katex-html');
-              if (kHtml) return extractVisibleMathText(kHtml);
-              return null;
-            }
-
-            // 在预览界面拦截复制事件，处理公式
-            document.addEventListener('copy', (event) => {
-              const sel = window.getSelection();
-              if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-              const fragment = sel.getRangeAt(0).cloneContents();
-              if (!fragment.querySelector('.katex')) return;
-              
-              event.preventDefault();
-              const div = document.createElement('div');
-              div.appendChild(fragment);
-              
-              div.querySelectorAll('.katex').forEach(el => {
-                const latex = extractLatex(el);
-                if (latex) {
-                  const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
-                  el.replaceWith(document.createTextNode(isBlock ? "\\n\\\\[" + latex + "\\\\]\\n" : "$" + latex + "$"));
-                } else {
-                  el.remove();
-                }
-              });
-              
-              let text = (div.innerText || div.textContent || '').replace(/[\\u00B0\\u2022\\u2219\\u25CF]/g, '').trim();
-              event.clipboardData.setData('text/plain', text);
-              event.clipboardData.setData('text/html', div.innerHTML);
-            });
-          </script>
         </body>
       </html>
     `;
     
+    // 2. 打开窗口并写入 HTML
     const win = window.open("", "_blank");
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-      const doc = win.document;
-      doc.getElementById("downloadPdfBtn").addEventListener("click", () => win.print());
-      doc.getElementById("downloadMdBtn").addEventListener("click", () => {
-        const lines = [];
-        lines.push("# " + doc.querySelector("h1").innerText);
-        lines.push("> " + doc.querySelector(".meta").innerText);
-        lines.push("\n---\n");
-        doc.querySelectorAll(".msg-pair").forEach(pair => {
-          const role = pair.querySelector(".user") ? "👤 **用户**" : "🤖 **NotebookLM**";
-          const contentEl = pair.querySelector(".content").cloneNode(true);
-          contentEl.querySelectorAll(".katex-mathml annotation").forEach(ann => {
-            const latex = ann.textContent.trim();
-            const isBlock = ann.closest(".katex-display") !== null;
-            ann.closest(".katex").replaceWith(doc.createTextNode(isBlock ? "\\[" + latex + "\\]" : "$" + latex + "$"));
-          });
-          lines.push("## " + role + "\n");
-          lines.push(contentEl.innerText.trim() + "\n");
-          lines.push("---\n");
-        });
-        const finalMd = lines.join("\n");
-        const blob = new Blob([finalMd], { type: "text/markdown;charset=utf-8" });
-        const a = doc.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-      });
-      doc.addEventListener("click", (e) => {
-        const btn = e.target.closest(".delete-btn");
-        if (btn) btn.closest(".msg-pair").remove();
+    if (!win) {
+      NLM.DOM.showToast("预览窗口被拦截，请允许弹出窗口", window.innerWidth / 2, 100, false);
+      return;
+    }
+    
+    win.document.write(html);
+    win.document.close();
+    const doc = win.document;
+
+    // ========================================================
+    // 3. 在扩展安全环境中绑定事件 (规避 CSP 限制的核心)
+    // ========================================================
+
+    // PDF 下载事件
+    const pdfBtn = doc.getElementById('downloadPdfBtn');
+    if (pdfBtn) {
+      pdfBtn.addEventListener('click', () => {
+        win.print();
       });
     }
+
+    // 删除消息事件
+    doc.addEventListener('click', (e) => {
+      const btn = e.target.closest('.delete-btn');
+      if (btn) {
+        const pair = btn.closest('.msg-pair');
+        if (pair) pair.remove();
+      }
+    });
+
+    // Markdown 导出事件
+    const mdBtn = doc.getElementById('downloadMdBtn');
+    if (mdBtn) {
+      mdBtn.addEventListener('click', () => {
+        const lines = [];
+        const titleEl = doc.querySelector('h1');
+        const metaEl = doc.querySelector('.meta');
+        lines.push('# ' + (titleEl ? titleEl.innerText : '导出的对话'));
+        lines.push('> ' + (metaEl ? metaEl.innerText : ''));
+        lines.push('');
+        lines.push('---');
+        lines.push('');
+        
+        doc.querySelectorAll('.msg-pair').forEach(pair => {
+          const isUser = pair.querySelector('.user') !== null;
+          const role = isUser ? '👤 **用户**' : '🤖 **NotebookLM**';
+          const contentEl = pair.querySelector('.content').cloneNode(true);
+          
+          // 还原公式为 Markdown 语法
+          contentEl.querySelectorAll('.katex-mathml annotation').forEach(ann => {
+            const latex = ann.textContent.trim();
+            const isBlock = ann.closest('.katex-display') !== null;
+            const katexNode = ann.closest('.katex');
+            if (katexNode) {
+              katexNode.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
+            }
+          });
+          
+          lines.push('## ' + role);
+          lines.push('');
+          lines.push(contentEl.innerText.trim());
+          lines.push('');
+          lines.push('---');
+          lines.push('');
+        });
+        
+        // 生成并下载 Markdown
+        const finalMd = lines.join('\n');
+        const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
+        const a = doc.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = filename; 
+        a.click();
+      });
+    }
+
+    // 预览页面的防干扰复制事件（拦截并重写剪贴板）
+    doc.addEventListener('copy', (event) => {
+      const sel = win.getSelection();
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+      const fragment = sel.getRangeAt(0).cloneContents();
+      if (!fragment.querySelector('.katex')) return;
+      
+      event.preventDefault();
+      const div = doc.createElement('div');
+      div.appendChild(fragment);
+      
+      div.querySelectorAll('.katex').forEach(el => {
+        const ann = el.querySelector('annotation');
+        if (ann && ann.textContent) {
+          const latex = ann.textContent.trim();
+          const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
+          el.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
+        } else {
+          el.remove();
+        }
+      });
+      
+      let text = (div.innerText || div.textContent || '').replace(/[\u00B0\u2022\u2219\u25CF]/g, '').trim();
+      event.clipboardData.setData('text/plain', text);
+      event.clipboardData.setData('text/html', div.innerHTML);
+    });
   }
 
   let isInitialized = false;
