@@ -9,9 +9,75 @@ window.NLM = NLM;
 NLM.Export = (() => {
   const LOG = '[NLM Enhancer Export]';
 
-  function cleanExtractedText(text) {
-    return text.replace(/[ \t]+\n/g, "\n").replace(/\n[ \t]+/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  // --- 重构：健壮的 HTML 转 Markdown 解析引擎 ---
+  function htmlToMarkdown(element) {
+    function walk(node, listDepth = 0) {
+      // 1. 纯文本节点直接返回
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+      // 2. 拦截并处理 LaTeX 公式烙印
+      if (node.hasAttribute('data-nlm-latex')) {
+        const latex = node.getAttribute('data-nlm-latex');
+        const isBlock = node.closest('.katex-display') !== null || node.classList.contains('katex-display');
+        return isBlock ? `\n$$\n${latex}\n$$\n` : `$${latex}$`;
+      }
+
+      const tag = node.tagName.toLowerCase();
+
+      // 3. 核心修复：针对 ul 和 ol 列表进行专属接管，避免子节点被错误加圆点
+      if (tag === 'ul' || tag === 'ol') {
+        let listOut = '';
+        let liIndex = 1;
+        for (const child of node.childNodes) {
+          if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'li') {
+            const indent = '  '.repeat(listDepth);
+            const bullet = tag === 'ol' ? `${liIndex++}. ` : '* ';
+            const itemContent = walk(child, listDepth + 1).trim();
+            // 如果列表项内有多段文本，保护换行的缩进格式不断层
+            const cleanedContent = itemContent.replace(/\n+/g, '\n' + indent + '  ');
+            listOut += `\n${indent}${bullet}${cleanedContent}`;
+          } else if (child.nodeType === Node.ELEMENT_NODE || (child.nodeType === Node.TEXT_NODE && child.textContent.trim())) {
+            listOut += walk(child, listDepth);
+          }
+        }
+        return `\n${listOut}\n`;
+      }
+
+      // 4. 常规元素遍历子节点
+      let childContent = '';
+      for (const child of node.childNodes) {
+        childContent += walk(child, listDepth);
+      }
+
+      // 5. 格式包裹（根据标签名翻译为 Markdown 语法）
+      if (tag === 'strong' || tag === 'b') {
+        return childContent.trim() ? `**${childContent}**` : '';
+      } else if (tag === 'em' || tag === 'i') {
+        return childContent.trim() ? `*${childContent}*` : '';
+      } else if (tag === 'code' && !node.closest('pre')) {
+        return `\`${childContent}\``;
+      } else if (tag === 'p' || tag === 'div') {
+        return `\n\n${childContent}\n\n`;
+      } else if (tag === 'br') {
+        return `\n`;
+      } else if (tag === 'pre') {
+        return `\n\`\`\`\n${childContent.trim()}\n\`\`\`\n`;
+      } else if (tag.match(/^h[1-6]$/)) {
+        return `\n\n${'#'.repeat(parseInt(tag[1]))} ${childContent.trim()}\n\n`;
+      }
+
+      return childContent;
+    }
+
+    // 最终清理多余的三重以上连续换行，保持版面干净
+    return walk(element)
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   }
+
 
   function extractCleanHtml(element) {
     const clone = element.cloneNode(true);
@@ -177,15 +243,12 @@ NLM.Export = (() => {
           const role = isUser ? '👤 **用户**' : '🤖 **NotebookLM**';
           const contentEl = pair.querySelector('.content').cloneNode(true);
           
-          contentEl.querySelectorAll('[data-nlm-latex]').forEach(el => {
-            const latex = el.getAttribute('data-nlm-latex');
-            const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
-            el.replaceWith(doc.createTextNode(isBlock ? '\n$$\n' + latex + '\n$$\n' : '$' + latex + '$'));
-          });
+          // 调用最新修复的解析引擎
+          const finalMarkdownText = htmlToMarkdown(contentEl);
           
           lines.push('## ' + role);
           lines.push('');
-          lines.push(contentEl.innerText.trim());
+          lines.push(finalMarkdownText);
           lines.push('');
           lines.push('---');
           lines.push('');
