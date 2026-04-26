@@ -1,0 +1,1 @@
+const fs = require('fs'); const content = fs.readFileSync('src/features/export.js', 'utf8'); const start = content.indexOf('let html = \'); const end = content.indexOf('\;', start); const template = content.substring(start + 12, end); fs.writeFileSync('scratch/mock_html.html', template);

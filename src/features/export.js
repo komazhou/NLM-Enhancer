@@ -1,6 +1,6 @@
 /**
  * NotebookLM++ 对话导出模块
- * 将当前对话导出为 Markdown 文件
+ * 将当前对话导出为 Markdown 文件，并提供纯净的 LaTeX 预览复制
  */
 
 var NLM = window.NLM || {};
@@ -33,9 +33,14 @@ NLM.Export = (() => {
 
     clone.querySelectorAll("sup, [data-citation], .citation").forEach(el => el.remove());
 
-    if (NLM.FormulaCopy && NLM.FormulaCopy.replaceFormulasWithLatex) {
-      NLM.FormulaCopy.replaceFormulasWithLatex(clone);
+    // 【核心联动】：利用强大的 FormulaCopy 引擎，为所有公式烙上无损的 LaTeX 源码印记
+    if (NLM.FormulaCopy && NLM.FormulaCopy.extractLatex) {
+      clone.querySelectorAll('.katex, [data-math], mjx-container, .MathJax, math').forEach(el => {
+        const latex = NLM.FormulaCopy.extractLatex(el);
+        if (latex) el.setAttribute('data-nlm-latex', latex);
+      });
     }
+
     return clone.innerHTML;
   }
 
@@ -50,7 +55,6 @@ NLM.Export = (() => {
     const date = new Date().toISOString().slice(0, 10);
     const filename = `${safeTitle}_${date}.md`;
     
-    // 1. 构建纯 HTML 模板（彻底移除任何 <script> 标签，规避 CSP 拦截）
     let html = `
       <!DOCTYPE html>
       <html>
@@ -132,7 +136,6 @@ NLM.Export = (() => {
       </html>
     `;
     
-    // 2. 打开窗口并写入 HTML
     const win = window.open("", "_blank");
     if (!win) {
       NLM.DOM.showToast("预览窗口被拦截，请允许弹出窗口", window.innerWidth / 2, 100, false);
@@ -143,11 +146,6 @@ NLM.Export = (() => {
     win.document.close();
     const doc = win.document;
 
-    // ========================================================
-    // 3. 在扩展安全环境中绑定事件 (规避 CSP 限制的核心)
-    // ========================================================
-
-    // PDF 下载事件
     const pdfBtn = doc.getElementById('downloadPdfBtn');
     if (pdfBtn) {
       pdfBtn.addEventListener('click', () => {
@@ -155,7 +153,6 @@ NLM.Export = (() => {
       });
     }
 
-    // 删除消息事件
     doc.addEventListener('click', (e) => {
       const btn = e.target.closest('.delete-btn');
       if (btn) {
@@ -164,7 +161,6 @@ NLM.Export = (() => {
       }
     });
 
-    // Markdown 导出事件
     const mdBtn = doc.getElementById('downloadMdBtn');
     if (mdBtn) {
       mdBtn.addEventListener('click', () => {
@@ -182,14 +178,11 @@ NLM.Export = (() => {
           const role = isUser ? '👤 **用户**' : '🤖 **NotebookLM**';
           const contentEl = pair.querySelector('.content').cloneNode(true);
           
-          // 还原公式为 Markdown 语法
-          contentEl.querySelectorAll('.katex-mathml annotation').forEach(ann => {
-            const latex = ann.textContent.trim();
-            const isBlock = ann.closest('.katex-display') !== null;
-            const katexNode = ann.closest('.katex');
-            if (katexNode) {
-              katexNode.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
-            }
+          // 利用 data-nlm-latex 属性还原 Markdown，放弃不稳定的 annotation 提取
+          contentEl.querySelectorAll('[data-nlm-latex]').forEach(el => {
+            const latex = el.getAttribute('data-nlm-latex');
+            const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
+            el.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
           });
           
           lines.push('## ' + role);
@@ -200,7 +193,6 @@ NLM.Export = (() => {
           lines.push('');
         });
         
-        // 生成并下载 Markdown
         const finalMd = lines.join('\n');
         const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
         const a = doc.createElement('a'); 
@@ -210,23 +202,22 @@ NLM.Export = (() => {
       });
     }
 
-    // 预览页面的防干扰复制事件（拦截并重写剪贴板）
+    // 【预览页专属防干扰复制】：直接读取预存的 LaTeX 烙印，无惧 DOM 缺失
     doc.addEventListener('copy', (event) => {
       const sel = win.getSelection();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
       const fragment = sel.getRangeAt(0).cloneContents();
-      if (!fragment.querySelector('.katex')) return;
+      if (!fragment.querySelector('.katex, [data-nlm-latex]')) return;
       
       event.preventDefault();
       const div = doc.createElement('div');
       div.appendChild(fragment);
-      
-      div.querySelectorAll('.katex').forEach(el => {
-        const ann = el.querySelector('annotation');
-        if (ann && ann.textContent) {
-          const latex = ann.textContent.trim();
+
+      div.querySelectorAll('[data-nlm-latex]').forEach(el => {
+        const latex = el.getAttribute('data-nlm-latex');
+        if (latex) {
           const isBlock = el.closest('.katex-display') !== null || el.classList.contains('katex-display');
-          el.replaceWith(doc.createTextNode(isBlock ? '\n\\[ ' + latex + ' \\]\n' : '$' + latex + '$'));
+          el.replaceWith(doc.createTextNode(isBlock ? "\n\\[" + latex + "\\]\n" : "$" + latex + "$"));
         } else {
           el.remove();
         }
@@ -248,7 +239,6 @@ NLM.Export = (() => {
       if (container) {
         const rect = container.getBoundingClientRect();
         if (rect && rect.width > 0) {
-          // 右侧按钮对齐输入框容器右边缘
           exportBtn.style.left = (rect.right - exportBtn.offsetWidth) + "px";
           exportBtn.style.top = (rect.top - exportBtn.offsetHeight) + "px";
         }

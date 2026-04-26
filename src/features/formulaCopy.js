@@ -2,8 +2,6 @@
  * NotebookLM++ 公式点击复制模块
  * 点击页面中渲染的数学公式，按用户选择的格式复制到剪贴板
  * 支持格式：LaTeX ($...$)、MathML (Word)、纯文本 (无$)、Notion ($$...$$)
- *
- * 增强复制：选中含公式的段落 Ctrl+C 时，自动将公式替换为 LaTeX 文本
  */
 
 var NLM = window.NLM || {};
@@ -20,10 +18,6 @@ NLM.FormulaCopy = (() => {
     noLatex: '✗ 无法提取源码',
   };
 
-  // ========================================================
-  // 公式查找与 LaTeX 提取
-  // ========================================================
-
   function findMathElement(target) {
     const selectors = ['.katex', '.katex-display', '[data-math]', 'mjx-container', '.MathJax', '.math-inline', '.math-block'];
     for (const sel of selectors) {
@@ -33,75 +27,153 @@ NLM.FormulaCopy = (() => {
     return null;
   }
 
+  // 【核心重构】：纯 HTML DOM 逆向重组引擎，彻底解决红钻乱码与结构错位
   function extractVisibleMathText(katexHtmlEl) {
     const parts = [];
+
     function walk(node) {
       if (!node) return;
+
       if (node.nodeType === Node.TEXT_NODE) {
         let text = node.textContent;
         if (text && text.trim()) {
           const symbolMap = {
-            '\u2212': '-', '\u22c5': '\\cdot ', '\u2217': '*', '\u00d7': '\\times ',
-            '\u00f7': '\\div ', '\u00b1': '\\pm ', '\u2264': '\\leq ', '\u2265': '\\geq ',
-            '\u2260': '\\neq ', '\u2248': '\\approx ', '\u221e': '\\infty ', '\u2202': '\\partial ',
-            '\u2206': '\\Delta ', '\u03b1': '\\alpha ', '\u03b2': '\\beta ', '\u03b3': '\\gamma ',
-            '\u03c0': '\\pi ', '\u03c3': '\\sigma ', '\u03bc': '\\mu ', '\u03c9': '\\omega ',
-            '\u03a9': '\\Omega ', '\u2192': '\\rightarrow ', '\u222b': '\\int ', '\u2211': '\\sum ',
-            '\u220f': '\\prod ',
+            '\u2212': '-', '−': '-', '\u22c5': '\\cdot ', '⋅': '\\cdot ',
+            '\u2217': '*', '∗': '*', '\u00d7': '\\times ', '×': '\\times ',
+            '\u00f7': '\\div ', '÷': '\\div ', '\u00b1': '\\pm ', '±': '\\pm ',
+            '\u2264': '\\leq ', '≤': '\\leq ', '\u2265': '\\geq ', '≥': '\\geq ',
+            '\u2260': '\\neq ', '≠': '\\neq ', '\u2248': '\\approx ', '≈': '\\approx ',
+            '\u221e': '\\infty ', '∞': '\\infty ', '\u2202': '\\partial ', '∂': '\\partial ',
+            '\u2206': '\\Delta ', 'Δ': '\\Delta ', '\u03b1': '\\alpha ', 'α': '\\alpha ',
+            '\u03b2': '\\beta ', 'β': '\\beta ', '\u03b3': '\\gamma ', 'γ': '\\gamma ',
+            '\u03c0': '\\pi ', 'π': '\\pi ', '\u03c3': '\\sigma ', 'σ': '\\sigma ',
+            '\u03bc': '\\mu ', 'μ': '\\mu ', '\u03c9': '\\omega ', 'ω': '\\omega ',
+            '\u03a9': '\\Omega ', 'Ω': '\\Omega ', '\u2192': '\\rightarrow ', '→': '\\rightarrow ',
+            '\u222b': '\\int ', '∫': '\\int ', '\u2211': '\\sum ', '∑': '\\sum ',
+            '\u220f': '\\prod ', '∏': '\\prod '
           };
-          let processed = '';
-          for (const char of text) processed += symbolMap[char] || char;
-          parts.push(processed);
+          let p = '';
+          for (let c of text) p += symbolMap[c] || c;
+          parts.push(p);
         }
         return;
       }
+
       if (node.nodeType !== Node.ELEMENT_NODE) return;
       const el = node;
-      const className = el.className || '';
       
-      // 兼容离线 DOM（DocumentFragment）：获取 computedStyle 或 inline style
+      // 【防崩锁】：防止 SVG 元素的 className 对象导致程序崩溃（红钻乱码元凶）
+      const cls = (typeof el.className === 'string') ? el.className : (el.getAttribute('class') || '');
+
       let isHidden = false;
       if (el.isConnected) {
-        const style = window.getComputedStyle(el);
-        isHidden = style.display === 'none' || style.visibility === 'hidden';
+        isHidden = window.getComputedStyle(el).display === 'none';
       } else {
-        isHidden = className.includes('hide-tail') || el.style.display === 'none';
+        isHidden = cls.includes('hide-tail') || el.style.display === 'none';
       }
-      if (isHidden) return;
-      
-      if (className.includes('strut') || className.includes('pstrut') || className.includes('vlist-s')) return;
+      if (isHidden || cls.includes('strut') || cls.includes('pstrut') || cls.includes('vlist-s') || cls.includes('frac-line')) {
+        return;
+      }
 
-      if (className.includes('mfrac')) {
-        const rows = Array.from(el.querySelectorAll('.vlist > span[style*="top"]'));
-        if (rows.length >= 2) {
-          rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
-          const numerRow = rows[0]; const denomRow = rows[rows.length - 1];
-          if (numerRow && denomRow && numerRow !== denomRow) {
-            parts.push('\\frac{'); walk(numerRow); parts.push('}{'); walk(denomRow); parts.push('}');
+      // 矩阵与数组
+      if (cls.includes('minner') || (cls.includes('mtable') && !el.closest('.minner'))) {
+        const mtable = cls.includes('mtable') ? el : el.querySelector(':scope > .mord > .mtable, :scope > .mtable');
+        if (mtable) {
+          let env = 'matrix';
+          if (cls.includes('minner')) {
+            const mopen = el.querySelector(':scope > .mopen')?.textContent.trim() || '';
+            const mclose = el.querySelector(':scope > .mclose')?.textContent.trim() || '';
+            if (mopen === '[' && mclose === ']') env = 'bmatrix';
+            else if (mopen === '(' && mclose === ')') env = 'pmatrix';
+            else if (mopen === '{' && !mclose) env = 'cases';
+            else if (mopen === '|' && mclose === '|') env = 'vmatrix';
+            else if (mopen === '{' && mclose === '}') env = 'Bmatrix';
+          }
+          parts.push(`\\begin{${env}} `);
+          const cols = Array.from(mtable.querySelectorAll(':scope > .col-align-c, :scope > .col-align-l, :scope > .col-align-r'));
+          if (cols.length > 0) {
+            let grid = [];
+            cols.forEach((col, colIdx) => {
+              const vlist = col.querySelector('.vlist');
+              if (!vlist) return;
+              const rows = Array.from(vlist.children).filter(c => c.tagName === 'SPAN' && c.style.top);
+              rows.forEach(r => {
+                const top = parseFloat(r.style.top || '0');
+                let rowObj = grid.find(g => Math.abs(g.top - top) < 0.2);
+                if (!rowObj) { rowObj = { top: top, cols: [] }; grid.push(rowObj); }
+                let currentLen = parts.length;
+                walk(r);
+                rowObj.cols[colIdx] = parts.splice(currentLen).join('');
+              });
+            });
+            grid.sort((a, b) => a.top - b.top);
+            grid.forEach((row, i) => {
+              let rowCols = [];
+              for (let c = 0; c < cols.length; c++) rowCols.push(row.cols[c] || ' ');
+              parts.push(rowCols.join(' & '));
+              if (i < grid.length - 1) parts.push(' \\\\ ');
+            });
+          }
+          parts.push(` \\end{${env}}`);
+          return;
+        }
+      }
+
+      // 复杂分数
+      if (cls.includes('mfrac')) {
+        const vlist = el.querySelector('.vlist');
+        if (vlist) {
+          const rows = Array.from(vlist.children).filter(c => c.tagName === 'SPAN' && c.style.top && !c.className.includes('frac-line') && !c.querySelector('.frac-line'));
+          if (rows.length >= 2) {
+            rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+            parts.push('\\frac{'); walk(rows[0]); parts.push('}{'); walk(rows[rows.length - 1]); parts.push('}');
             return;
           }
         }
       }
 
-      // 匹配上标、下标及上下标组合结构
-      if (className.includes('msupsub') || className.includes('msup') || className.includes('msub')) {
-        // 限制只查询直系子层的 vlist，避免嵌套公式（如指数带有分数）解析混乱
+      // 极限、求和等大符号的上下标
+      if (cls.includes('op-limits')) {
         const vlist = el.querySelector('.vlist');
         if (vlist) {
-          const rows = Array.from(vlist.querySelectorAll(':scope > span[style*="top"]'));
+          const rows = Array.from(vlist.children).filter(c => c.tagName === 'SPAN' && c.style.top);
+          let baseOp = null, upper = null, lower = null;
+          rows.forEach(r => {
+            if (r.querySelector('.mop') || r.querySelector('.large-op') || r.textContent?.match(/[∑∫∏]/) || r.textContent?.match(/lim/)) baseOp = r;
+          });
+          if (!baseOp && rows.length > 0) baseOp = rows[1] || rows[0]; 
+          if (baseOp) {
+            const baseTop = parseFloat(baseOp.style.top || '0');
+            rows.forEach(r => {
+              if (r !== baseOp) {
+                const t = parseFloat(r.style.top || '0');
+                if (t < baseTop - 0.4) upper = r;
+                else if (t > baseTop + 0.4) lower = r;
+              }
+            });
+            walk(baseOp);
+            if (lower) { parts.push('_{'); walk(lower); parts.push('}'); }
+            if (upper) { parts.push('^{'); walk(upper); parts.push('}'); }
+            return;
+          }
+        }
+      }
+
+      // 【保留】您完美的 -2.8 上下标阈值修复
+      if (cls.includes('msupsub') || cls.includes('msup') || cls.includes('msub')) {
+        const vlist = el.querySelector('.vlist');
+        if (vlist) {
+          const rows = Array.from(vlist.children).filter(c => c.tagName === 'SPAN' && c.style.top);
           if (rows.length > 0) {
-            // 按 top 值从小到大排序 (负数越小，位置越高屏幕，即上标)
             rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
             rows.forEach(row => {
               const top = parseFloat(row.style.top || '0');
-              const rowText = row.innerText?.trim() || row.textContent?.trim() || '';
+              const rowText = row.textContent?.trim() || '';
               if (!rowText) return;
-              
-              // 阈值调整为 -2.8：上标通常在 -3.0 左右，下标在 -2.5 左右或正数
-              if (top < -2.8) { 
-                parts.push('^{'); walk(row); parts.push('}'); 
-              } else { 
-                parts.push('_{'); walk(row); parts.push('}'); 
+              if (top < -2.8) {
+                parts.push('^{'); walk(row); parts.push('}');
+              } else {
+                parts.push('_{'); walk(row); parts.push('}');
               }
             });
             return;
@@ -109,12 +181,53 @@ NLM.FormulaCopy = (() => {
         }
       }
 
-      if (className.includes('msqrt')) {
+      // 【核心修复】：根号类名是 sqrt 而非 msqrt，此修复将彻底消灭单点复制的红钻乱码
+      if (cls.includes('sqrt')) {
         const body = el.querySelector('.mord');
-        if (body) { parts.push('\\sqrt{'); walk(body); parts.push('}'); return; }
+        const rootIndex = el.querySelector('.root');
+        if (rootIndex) {
+          parts.push('\\sqrt['); walk(rootIndex); parts.push(']{');
+        } else {
+          parts.push('\\sqrt{');
+        }
+        if (body) walk(body);
+        parts.push('}');
+        return;
       }
-      
-      if (className.includes('mopen') || className.includes('mclose')) {
+
+      // 规范化大写算符，补齐空格防止粘连 (如 sinx -> sin x)
+      if (cls.includes('mop')) {
+        const text = el.textContent.trim();
+        if (['lim', 'max', 'min', 'sin', 'cos', 'tan', 'log', 'ln', 'exp'].includes(text)) {
+          parts.push('\\' + text + ' ');
+          return;
+        }
+      }
+
+      // 导数与矢量符号 (\dot)
+      if (cls.includes('accent')) {
+        const vlist = el.querySelector('.vlist');
+        if (vlist) {
+          const rows = Array.from(vlist.children).filter(c => c.tagName === 'SPAN' && c.style.top);
+          let accentRow = rows.find(r => r.querySelector('.accent-body'));
+          let baseRow = rows.find(r => r !== accentRow);
+          
+          let accentChar = accentRow ? accentRow.textContent.trim() : '';
+          let cmd = '\\bar';
+          if (accentChar === '˙' || accentChar === '\u02D9') cmd = '\\dot';
+          else if (accentChar === '¨' || accentChar === '\u00A8') cmd = '\\ddot';
+          else if (accentChar === '^' || accentChar === '\u005E') cmd = '\\hat';
+          else if (accentChar === '~' || accentChar === '\u02DC') cmd = '\\tilde';
+          else if (accentChar === '\u2192' || accentChar === '→') cmd = '\\vec';
+          
+          parts.push(cmd + '{');
+          if (baseRow) walk(baseRow);
+          parts.push('}');
+          return;
+        }
+      }
+
+      if (cls.includes('mopen') || cls.includes('mclose')) {
         const text = el.textContent.trim();
         if (text) { parts.push(text); return; }
       }
@@ -128,13 +241,16 @@ NLM.FormulaCopy = (() => {
 
   function extractLatex(element) {
     if (!element) return null;
-    const attrLatex = element.getAttribute('data-math') || element.getAttribute('data-latex') ||
-                     element.querySelector('[data-math]')?.getAttribute('data-math') ||
-                     element.querySelector('[data-latex]')?.getAttribute('data-latex');
+    if (element.hasAttribute('data-nlm-latex')) return element.getAttribute('data-nlm-latex');
+
+    const container = element.closest('.katex, .MathJax, mjx-container, [data-math], math, .math-inline, .math-block') || element;
+    const attrLatex = container.getAttribute('data-math') || container.getAttribute('data-latex') ||
+                     container.querySelector('[data-math]')?.getAttribute('data-math') ||
+                     container.querySelector('[data-latex]')?.getAttribute('data-latex');
     if (attrLatex) return attrLatex;
 
     try {
-      const annotations = element.querySelectorAll('annotation');
+      const annotations = Array.from(container.querySelectorAll('*')).filter(n => n.localName === 'annotation');
       for (const ann of annotations) {
         const text = ann.textContent?.trim();
         if (text) {
@@ -144,63 +260,15 @@ NLM.FormulaCopy = (() => {
       }
     } catch (e) {}
 
-    if (element.tagName.toLowerCase() === 'mjx-container' || element.querySelector('mjx-container')) {
-      const mjx = element.tagName.toLowerCase() === 'mjx-container' ? element : element.querySelector('mjx-container');
-      const script = mjx.querySelector('script[type^="math/tex"]');
-      if (script?.textContent) return script.textContent.trim();
-      const assist = mjx.querySelector('[aria-label]');
-      if (assist) {
-        const label = assist.getAttribute('aria-label');
-        if (label && (label.includes('\\') || label.includes('^'))) return label;
-      }
-    }
-
-    const mathml = element.querySelector('.katex-mathml math') || element.querySelector('math');
-    if (mathml) {
-      try {
-        const parsed = convertMathmlToLatex(mathml);
-        if (parsed && parsed.length > 1) return parsed;
-      } catch (e) {}
-    }
-
-    const katexHtml = element.querySelector('.katex-html');
+    const katexHtml = container.querySelector('.katex-html');
     if (katexHtml) {
       try {
         const visibleText = extractVisibleMathText(katexHtml);
         if (visibleText) return visibleText;
       } catch (e) {}
     }
-
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-    let node;
-    while (node = walker.nextNode()) {
-      const t = node.textContent.trim();
-      if (t.startsWith('\\') || (t.includes('^') && t.includes('_')) || t.includes('\\frac')) return t;
-    }
-
     return null;
   }
-
-  function convertMathmlToLatex(node) {
-    if (node.nodeType === Node.TEXT_NODE) return node.textContent;
-    if (node.nodeType !== Node.ELEMENT_NODE) return '';
-    const tag = node.tagName.toLowerCase();
-    const children = Array.from(node.children);
-    const parse = (n) => convertMathmlToLatex(n);
-    switch (tag) {
-      case 'math': case 'mrow': case 'mstyle': return children.map(parse).join('');
-      case 'mi': case 'mn': case 'mo': return node.textContent.trim();
-      case 'msub': return `${parse(children[0])}_{${parse(children[1])}}`;
-      case 'msup': return `${parse(children[0])}^{${parse(children[1])}}`;
-      case 'mfrac': return `\\frac{${parse(children[0])}}{${parse(children[1])}}`;
-      case 'msqrt': return `\\sqrt{${children.map(parse).join('')}}`;
-      default: return children.map(parse).join('');
-    }
-  }
-
-  // ========================================================
-  // MathML 生成管线
-  // ========================================================
 
   const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
 
@@ -212,15 +280,15 @@ NLM.FormulaCopy = (() => {
     } catch (e) { return null; }
   }
 
-
-
   function toWordMathML(mathml) {
     try {
+      // 【消灭空白框的核心】：剔除 Word 无法渲染的不可见乘号与应用符
+      mathml = mathml.replace(/[\u2061\u2062\u2063\u2064\u200B]/g, '');
+
       const parsed = new DOMParser().parseFromString(mathml, 'application/xml');
       if (parsed.getElementsByTagName('parsererror').length > 0) return mathml;
       const root = parsed.documentElement;
       
-      // 1. 递归移除所有 annotation 和 semantics (只保留演示内容)
       const annotations = Array.from(root.querySelectorAll('annotation, annotation-xml'));
       annotations.forEach(a => a.parentNode?.removeChild(a));
       
@@ -231,11 +299,9 @@ NLM.FormulaCopy = (() => {
         else s.parentNode?.removeChild(s);
       });
 
-      // 2. 创建带 mml 前缀的新文档
       const output = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
       const outRoot = output.documentElement;
       
-      // 复制根属性 (过滤 class, style 和 xmlns)
       for (const attr of Array.from(root.attributes)) {
         if (!attr.name.startsWith('xmlns') && attr.name !== 'class' && attr.name !== 'style') {
           outRoot.setAttribute(attr.name, attr.value);
@@ -258,7 +324,6 @@ NLM.FormulaCopy = (() => {
     if (node.nodeType !== Node.ELEMENT_NODE) return null;
     
     const el = doc.createElementNS(MATHML_NS, `mml:${node.localName}`);
-    // 过滤属性，Word 不喜欢 MathML 带有 class 或 style
     for (const attr of Array.from(node.attributes)) {
       if (!attr.name.startsWith('xmlns') && attr.name !== 'class' && attr.name !== 'style') {
         el.setAttribute(attr.name, attr.value);
@@ -273,7 +338,7 @@ NLM.FormulaCopy = (() => {
   }
 
   function wrapMathMLForWordHtml(mathml) {
-    return `<html xmlns:mml="${MATHML_NS}"><head><meta charset="utf-8"></head><body><!--StartFragment-->${mathml}<!--EndFragment--></body></html>`;
+    return `<html xmlns:mml="${MATHML_NS}"><head><meta charset="utf-8"></head><body>${mathml}</body></html>`;
   }
 
   function isDisplayMode(el) {
@@ -287,32 +352,23 @@ NLM.FormulaCopy = (() => {
   }
 
   function wrapFormula(formula, isBlock) {
-    // 强化正则：彻底剥离可能存在的包装符，兼容首尾附带的空格
     const raw = formula.trim().replace(/^(\$\$?|\\\[|\\\()\s*|\s*(\$\$?|\\\]|\\\))$/g, '').trim();
     if (!raw) return { text: '', html: '' };
 
     const result = { text: '', html: '' };
     
-    // 模式识别与转换
     switch (currentFormat) {
       case 'notion':
-        // Notion 语法强制要求所有块/行公式均使用 $$ 包裹
         result.text = `$$${raw}$$`;
         break;
-
       case 'no-dollar':
-        // 纯源码输出
         result.text = raw;
         break;
-
       case 'mathml':
         const mml = latexToMathML(raw, isBlock);
         if (mml) {
           const wordMml = toWordMathML(mml);
-          // 纯文本：使用 Word MML，适配普通粘贴选项
           result.text = wordMml; 
-          
-          // HTML：强行插入 xmlns 属性，防止 Word 剥离未声明的 <math> 标签
           let standardMml = mml;
           if (!standardMml.includes('xmlns=')) {
             standardMml = standardMml.replace('<math', `<math xmlns="${MATHML_NS}"`);
@@ -322,10 +378,8 @@ NLM.FormulaCopy = (() => {
           result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
         }
         break;
-
       case 'latex':
       default:
-        // 修正为标准 LaTeX 语法：行内 $...$, 块级 \[...\]
         result.text = isBlock ? `\\[${raw}\\]` : `$${raw}$`;
         break;
     }
@@ -359,8 +413,6 @@ NLM.FormulaCopy = (() => {
     const isBlock = isDisplayMode(mathEl);
     const { text, html } = wrapFormula(latex, isBlock);
     
-    // 如果是 MathML 模式且生成成功，我们将 MathML 字符串作为 plainText 的一部分（或根据 copyToClipboard 处理）
-    // 但通常用户希望点击复制的是渲染后的“可粘贴”内容
     const success = await copyToClipboard(text, html);
     
     if (success) { 
@@ -396,7 +448,6 @@ NLM.FormulaCopy = (() => {
           const ph = `___MATHML_PLACEHOLDER_${counter++}___`;
           placeholders[ph] = wrapped.html;
           
-          // 【核心修改逻辑】：为块级公式创建独立的段落 (硬回车) 并居中
           if (isBlock) {
             const p = document.createElement('p');
             p.style.textAlign = 'center'; 
@@ -488,75 +539,68 @@ NLM.FormulaCopy = (() => {
   function handleCopy(event) {
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-    const fragment = sel.getRangeAt(0).cloneContents();
+
+    // 提取时强制打上烙印，保障源码不随隐藏节点丢失
+    const range = sel.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+    const parent = container.nodeType === Node.ELEMENT_NODE ? container : container.parentElement;
+    
+    if (parent) {
+      parent.querySelectorAll('.katex, [data-math], mjx-container, .MathJax, math').forEach(el => {
+        if (range.intersectsNode(el)) {
+          const latex = extractLatex(el); 
+          if (latex) el.setAttribute('data-nlm-latex', latex); 
+        }
+      });
+    }
+
+    const fragment = range.cloneContents();
     if (!fragment.querySelector('.katex, [data-math], mjx-container, .MathJax, math')) return;
 
-    // 拦截并阻止浏览器的默认复制行为
     event.preventDefault();
     event.stopPropagation();
 
     const htmlFrag = fragment.cloneNode(true);
     const textFrag = fragment.cloneNode(true);
 
-    // ==========================================
-    // 策略调整：整段复制时的格式重载
-    // ==========================================
     let effectiveFormat = currentFormat;
-    // 纯文本格式在整段复制时，强制降级为 latex（保留 $ 包裹），以免丢失公式边界
+    // 不再强制转为 LaTeX，由用户自主决定（配合 UI 上的“试验”标签）
     if (effectiveFormat === 'no-dollar') {
       effectiveFormat = 'latex'; 
     }
 
     const originalFormat = currentFormat;
-    currentFormat = effectiveFormat; // 临时覆盖全局格式，让下层逻辑按新策略执行
+    currentFormat = effectiveFormat; 
 
     let htmlPlaceholders = {};
 
     if (effectiveFormat === 'latex') {
-      // LaTeX 模式：HTML 剪贴板保留旧版清理逻辑，纯文本使用强制 LaTeX
       replaceFormulasWithLatexOld(htmlFrag); 
       replaceFormulasWithLatex(textFrag, { forceLatex: true }); 
     } else {
-      // Notion / MathML 模式：正常执行各自的包裹逻辑
       htmlPlaceholders = replaceFormulasWithLatex(htmlFrag, { isHtmlClipboard: true });
       replaceFormulasWithLatex(textFrag, { forceLatex: false });
     }
 
-    currentFormat = originalFormat; // 逻辑执行完毕，恢复全局格式设置
+    currentFormat = originalFormat; 
 
-    // 打印当前复制格式，协助调试（建议用户在控制台查看）
-    console.log(LOG, 'Copy execution - Effective Format:', effectiveFormat);
-
-    // ==========================================
-    // 处理 HTML 剪贴板内容
-    // ==========================================
     const htmlWrapper = document.createElement('div');
-    // 根节点补充 MML 声明，满足 Word 解析器的规范
     htmlWrapper.setAttribute('xmlns:mml', MATHML_NS);
     htmlWrapper.appendChild(htmlFrag);
     if (effectiveFormat === 'latex') {
       htmlWrapper.querySelectorAll('sup, [data-citation], .citation, .source-annotation').forEach(el => el.remove());
     }
     
-    // 使用 outerHTML 以确保包含 xmlns:mml 属性
-    let htmlContent = htmlWrapper.outerHTML;
-    
-    // 还原 MathML 占位符
+    let htmlContent = htmlWrapper.innerHTML;
     for (const [ph, mmlStr] of Object.entries(htmlPlaceholders)) {
       htmlContent = htmlContent.replace(ph, mmlStr);
     }
 
-
-
-    // ==========================================
-    // 处理纯文本剪贴板内容
-    // ==========================================
     const textWrapper = document.createElement('div');
     textWrapper.style.cssText = 'position:fixed;left:-9999px;opacity:0;';
     textWrapper.appendChild(textFrag);
     document.body.appendChild(textWrapper);
     
-    // 提取文本，并移除圆点符号
     let text = (textWrapper.innerText || textWrapper.textContent || '').replace(/[\u00B0\u2022\u2219\u25CF]/g, '');
     document.body.removeChild(textWrapper);
 
@@ -566,7 +610,6 @@ NLM.FormulaCopy = (() => {
       text = text.trim();
     }
 
-    // 恢复严格的同步写入，规避异步丢包及格式篡改
     event.clipboardData.setData('text/plain', text);
     event.clipboardData.setData('text/html', htmlContent);
   }
@@ -574,17 +617,14 @@ NLM.FormulaCopy = (() => {
   async function init() {
     if (isInitialized) return;
     
-    // 加载初始格式
     const savedFormat = await NLM.Storage.get('formulaCopyFormat');
     if (savedFormat) {
       currentFormat = savedFormat;
     }
     
-    // 监听变更
     NLM.Storage.onChange((changes, area) => { 
       if (area === 'sync' && changes.formulaCopyFormat) {
         currentFormat = changes.formulaCopyFormat.newValue || 'latex';
-        console.log(LOG, 'Format updated to:', currentFormat);
       } 
     });
 
@@ -593,5 +633,11 @@ NLM.FormulaCopy = (() => {
     isInitialized = true;
   }
 
-  return { init, destroy: () => { document.removeEventListener('click', handleClick, true); document.removeEventListener('copy', handleCopy, true); isInitialized = false; } };
+  // 暴露 extractLatex 供导出预览组件(export.js) 调用中转
+  return { 
+    init, 
+    extractLatex, 
+    replaceFormulasWithLatex,
+    destroy: () => { document.removeEventListener('click', handleClick, true); document.removeEventListener('copy', handleCopy, true); isInitialized = false; } 
+  };
 })();
