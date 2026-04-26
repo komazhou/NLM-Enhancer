@@ -63,11 +63,16 @@ NLM.Timeline = (() => {
     if (chatArea) {
       const rect = chatArea.getBoundingClientRect();
       
-      // 直接对齐对话面板右边缘
-      timelineBar.style.left = `${rect.right}px`;
+      // 与对话面板右边缘保持 2px 的间距
+      timelineBar.style.left = `${rect.right + 2}px`;
+      
+      // 直接使用 rect.top，在 DOM 几何层面上实现与面板顶部绝对齐平
       timelineBar.style.top = `${rect.top}px`;
+      
+      // 高度与面板保持完全一致
       timelineBar.style.height = `${rect.height}px`;
-      timelineBar.style.transform = 'none'; // 移除水平偏移，实现左侧对齐
+      
+      timelineBar.style.transform = 'none'; // 移除水平偏移
       timelineBar.style.display = 'flex';
     } else {
       timelineBar.style.display = 'none';
