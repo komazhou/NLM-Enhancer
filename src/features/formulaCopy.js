@@ -83,18 +83,29 @@ NLM.FormulaCopy = (() => {
         }
       }
 
-      if (className.includes('msupsub')) {
-        const rows = Array.from(el.querySelectorAll('.vlist > span[style*="top"]'));
-        if (rows.length > 0) {
-          rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
-          rows.forEach(row => {
-            const top = parseFloat(row.style.top || '0');
-            const rowText = row.innerText?.trim() || row.textContent?.trim() || '';
-            if (!rowText) return;
-            if (top < -3.1) { parts.push('^{'); walk(row); parts.push('}'); } 
-            else { parts.push('_{'); walk(row); parts.push('}'); }
-          });
-          return;
+      // 匹配上标、下标及上下标组合结构
+      if (className.includes('msupsub') || className.includes('msup') || className.includes('msub')) {
+        // 限制只查询直系子层的 vlist，避免嵌套公式（如指数带有分数）解析混乱
+        const vlist = el.querySelector('.vlist');
+        if (vlist) {
+          const rows = Array.from(vlist.querySelectorAll(':scope > span[style*="top"]'));
+          if (rows.length > 0) {
+            // 按 top 值从小到大排序 (负数越小，位置越高屏幕，即上标)
+            rows.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+            rows.forEach(row => {
+              const top = parseFloat(row.style.top || '0');
+              const rowText = row.innerText?.trim() || row.textContent?.trim() || '';
+              if (!rowText) return;
+              
+              // 阈值调整为 -2.8：上标通常在 -3.0 左右，下标在 -2.5 左右或正数
+              if (top < -2.8) { 
+                parts.push('^{'); walk(row); parts.push('}'); 
+              } else { 
+                parts.push('_{'); walk(row); parts.push('}'); 
+              }
+            });
+            return;
+          }
         }
       }
 
