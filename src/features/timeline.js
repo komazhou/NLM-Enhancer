@@ -65,7 +65,8 @@ NLM.Timeline = (() => {
     if (chatArea) {
       const chatRect = chatArea.getBoundingClientRect();
       
-      timelineBar.style.left = `${chatRect.right + 2}px`;
+      // 与对话面板右边缘保持 1px 的间距
+      timelineBar.style.left = `${chatRect.right + 1}px`;
       timelineBar.style.top = `${chatRect.top}px`;
       
       if (omnibar) {
