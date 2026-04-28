@@ -1,131 +1,93 @@
-[English](./README_EN.md) | **简体中文**
-
 <div align="center">
+  <h1>📓 NLM Enhancer</h1>
+  <p>
+    <b>The missing productivity power-up for Google's NotebookLM.</b><br>
+    Perfect MathML/LaTeX export, pure Markdown downloads, and timeline navigation.
+  </p>
 
-# 📓 NLM Enhancer
-
-### LaTeX Export for NotebookLM
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Coming_Soon-4285F4?logo=googlechrome&logoColor=white)](https://github.com/komazhou/NLM-Enhancer)
-[![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/komazhou/NLM-Enhancer)
-
-**解决 Google NotebookLM 导出公式时的排版崩塌、空白方框与乱码问题。**
-
+  <p>
+    <a href="https://chrome.google.com/webstore/detail/YOUR_EXTENSION_ID" target="_blank">
+      <img src="https://img.shields.io/badge/Chrome_Web_Store-Pending-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome">
+    </a>
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License">
+    <img src="https://img.shields.io/github/stars/komazhou/NLM-Enhancer?style=flat-square&logo=github" alt="GitHub stars">
+  </p>
+  
+  <p>
+    **English** • 
+    <a href="./README_zh.md">简体中文</a>
+  </p>
 </div>
 
 ---
 
-## 🎯 核心痛点
+## 👋 Why NLM Enhancer?
 
-当你在 NotebookLM 中处理包含数学公式的学术笔记时，是否遇到过以下问题：
+Google's NotebookLM is an incredible tool for analyzing documents, but it has a frustrating bottleneck for researchers, students, and professionals: **Exporting complex mathematical formulas.**
 
-- 📋 **复制公式到 Markdown** → 得到一堆红色钻石 `◆` 或空白方框 `□`
-- 📄 **导出到 Microsoft Word** → 复杂积分、矩阵、上下标全部变为乱码
-- 📝 **粘贴到笔记软件** → 公式直接丢失，只剩占位符
+When you copy limits, integrals, or matrices from NotebookLM and paste them into Microsoft Word or Markdown editors, the formatting completely breaks. 
 
-**NLM Enhancer** 从根本上解决了这一问题。它在页面层面拦截公式渲染结果，精准提取 LaTeX 源码，让你的数学笔记在任何编辑器中都能完美还原。
+**NLM Enhancer** was built to solve this exact problem. By utilizing deep DOM reverse-parsing technology, it losslessly extracts NotebookLM's rendered formulas and converts them into standard LaTeX or MathML. No more garbled text—just perfect equations ready for your thesis, patents, or research papers.
 
 ---
 
-## ✨ 功能亮点
+## ✨ Core Features
 
-### 📐 LaTeX 公式导出（核心功能）
+### 📐 Perfect Math Extraction
+- **Click-to-Copy**: Click any formula in NotebookLM to instantly copy its source code.
+- **MathML (Word) Support**: Paste complex matrices and calculus directly into Microsoft Word without losing structure.
+- **Standard LaTeX**: Extract pure LaTeX equations for academic writing.
 
-- **点击即复制**：单击页面中任意数学公式，自动提取并复制 LaTeX 源码
-- **多格式支持**：LaTeX `$...$`、MathML (Word)、纯文本、Notion `$$...$$`
-- **智能选区复制**：选中包含公式的文本段落，Ctrl+C 即可得到完整的 LaTeX 混排文本
-- **完美还原**：微积分、矩阵、分式、上下标、希腊字母——全部精准提取
+### 💾 Pure Markdown Export
+- Export entire chat histories into clean `.md` or `.pdf` files with one click.
+- Block formulas, bold text, and lists are perfectly preserved for tools like Obsidian and Typora.
 
-### 🔘 对话时间轴导航
+### 📍 Timeline Navigation & UI Control
+- **Chat Timeline**: Visual sidebar nodes allow you to jump between long messages instantly.
+- **Message Toggling**: Hide unwanted messages to keep your workspace focused.
+- **Prevent Auto-Scroll**: Stop the annoying page jump when hitting "Enter" to send a new prompt.
 
-- 页面右侧显示用户提问的圆点时间轴
-- 单击圆点快速跳转至对应提问
-- 悬停预览提问内容
-- 左侧搜索面板，模糊搜索历史提问
-
-### 📥 纯净 Markdown 导出
-
-- 一键导出当前对话为干净的 Markdown 文件
-- 自动剔除 NotebookLM 的引用标注、操作按钮等干扰元素
-- 导出预览支持逐条删除，灵活筛选内容
-- 同时支持另存为 PDF
-
-### 💬 选中一键引用
-
-- 选中任意回复文本，弹出「引用」浮动按钮
-- 点击后自动将内容以引用格式插入输入框
-- 保留 LaTeX 公式语法，引用内容不丢失格式
-
-### ⚡ 提示词库
-
-- 内置常用提示词模板（摘要总结、费曼解释、对比分析等）
-- 支持添加自定义提示词
-- 一键插入输入框
-
-### ⚙️ 输入增强
-
-- **草稿防丢**：自动保存输入框内容，刷新页面后自动恢复
-- **Ctrl+Enter 发送**：Enter 变为换行，防止误触发送
-- **防自动滚动**：AI 生成回复时上滚查看历史，不会被强制拉回底部
+### 💡 Prompt Vault
+- Save and quickly insert your most frequently used research prompts.
 
 ---
 
-## 📦 安装
+## 🔒 Privacy & Security (Zero Data Collection)
 
-> 目前处于开发者预览阶段，尚未上架 Chrome Web Store。
-
-### 开发者模式安装
-
-1. **下载源码**
-   ```bash
-   git clone https://github.com/komazhou/NLM-Enhancer.git
-   ```
-
-2. **打开 Chrome 扩展管理页面**
-   - 在地址栏输入 `chrome://extensions/`
-   - 开启右上角的「开发者模式」
-
-3. **加载扩展**
-   - 点击「加载已解压的扩展程序」
-   - 选择克隆下来的 `NLM-Enhancer` 文件夹
-
-4. **开始使用**
-   - 打开 [NotebookLM](https://notebooklm.google.com/)
-   - 点击浏览器工具栏中的 NLM Enhancer 图标，管理功能开关
+This extension operates **100% locally**. 
+- 🚫 **NO** external network requests.
+- 🚫 **NO** user data collection.
+- 🚫 **NO** remote tracking code.
+Your sensitive documents and chat histories remain strictly between your browser and Google's servers.
 
 ---
 
-## 🔒 隐私安全
+## 📥 Installation
 
-**NLM Enhancer 承诺对用户数据零侵入。**
+### Option 1: Chrome Web Store
+*(Currently under review, link coming soon!)*
 
-| 项目 | 状态 |
-|------|------|
-| 网络请求 | ❌ **零网络请求**——所有功能纯本地运行 |
-| 数据收集 | ❌ **零数据收集**——不追踪、不上报、不分析 |
-| 第三方服务 | ❌ 不调用任何外部 API 或分析平台 |
-| 数据存储 | ✅ 仅使用 `chrome.storage` 保存用户偏好设置 |
-| 权限范围 | ✅ 仅在 `notebooklm.google.com` 域名下激活 |
-
-你可以随时审查完整源码：[GitHub 仓库](https://github.com/komazhou/NLM-Enhancer)
+### Option 2: Manual Installation (Developer Mode)
+1. Download the latest `NLM-Enhancer-main.zip` from the [Releases](#) page or clone this repository.
+2. Unzip the file to a folder.
+3. Open your Chromium-based browser and navigate to `chrome://extensions/`.
+4. Enable **"Developer mode"** in the top right corner.
+5. Click **"Load unpacked"** and select the unzipped folder.
 
 ---
 
-## 🤝 支持开发者
+## 🙏 Acknowledgments & Credits
 
-如果 NLM Enhancer 对你的学习或研究有所帮助，欢迎请作者喝杯咖啡 ☕
+This project was profoundly inspired by [**Gemini Voyager**](https://github.com/Nagi-ovo/gemini-voyager). 
 
-<div align="center">
+While Voyager revolutionized the UI and folder organization for Google Gemini, **NLM Enhancer** was built from the ground up (with extensive AI collaboration) to solve a completely different, highly specific technical challenge: reverse-engineering NotebookLM's complex DOM to extract lossless equations. 
 
-<img src="docs/donate-qrcode.png" width="250" alt="微信赞赏码">
-
-*微信扫码赞赏*
-
-</div>
+We adopted some of Voyager's elegant UI concepts (like the Timeline and Prompt Vault) to provide a familiar and efficient experience. Huge thanks to the Voyager developer team and the open-source community for paving the way in AI workspace enhancements!
 
 ---
 
-## 📄 许可证
+## ☕ Support the Developer
 
-本项目基于 [MIT License](https://opensource.org/licenses/MIT) 开源。
+This tool was born out of a personal hobby and the genuine need to solve real-world workflow pain points. If NLM Enhancer has saved you from hours of formatting frustration, your support is highly appreciated!
+
+*(Feel free to Star this repository! Donation options coming soon.)*
