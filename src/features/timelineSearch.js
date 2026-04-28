@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 对话提问搜索模块
  * 在面板左侧提供搜索图标，展开后可搜索并跳转到历史提问
  */
@@ -46,7 +46,7 @@ NLM.TimelineSearch = (() => {
         <line x1="3" y1="18" x2="3.01" y2="18"></line>
       </svg>
     `;
-    triggerIcon.title = '搜索历史提问';
+    triggerIcon.title = NLM.i18n.get('btnSearchQuestions');
     
     triggerIcon.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -78,7 +78,7 @@ NLM.TimelineSearch = (() => {
     
     searchPanel.innerHTML = `
       <div class="nlm-search-header">
-        <input type="text" placeholder="搜索提问..." class="nlm-search-input" />
+        <input type="text" placeholder="${NLM.i18n.get('searchPlaceholder')}" class="nlm-search-input" />
       </div>
       <div class="nlm-search-list"></div>
     `;
@@ -129,7 +129,7 @@ NLM.TimelineSearch = (() => {
     );
 
     if (filtered.length === 0) {
-      listContainer.innerHTML = '<div class="nlm-search-empty">未找到相关提问</div>';
+      listContainer.innerHTML = `<div class="nlm-search-empty">${NLM.i18n.get('searchNoResults')}</div>`;
       return;
     }
 

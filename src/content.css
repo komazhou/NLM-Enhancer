@@ -322,8 +322,7 @@
   filter: brightness(1.1);
 }
 
-.nlm-prompt-trigger::after {
-  content: '提示词库';
+.nlm-prompt-trigger .nlm-trigger-label {
   font-family: 'Google Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;

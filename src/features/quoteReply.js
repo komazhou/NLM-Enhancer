@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 选中文本引用回复模块
  * 选中任意文本后弹出"引用"按钮，点击后将文本以【引用内容】格式插入输入框，避免 Markdown 符号被吞噬
  */
@@ -22,7 +22,7 @@ NLM.QuoteReply = (() => {
     if (quoteBtn) return;
     quoteBtn = document.createElement('div');
     quoteBtn.className = 'nlm-quote-btn nlm-hidden';
-    quoteBtn.innerHTML = `${QUOTE_ICON}<span>引用</span>`;
+    quoteBtn.innerHTML = `${QUOTE_ICON}<span>${NLM.i18n.get('btnQuote')}</span>`;
 
     quoteBtn.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -195,9 +195,9 @@ NLM.QuoteReply = (() => {
     }
 
     // 使用明确的中文引用标识和直角引号，避免 > 被编辑器吞噬
-    const quoteBody = `【引用内容】：\n` + selectedText
+    const quoteBody = NLM.i18n.get('quotePrefix') + selectedText
       .split('\n')
-      .map((line) => `「${line}」`)
+      .map((line) => `${NLM.i18n.get('quoteLineWrapOpen')}${line}${NLM.i18n.get('quoteLineWrapClose')}`)
       .join('\n');
 
     // 插入引用到输入框

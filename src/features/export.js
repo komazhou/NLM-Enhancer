@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 对话导出模块
  * 将当前对话导出为 Markdown 文件，并提供纯净的 LaTeX 预览复制
  */
@@ -112,7 +112,7 @@ NLM.Export = (() => {
   function openExportPreview() {
     const messages = NLM.DOM.findAllMessages();
     if (messages.length === 0) {
-      NLM.DOM.showToast("未找到对话内容", window.innerWidth / 2, 100, false);
+      NLM.DOM.showToast(NLM.i18n.get('toastNoConversation'), window.innerWidth / 2, 100, false);
       return;
     }
     
@@ -124,7 +124,7 @@ NLM.Export = (() => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>导出预览 - ${document.title}</title>
+          <title>${NLM.i18n.get('exportPreviewTitle', [document.title])}</title>
           <link rel="stylesheet" href="${chrome.runtime.getURL('lib/katex.min.css')}">
           <style>
             body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1f1f1f; }
@@ -166,25 +166,25 @@ NLM.Export = (() => {
         </head>
         <body>
           <div class="toolbar">
-            <div class="toolbar-title">对话导出预览</div>
+            <div class="toolbar-title">${NLM.i18n.get('exportToolbarTitle')}</div>
             <div class="btn-group">
-              <button class="btn-md" id="downloadMdBtn">下载 Markdown</button>
-              <button class="btn-pdf" id="downloadPdfBtn">另存为 PDF</button>
+              <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
+              <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
             </div>
           </div>
           <div class="preview-container">
-            <h1>预览</h1>
-            <div class="meta">导出时间: ${new Date().toLocaleString("zh-CN")}</div>
+            <h1>${NLM.i18n.get('exportPreview')}</h1>
+            <div class="meta">${NLM.i18n.get('exportTime', [new Date().toLocaleString()])}</div>
             <div id="messages-container">
     `;
     
     messages.forEach((msg, idx) => {
-      const roleName = msg.type === "user" ? "用户" : "NotebookLM";
+      const roleName = msg.type === "user" ? NLM.i18n.get('roleUser') : NLM.i18n.get('roleModel');
       const roleClass = msg.type === "user" ? "user" : "model";
       const cleanHtml = extractCleanHtml(msg.element);
       html += `
         <div class="msg-pair" data-idx="${idx}">
-          <button class="delete-btn" title="删除此条消息">
+          <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
           <div class="msg ${roleClass}">
@@ -203,7 +203,7 @@ NLM.Export = (() => {
     
     const win = window.open("", "_blank");
     if (!win) {
-      NLM.DOM.showToast("预览窗口被拦截，请允许弹出窗口", window.innerWidth / 2, 100, false);
+      NLM.DOM.showToast(NLM.i18n.get('toastPopupBlocked'), window.innerWidth / 2, 100, false);
       return;
     }
     
@@ -232,7 +232,7 @@ NLM.Export = (() => {
         const lines = [];
         const titleEl = doc.querySelector('h1');
         const metaEl = doc.querySelector('.meta');
-        lines.push('# ' + (titleEl ? titleEl.innerText : '导出的对话'));
+        lines.push('# ' + (titleEl ? titleEl.innerText : NLM.i18n.get('exportDefaultTitle')));
         lines.push('> ' + (metaEl ? metaEl.innerText : ''));
         lines.push('');
         lines.push('---');
@@ -240,7 +240,7 @@ NLM.Export = (() => {
         
         doc.querySelectorAll('.msg-pair').forEach(pair => {
           const isUser = pair.querySelector('.user') !== null;
-          const role = isUser ? '👤 **用户**' : '🤖 **NotebookLM**';
+          const role = isUser ? NLM.i18n.get('mdRoleUser') : NLM.i18n.get('mdRoleModel');
           const contentEl = pair.querySelector('.content').cloneNode(true);
           
           // 调用最新修复的解析引擎
@@ -317,7 +317,7 @@ NLM.Export = (() => {
         <polyline points="7 10 12 15 17 10"></polyline>
         <line x1="12" y1="15" x2="12" y2="3"></line>
       </svg>
-      <span>导出</span>
+      <span>${NLM.i18n.get('btnExport')}</span>
     `;
     exportBtn.onclick = openExportPreview;
     document.body.appendChild(exportBtn);

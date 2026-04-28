@@ -8,6 +8,9 @@
   console.log(LOG, '扩展已加载，正在初始化...');
 
   try {
+    // 先初始化 i18n 模块，确保后续模块可以获取翻译
+    await NLM.i18n.init();
+
     const settings = await NLM.Storage.getAll();
 
     // 功能模块启动

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer Mermaid 图表渲染模块
  * 拦截 Mermaid 代码块并渲染为可视化 SVG 图表
  * Mermaid 库按需动态加载以减小初始包体积
@@ -79,11 +79,11 @@ NLM.MermaidRender = (() => {
         toggle.className = 'nlm-mermaid-toggle';
 
         const diagramBtn = document.createElement('button');
-        diagramBtn.textContent = '📊 图表';
+        diagramBtn.textContent = NLM.i18n.get('btnMermaidDiagram');
         diagramBtn.className = 'active';
 
         const codeBtn = document.createElement('button');
-        codeBtn.textContent = '</> 代码';
+        codeBtn.textContent = NLM.i18n.get('btnMermaidCode');
 
         toggle.appendChild(diagramBtn);
         toggle.appendChild(codeBtn);

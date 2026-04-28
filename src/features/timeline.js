@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 对话时间轴导航模块
  * 在页面右侧显示圆点时间轴，每个圆点对应一轮对话，点击可快速跳转
  */
@@ -28,7 +28,7 @@ NLM.Timeline = (() => {
         turns.push({
           index: index,
           element: msg.element,
-          text: (msg.text || '').substring(0, 60).trim() || `提问 ${turns.length + 1}`,
+          text: (msg.text || '').substring(0, 60).trim() || NLM.i18n.get('timelineQuestion', [String(turns.length + 1)]),
           type: msg.type
         });
       }

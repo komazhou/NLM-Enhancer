@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NLM Enhancer 设置</title>
+  <title>NLM Enhancer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,18 +17,22 @@
           <span class="version">v1.0.0</span>
         </div>
       </div>
+      <button class="lang-switch" id="langSwitch" title="Switch Language / 切换语言">
+        <span class="lang-icon">🌐</span>
+        <span class="lang-label" id="langLabel">EN</span>
+      </button>
     </header>
 
     <!-- 功能开关区域 -->
     <div class="settings-section">
-      <h2 class="section-title">🔧 核心功能</h2>
+      <h2 class="section-title" data-i18n="sectionCoreFeatures"></h2>
 
       <div class="setting-item" id="setting-quoteReply">
         <div class="setting-info">
           <span class="setting-icon">💬</span>
           <div>
-            <div class="setting-name">选中文本引用</div>
-            <div class="setting-desc">选中文本后弹出引用按钮</div>
+            <div class="setting-name" data-i18n="featureQuoteReply"></div>
+            <div class="setting-desc" data-i18n="featureQuoteReplyDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -41,8 +45,8 @@
         <div class="setting-info">
           <span class="setting-icon">📐</span>
           <div>
-            <div class="setting-name">公式点击复制</div>
-            <div class="setting-desc">点击公式复制 LaTeX 源码</div>
+            <div class="setting-name" data-i18n="featureFormulaCopy"></div>
+            <div class="setting-desc" data-i18n="featureFormulaCopyDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -53,23 +57,23 @@
 
       <!-- 公式格式选择 -->
       <div class="sub-setting" id="formula-format-group">
-        <div class="setting-name-small">复制格式</div>
+        <div class="setting-name-small" data-i18n="formulaCopyFormat"></div>
         <div class="radio-group" id="formulaFormatGroup">
           <label class="radio-option">
             <input type="radio" name="formulaFormat" value="latex">
-            <span>LaTeX <code>$...$</code> [推荐]</span>
+            <span data-i18n="formatLatexRecommended"></span>
           </label>
           <label class="radio-option">
             <input type="radio" name="formulaFormat" value="mathml">
-            <span>MathML (Word) [试验]</span>
+            <span data-i18n="formatMathmlExperimental"></span>
           </label>
           <label class="radio-option">
             <input type="radio" name="formulaFormat" value="no-dollar">
-            <span>纯文本 (无 $)</span>
+            <span data-i18n="formatPlainText"></span>
           </label>
           <label class="radio-option">
             <input type="radio" name="formulaFormat" value="notion">
-            <span>Notion <code>$$...$$</code></span>
+            <span data-i18n="formatNotion"></span>
           </label>
         </div>
       </div>
@@ -78,8 +82,8 @@
         <div class="setting-info">
           <span class="setting-icon">🔘</span>
           <div>
-            <div class="setting-name">对话时间轴</div>
-            <div class="setting-desc">侧边圆点快速跳转对话</div>
+            <div class="setting-name" data-i18n="featureTimeline"></div>
+            <div class="setting-desc" data-i18n="featureTimelineDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -92,8 +96,8 @@
         <div class="setting-info">
           <span class="setting-icon">📥</span>
           <div>
-            <div class="setting-name">对话导出</div>
-            <div class="setting-desc">一键导出为 Markdown</div>
+            <div class="setting-name" data-i18n="featureExport"></div>
+            <div class="setting-desc" data-i18n="featureExportDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -106,8 +110,8 @@
         <div class="setting-info">
           <span class="setting-icon">⚡</span>
           <div>
-            <div class="setting-name">提示词库</div>
-            <div class="setting-desc">快捷插入预设提示词</div>
+            <div class="setting-name" data-i18n="featurePromptVault"></div>
+            <div class="setting-desc" data-i18n="featurePromptVaultDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -120,14 +124,14 @@
     </div>
 
     <div class="settings-section">
-      <h2 class="section-title">⚙️ 输入与体验</h2>
+      <h2 class="section-title" data-i18n="sectionInputExperience"></h2>
 
       <div class="setting-item" id="setting-draft">
         <div class="setting-info">
           <span class="setting-icon">💾</span>
           <div>
-            <div class="setting-name">草稿防丢</div>
-            <div class="setting-desc">自动保存输入框内容</div>
+            <div class="setting-name" data-i18n="featureDraftSave"></div>
+            <div class="setting-desc" data-i18n="featureDraftSaveDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -140,8 +144,8 @@
         <div class="setting-info">
           <span class="setting-icon">⌨️</span>
           <div>
-            <div class="setting-name">Ctrl+Enter 发送</div>
-            <div class="setting-desc">Enter 变换行，防止误发</div>
+            <div class="setting-name" data-i18n="featureCtrlEnterSend"></div>
+            <div class="setting-desc" data-i18n="featureCtrlEnterSendDesc"></div>
           </div>
         </div>
         <label class="toggle">
@@ -154,8 +158,8 @@
         <div class="setting-info">
           <span class="setting-icon">🔒</span>
           <div>
-            <div class="setting-name">防自动滚动</div>
-            <div class="setting-desc">回复生成中上滚不会被拉回</div>
+            <div class="setting-name" data-i18n="featurePreventScroll"></div>
+            <div class="setting-desc" data-i18n="featurePreventScrollDesc"></div>
           </div>
         </div>
         <label class="toggle">

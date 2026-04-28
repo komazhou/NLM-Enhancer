@@ -9,15 +9,17 @@ window.NLM = NLM;
 NLM.PromptVault = (() => {
   const LOG = '[NLM Enhancer PromptVault]';
 
-  // 内置默认提示词
-  const BUILTIN_PROMPTS = [
-    { title: '📊 提取关键信息制表', text: '请从上传的文档中提取所有关键数据和核心论点，以表格形式呈现，包含序号、要点、详细说明三列。' },
-    { title: '🧠 费曼技巧解释', text: '请用费曼技巧（假设我是一个完全不懂这个领域的人）来向我解释上述文档中最核心的概念。' },
-    { title: '❓ 生成思考题', text: '基于上传的文档内容，生成10个有深度的思考题和讨论问题，帮助我更好地理解和消化这些材料。' },
-    { title: '📝 摘要总结', text: '请为上述文档撰写一份结构化的摘要，包含：背景、核心观点、关键论据、结论，每个部分不超过3句话。' },
-    { title: '🔍 对比分析', text: '请对比文档中提到的不同观点/方案/理论，列出它们各自的优缺点和适用场景。' },
-    { title: '🎯 行动计划', text: '基于文档的建议和结论，帮我制定一个可执行的行动计划，包含具体步骤、时间节点和预期成果。' },
-  ];
+  // 内置默认提示词（使用函数以确保每次获取最新的 i18n 翻译）
+  function getBuiltinPrompts() {
+    return [
+      { title: NLM.i18n.get('builtinPrompt1Title'), text: NLM.i18n.get('builtinPrompt1Text') },
+      { title: NLM.i18n.get('builtinPrompt2Title'), text: NLM.i18n.get('builtinPrompt2Text') },
+      { title: NLM.i18n.get('builtinPrompt3Title'), text: NLM.i18n.get('builtinPrompt3Text') },
+      { title: NLM.i18n.get('builtinPrompt4Title'), text: NLM.i18n.get('builtinPrompt4Text') },
+      { title: NLM.i18n.get('builtinPrompt5Title'), text: NLM.i18n.get('builtinPrompt5Text') },
+      { title: NLM.i18n.get('builtinPrompt6Title'), text: NLM.i18n.get('builtinPrompt6Text') },
+    ];
+  }
 
   let triggerBtn = null;
   let panel = null;
@@ -51,8 +53,8 @@ NLM.PromptVault = (() => {
 
     triggerBtn = document.createElement('button');
     triggerBtn.className = 'nlm-prompt-trigger';
-    triggerBtn.innerHTML = '⚡';
-    triggerBtn.title = '提示词库';
+    triggerBtn.innerHTML = `⚡<span class="nlm-trigger-label">${NLM.i18n.get('promptVaultTitle')}</span>`;
+    triggerBtn.title = NLM.i18n.get('promptVaultTitle');
 
     triggerBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -141,19 +143,20 @@ NLM.PromptVault = (() => {
   function renderPanelContent() {
     if (!panel) return;
 
-    const allPrompts = [...BUILTIN_PROMPTS, ...userPrompts];
+    const builtinPrompts = getBuiltinPrompts();
+    const allPrompts = [...builtinPrompts, ...userPrompts];
 
     panel.innerHTML = `
       <div class="nlm-prompt-header">
-        <h3>⚡ 提示词库</h3>
-        <button class="nlm-prompt-add-btn" title="添加自定义提示词">+</button>
+        <h3>${NLM.i18n.get('promptVaultPanelTitle')}</h3>
+        <button class="nlm-prompt-add-btn" title="${NLM.i18n.get('btnAddPrompt')}">+</button>
       </div>
       <div class="nlm-prompt-list">
         ${allPrompts.map((p, i) => `
-          <div class="nlm-prompt-item" data-index="${i}" data-custom="${i >= BUILTIN_PROMPTS.length}">
+          <div class="nlm-prompt-item" data-index="${i}" data-custom="${i >= builtinPrompts.length}">
             <div class="nlm-prompt-item-title">${p.title}</div>
             <div class="nlm-prompt-item-preview">${p.text.substring(0, 50)}...</div>
-            ${i >= BUILTIN_PROMPTS.length ? '<button class="nlm-prompt-delete" title="删除">×</button>' : ''}
+            ${i >= builtinPrompts.length ? `<button class="nlm-prompt-delete" title="${NLM.i18n.get('btnDelete')}">×</button>` : ''}
           </div>
         `).join('')}
       </div>
@@ -178,7 +181,7 @@ NLM.PromptVault = (() => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const item = btn.closest('.nlm-prompt-item');
-        const idx = parseInt(item.dataset.index) - BUILTIN_PROMPTS.length;
+        const idx = parseInt(item.dataset.index) - builtinPrompts.length;
         if (idx >= 0) {
           userPrompts.splice(idx, 1);
           saveUserPrompts();
@@ -200,13 +203,13 @@ NLM.PromptVault = (() => {
   function insertPrompt(text) {
     const input = NLM.DOM.findChatInput();
     if (!input) {
-      NLM.DOM.showToast('未找到输入框', window.innerWidth / 2, 100, false);
+      NLM.DOM.showToast(NLM.i18n.get('toastInputNotFound'), window.innerWidth / 2, 100, false);
       return;
     }
 
     NLM.DOM.setInputText(input, text);
     input.focus();
-    NLM.DOM.showToast('✓ 已插入', window.innerWidth / 2, 100, true);
+    NLM.DOM.showToast(NLM.i18n.get('toastInserted'), window.innerWidth / 2, 100, true);
   }
 
   /**
@@ -217,12 +220,12 @@ NLM.PromptVault = (() => {
     dialog.className = 'nlm-prompt-dialog';
     dialog.innerHTML = `
       <div class="nlm-prompt-dialog-content">
-        <h3>添加自定义提示词</h3>
-        <input type="text" placeholder="标题（如：📌 代码审查）" class="nlm-prompt-dialog-title" />
-        <textarea placeholder="提示词内容..." class="nlm-prompt-dialog-text" rows="4"></textarea>
+        <h3>${NLM.i18n.get('dialogAddPromptTitle')}</h3>
+        <input type="text" placeholder="${NLM.i18n.get('dialogPromptTitlePlaceholder')}" class="nlm-prompt-dialog-title" />
+        <textarea placeholder="${NLM.i18n.get('dialogPromptTextPlaceholder')}" class="nlm-prompt-dialog-text" rows="4"></textarea>
         <div class="nlm-prompt-dialog-actions">
-          <button class="nlm-btn-cancel">取消</button>
-          <button class="nlm-btn-save">保存</button>
+          <button class="nlm-btn-cancel">${NLM.i18n.get('btnCancel')}</button>
+          <button class="nlm-btn-save">${NLM.i18n.get('btnSave')}</button>
         </div>
       </div>
     `;
@@ -238,7 +241,7 @@ NLM.PromptVault = (() => {
         saveUserPrompts();
         renderPanelContent();
         dialog.remove();
-        NLM.DOM.showToast('✓ 已保存', window.innerWidth / 2, 100, true);
+        NLM.DOM.showToast(NLM.i18n.get('toastSaved'), window.innerWidth / 2, 100, true);
       }
     });
   }

@@ -4,6 +4,78 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // === i18n 本地化系统 ===
+  // 加载两个语言包
+  const [enMessages, zhMessages] = await Promise.all([
+    fetch(chrome.runtime.getURL('_locales/en/messages.json')).then(r => r.json()),
+    fetch(chrome.runtime.getURL('_locales/zh_CN/messages.json')).then(r => r.json()),
+  ]);
+
+  const LANG_PACKS = { en: enMessages, zh_CN: zhMessages };
+
+  // 获取用户保存的语言偏好，默认跟随浏览器
+  const stored = await new Promise(r => chrome.storage.sync.get({ uiLanguage: 'auto' }, r));
+  let currentLang = stored.uiLanguage;
+
+  // auto 模式时，根据浏览器语言决定
+  function resolveLocale(lang) {
+    if (lang !== 'auto') return lang;
+    const browserLang = chrome.i18n.getUILanguage();
+    return (browserLang.startsWith('zh')) ? 'zh_CN' : 'en';
+  }
+
+  // 获取指定 key 的翻译文本
+  function getMsg(key, substitutions) {
+    const locale = resolveLocale(currentLang);
+    const pack = LANG_PACKS[locale] || LANG_PACKS.en;
+    const entry = pack[key] || LANG_PACKS.en[key];
+    if (!entry) return key;
+    let msg = entry.message;
+    // 处理 placeholder 替换
+    if (substitutions && entry.placeholders) {
+      Object.entries(entry.placeholders).forEach(([name, ph]) => {
+        const idx = parseInt(ph.content.replace('$', '')) - 1;
+        if (substitutions[idx] !== undefined) {
+          msg = msg.replace(`$${name.toUpperCase()}$`, substitutions[idx]);
+        }
+      });
+    }
+    return msg;
+  }
+
+  // 将翻译应用到所有 data-i18n 元素
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.dataset.i18n;
+      const msg = getMsg(key);
+      if (msg) el.textContent = msg;
+    });
+    document.title = getMsg('popupTitle');
+
+    // 更新语言按钮标签
+    const label = document.getElementById('langLabel');
+    if (label) {
+      const resolved = resolveLocale(currentLang);
+      label.textContent = resolved === 'zh_CN' ? '中文' : 'EN';
+    }
+  }
+
+  // 初始化 i18n
+  applyI18n();
+
+  // === 语言切换按钮 ===
+  const langBtn = document.getElementById('langSwitch');
+  if (langBtn) {
+    langBtn.addEventListener('click', () => {
+      const resolved = resolveLocale(currentLang);
+      // 切换语言
+      currentLang = (resolved === 'en') ? 'zh_CN' : 'en';
+      chrome.storage.sync.set({ uiLanguage: currentLang });
+      applyI18n();
+    });
+  }
+
+
   // 默认设置
   const DEFAULTS = {
     quoteReplyEnabled: true,

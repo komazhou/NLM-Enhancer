@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 删除/隐藏特定对话轮次模块
  * 允许用户点击垃圾桶图标将某些不要的对话从本地页面隐藏
  */
@@ -32,7 +32,7 @@ NLM.DeleteMessage = (() => {
 
       const btn = document.createElement('button');
       btn.className = 'nlm-delete-msg-btn';
-      btn.title = '隐藏本轮对话（仅本地）';
+      btn.title = NLM.i18n.get('btnHideMessage');
       btn.innerHTML = `
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 6 5 6 21 6"></polyline>
@@ -46,7 +46,7 @@ NLM.DeleteMessage = (() => {
       btn.addEventListener('mouseleave', () => pair.classList.remove('nlm-highlight-delete'));
 
       btn.onclick = () => {
-        if (confirm('是否隐藏此对话回合？（仅在本次页面加载期间隐藏）')) {
+        if (confirm(NLM.i18n.get('confirmHideMessage'))) {
           pair.style.display = 'none';
           pair.classList.add('nlm-hidden-msg');
           

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NLM Enhancer 公式点击复制模块
  * 点击页面中渲染 of 数学公式，按用户选择的格式复制到剪贴板
  * 支持格式：LaTeX ($...$)、MathML (Word)、纯文本 (无$)、Notion ($$...$$)
@@ -13,9 +13,9 @@ NLM.FormulaCopy = (() => {
   let isInitialized = false;
 
   const I18N = {
-    copied: '✓ 公式已复制',
-    failed: '✗ 复制失败',
-    noLatex: '✗ 无法提取源码',
+    get copied() { return NLM.i18n.get('toastFormulaCopied'); },
+    get failed() { return NLM.i18n.get('toastCopyFailed'); },
+    get noLatex() { return NLM.i18n.get('toastNoLatex'); },
   };
 
   function findMathElement(target) {

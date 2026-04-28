@@ -29,6 +29,39 @@ body {
   padding: 18px 20px 14px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8eaed;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.lang-switch:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(138, 180, 248, 0.3);
+}
+
+.lang-icon {
+  font-size: 14px;
+}
+
+.lang-label {
+  letter-spacing: 0.3px;
 }
 
 .logo-area {

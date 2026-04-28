@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "NLM Enhancer - LaTeX Export for NotebookLM",
+  "name": "__MSG_extName__",
   "version": "1.0.0",
-  "description": "A productivity tool for NotebookLM: LaTeX math export, timeline navigation, prompt vault, and message hiding.",
+  "description": "__MSG_extDesc__",
+  "default_locale": "en",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -26,6 +27,7 @@
         "https://notebooklm.google.com/*"
       ],
       "js": [
+        "src/utils/i18n.js",
         "src/utils/storage.js",
         "src/utils/dom.js",
         "src/features/quoteReply.js",
@@ -49,7 +51,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["lib/*", "lib/fonts/*"],
+      "resources": ["lib/*", "lib/fonts/*", "_locales/*/messages.json"],
       "matches": ["https://notebooklm.google.com/*"]
     }
   ]
