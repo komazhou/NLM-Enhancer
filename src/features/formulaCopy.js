@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NLM Enhancer 公式点击复制模块
  * 点击页面中渲染 of 数学公式，按用户选择的格式复制到剪贴板
  * 支持格式：LaTeX ($...$)、MathML (Word)、纯文本 (无$)、Notion ($$...$$)
@@ -222,8 +222,22 @@ NLM.FormulaCopy = (() => {
       }
 
       if (cls.includes('mopen') || cls.includes('mclose')) {
-        const text = el.textContent.trim();
-        if (text) { parts.push(text); return; }
+        // 只提取当前节点的直接文本内容（括号本身），不包含子节点
+        let bracketText = "";
+        for (const child of el.childNodes) {
+          if (child.nodeType === Node.TEXT_NODE) {
+            bracketText += child.textContent.trim();
+          }
+        }
+        if (bracketText) parts.push(bracketText);
+        
+        // 递归处理子节点（特别是可能嵌套在内部的 msupsub）
+        for (const child of el.childNodes) {
+          if (child.nodeType === Node.ELEMENT_NODE) {
+            walk(child);
+          }
+        }
+        return;
       }
 
       for (const child of el.childNodes) walk(child);
@@ -392,7 +406,11 @@ NLM.FormulaCopy = (() => {
         if (cloned) outRoot.appendChild(cloned);
       }
       
-      return new XMLSerializer().serializeToString(outRoot);
+      const serialized = new XMLSerializer().serializeToString(outRoot);
+      // 增加清洗步骤：使用正则全局替换，将 ± 替换为安全的 XML 实体，并替换排版级减号
+      return serialized
+        .replace(/±/g, '&#x00B1;')
+        .replace(/\u2212/g, '-');
     } catch (e) {
       return mathml;
     }
