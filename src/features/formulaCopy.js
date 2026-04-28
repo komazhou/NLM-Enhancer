@@ -449,7 +449,12 @@ NLM.FormulaCopy = (() => {
   }
 
   function wrapFormula(formula, isBlock) {
-    const raw = formula.trim().replace(/^(\$\$?|\\\[|\\\()\s*|\s*(\$\$?|\\\]|\\\))$/g, '').trim();
+    let raw = formula.trim().replace(/^(\$\$?|\\\[|\\\()\s*|\s*(\$\$?|\\\]|\\\))$/g, '').trim();
+    
+    // 修复 Bug 3: 将 Unicode 撇号 ′ (U+2032) 和中文单引号 ’ (U+2019) 替换为标准 ASCII 单引号 '
+    // 修复 Bug 4: 消除冗余的 ^{'} 语法（MathType 不支持），直接替换为 ' 或 ^{\prime}
+    raw = raw.replace(/[′’]/g, "'").replace(/\^{'}/g, "'");
+
     if (!raw) return { text: '', html: '' };
 
     const result = { text: '', html: '' };
