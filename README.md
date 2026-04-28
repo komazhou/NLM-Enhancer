@@ -88,6 +88,20 @@ We adopted some of Voyager's elegant UI concepts (like the Timeline and Prompt V
 
 ## ☕ Support the Developer
 
-This tool was born out of a personal hobby and the genuine need to solve real-world workflow pain points. If NLM Enhancer has saved you from hours of formatting frustration, your support is highly appreciated!
+This tool was born out of a personal hobby and the genuine need to solve real-world workflow pain points. If NLM Enhancer has saved you from hours of formatting frustration, consider buying me a coffee. It helps keep the updates coming! ❤️
 
-*(Feel free to Star this repository! Donation options coming soon.)*
+<div align="center">
+  <p><b>Support via WeChat / Alipay:</b></p>
+  <table align="center" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center" width="200">
+        <img src="docs/wechat.png" alt="WeChat Pay" height="160"><br>
+        <sub><b>WeChat Pay (微信支付)</b></sub>
+      </td>
+      <td align="center" width="200">
+        <img src="docs/alipay.png" alt="Alipay" height="160"><br>
+        <sub><b>Alipay (支付宝)</b></sub>
+      </td>
+    </tr>
+  </table>
+</div>
