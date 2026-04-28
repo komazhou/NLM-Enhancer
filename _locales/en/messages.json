@@ -91,7 +91,5 @@
   "confirmHideMessage": { "message": "Hide this conversation round? (Only hidden during this page session)" },
   "btnSearchQuestions": { "message": "Search questions" },
   "searchPlaceholder": { "message": "Search questions..." },
-  "searchNoResults": { "message": "No matching questions found" },
-  "btnMermaidDiagram": { "message": "📊 Diagram" },
-  "btnMermaidCode": { "message": "</> Code" }
+  "searchNoResults": { "message": "No matching questions found" }
 }

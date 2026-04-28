@@ -15,7 +15,6 @@ NLM.Storage = (() => {
     timelineEnabled: true,
     exportEnabled: true,
     promptVaultEnabled: true,
-    mermaidEnabled: true,
     draftSaveEnabled: true,
     ctrlEnterSend: false,
     uiTweaksEnabled: false,

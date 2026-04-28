@@ -89,7 +89,5 @@
   "confirmHideMessage": { "message": "是否隐藏此对话回合？（仅在本次页面加载期间隐藏）" },
   "btnSearchQuestions": { "message": "搜索历史提问" },
   "searchPlaceholder": { "message": "搜索提问..." },
-  "searchNoResults": { "message": "未找到相关提问" },
-  "btnMermaidDiagram": { "message": "📊 图表" },
-  "btnMermaidCode": { "message": "</> 代码" }
+  "searchNoResults": { "message": "未找到相关提问" }
 }

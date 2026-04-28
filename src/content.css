@@ -565,69 +565,6 @@
 }
 
 
-/* === Mermaid 图表 === */
-.nlm-mermaid-wrapper {
-  position: relative;
-  margin: 8px 0;
-}
-
-.nlm-mermaid-toggle {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-  display: flex;
-  gap: 2px;
-  background: rgba(40, 40, 40, 0.7);
-  backdrop-filter: blur(8px);
-  border-radius: 8px;
-  padding: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.nlm-mermaid-toggle button {
-  padding: 4px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: 'Google Sans', sans-serif;
-  transition: all 0.2s;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.nlm-mermaid-toggle button:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.nlm-mermaid-toggle button.active {
-  background: #8ab4f8;
-  color: #1f1f1f;
-}
-
-.nlm-mermaid-diagram {
-  padding: 16px;
-  text-align: center;
-  overflow-x: auto;
-  min-height: 80px;
-}
-
-.nlm-mermaid-diagram svg {
-  max-width: 100%;
-  height: auto;
-}
-
-@media (prefers-color-scheme: light) {
-  .nlm-mermaid-toggle {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(0, 0, 0, 0.06);
-  }
-  .nlm-mermaid-toggle button { color: #666; }
-  .nlm-mermaid-toggle button:hover { background: rgba(0,0,0,0.04); }
-  .nlm-mermaid-toggle button.active { background: #1a73e8; color: #fff; }
-}
-
 
 /* === 公式悬停样式 === */
 /* 使用 ::after 伪元素实现稳定的悬停框，不依赖 outline（避免被 NotebookLM 的 DOM 更新打断） */

@@ -3,3 +3,11 @@
 /demo.html
 /src/features/formulaCopy_old.js
 /CLAUDE.md
+/src/donate-qrcode.png
+
+# 暂未实现的功能模块（保留本地，待实现后再加入仓库）
+/src/features/mermaidRender.js
+
+# 字体优化：Chrome 环境仅需 woff2 格式
+lib/fonts/*.ttf
+lib/fonts/*.woff
