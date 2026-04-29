@@ -339,9 +339,18 @@ NLM.Export = (() => {
   function openStashPreview(stashItems) {
     if (!stashItems || stashItems.length === 0) return;
 
-    const safeTitle = (document.title || 'notebooklm').replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_').slice(0, 50);
+    // 尝试获取笔记本标题
+    let notebookTitle = document.title;
+    const notebookNameEl = document.querySelector('.notebook-name, [aria-label="Notebook name"]');
+    if (notebookNameEl) {
+      notebookTitle = notebookNameEl.innerText.trim();
+    } else if (notebookTitle.includes(' - NotebookLM')) {
+      notebookTitle = notebookTitle.replace(' - NotebookLM', '');
+    }
+    
+    // 初始预览标题：笔记本名称 + 知识购物车
+    const defaultTitle = `${notebookTitle} - ${NLM.i18n.get('cartPanelTitle')}`;
     const date = new Date().toISOString().slice(0, 10);
-    const filename = `${safeTitle}_stash_${date}.md`;
 
     let html = `
       <!DOCTYPE html>
@@ -360,7 +369,9 @@ NLM.Export = (() => {
             .btn-pdf { background: #1a73e8; color: white; }
             .btn-pdf:hover { background: #1765cc; }
             .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
-            h1 { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: 700; }
+            h1 { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: 700; border-radius: 4px; padding: 4px; transition: background 0.2s; outline: none; }
+            h1[contenteditable="true"]:hover { background: #f1f3f4; cursor: text; }
+            h1[contenteditable="true"]:focus { background: #fff; box-shadow: 0 0 0 2px #1a73e8; }
             .meta { text-align: center; color: #70757a; font-size: 13px; margin-bottom: 50px; }
             .msg-pair { position: relative; margin-bottom: 20px; border-radius: 12px; transition: background 0.2s; }
             .msg-pair:hover { background: #fdfdfd; }
@@ -391,7 +402,7 @@ NLM.Export = (() => {
             </div>
           </div>
           <div class="preview-container">
-            <h1>${NLM.i18n.get('cartPanelTitle')}</h1>
+            <h1 id="editableTitle" contenteditable="true" title="${NLM.i18n.get('clickToEdit', ['点击修改标题'])}">${defaultTitle}</h1>
             <div class="meta">${NLM.i18n.get('exportTime', [new Date().toLocaleString()])} · ${NLM.i18n.get('stashItemCount', [String(stashItems.length)])}</div>
             <div id="messages-container">
     `;
@@ -460,8 +471,9 @@ NLM.Export = (() => {
     const mdBtn = doc.getElementById('downloadMdBtn');
     if (mdBtn) {
       mdBtn.addEventListener('click', () => {
+        const currentTitle = doc.getElementById('editableTitle').innerText.trim() || defaultTitle;
         const lines = [];
-        lines.push(`# ${NLM.i18n.get('cartPanelTitle')}`);
+        lines.push(`# ${currentTitle}`);
         lines.push(`> ${NLM.i18n.get('exportTime', [new Date().toLocaleString()])}`);
         lines.push('');
         lines.push('---');
