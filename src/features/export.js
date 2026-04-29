@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NLM Enhancer 对话导出模块
  * 将当前对话导出为 Markdown 文件，并提供纯净的 LaTeX 预览复制
  */
@@ -331,5 +331,169 @@ NLM.Export = (() => {
     isInitialized = false;
   }
 
-  return { init, destroy };
+  /**
+   * 打开暂存内容的合并预览窗口（供 StashCart 模块调用）
+   * 复用与全量导出相同的预览 UI
+   * @param {Array} stashItems - 暂存数据数组 [{id, markdown, userMarkdown, modelMarkdown, timestamp, ...}]
+   */
+  function openStashPreview(stashItems) {
+    if (!stashItems || stashItems.length === 0) return;
+
+    const safeTitle = (document.title || 'notebooklm').replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_').slice(0, 50);
+    const date = new Date().toISOString().slice(0, 10);
+    const filename = `${safeTitle}_stash_${date}.md`;
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${NLM.i18n.get('exportPreviewTitle', [document.title])}</title>
+          <link rel="stylesheet" href="${chrome.runtime.getURL('lib/katex.min.css')}">
+          <style>
+            body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1f1f1f; }
+            .toolbar { position: sticky; top: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 12px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+            .toolbar-title { font-size: 16px; font-weight: 600; color: #1a73e8; }
+            .btn-group { display: flex; gap: 12px; }
+            button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+            .btn-md { background: #fff; border: 1px solid #dadce0; color: #3c4043; }
+            .btn-md:hover { background: #f8f9fa; border-color: #bdc1c6; }
+            .btn-pdf { background: #1a73e8; color: white; }
+            .btn-pdf:hover { background: #1765cc; }
+            .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
+            h1 { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: 700; }
+            .meta { text-align: center; color: #70757a; font-size: 13px; margin-bottom: 50px; }
+            .msg-pair { position: relative; margin-bottom: 20px; border-radius: 12px; transition: background 0.2s; }
+            .msg-pair:hover { background: #fdfdfd; }
+            .msg-pair:hover .delete-btn { opacity: 1; }
+            .delete-btn { position: absolute; left: -45px; top: 10px; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #eee; color: #d93025; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0 !important; }
+            .delete-btn:hover { background: #fce8e6; border-color: #f19f97; transform: scale(1.1); }
+            .delete-btn svg { pointer-events: none; width: 18px; height: 18px; }
+            .msg { padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; }
+            .user { background: #f8f9fa; border-left: 4px solid #1a73e8; }
+            .model { background: #fff; border-bottom: 1px solid #f1f3f4; }
+            .role { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #5f6368; text-transform: uppercase; }
+            .content { font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
+            pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; }
+            .stash-divider { border: none; border-top: 2px dashed #dadce0; margin: 30px 0; }
+            @media print {
+              .toolbar, .delete-btn { display: none !important; }
+              .preview-container { box-shadow: none; margin: 0; padding: 20px; width: 100%; max-width: none; }
+              .msg-pair { page-break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="toolbar">
+            <div class="toolbar-title">${NLM.i18n.get('cartPanelTitle')}</div>
+            <div class="btn-group">
+              <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
+              <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
+            </div>
+          </div>
+          <div class="preview-container">
+            <h1>${NLM.i18n.get('cartPanelTitle')}</h1>
+            <div class="meta">${NLM.i18n.get('exportTime', [new Date().toLocaleString()])} · ${NLM.i18n.get('stashItemCount', [String(stashItems.length)])}</div>
+            <div id="messages-container">
+    `;
+
+    stashItems.forEach((item, idx) => {
+      // 每个暂存块可能包含 user + model
+      if (item.userHtml || item.userMarkdown) {
+        const contentToShow = item.userHtml ? item.userHtml : escapeHtmlForPreview(item.userMarkdown);
+        html += `
+          <div class="msg-pair" data-idx="${idx}-user">
+            <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+            <div class="msg user">
+              <div class="role">${NLM.i18n.get('roleUser')}</div>
+              <div class="content">${contentToShow}</div>
+            </div>
+          </div>`;
+      }
+      if (item.modelHtml || item.modelMarkdown) {
+        const contentToShow = item.modelHtml ? item.modelHtml : escapeHtmlForPreview(item.modelMarkdown);
+        html += `
+          <div class="msg-pair" data-idx="${idx}-model">
+            <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+            <div class="msg model">
+              <div class="role">${NLM.i18n.get('roleModel')}</div>
+              <div class="content">${contentToShow}</div>
+            </div>
+          </div>`;
+      }
+      if (idx < stashItems.length - 1) {
+        html += `<hr class="stash-divider">`;
+      }
+    });
+
+    html += `
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const win = window.open('', '_blank');
+    if (!win) {
+      NLM.DOM.showToast(NLM.i18n.get('toastPopupBlocked'), window.innerWidth / 2, 100, false);
+      return;
+    }
+
+    win.document.write(html);
+    win.document.close();
+    const doc = win.document;
+
+    // PDF
+    const pdfBtn = doc.getElementById('downloadPdfBtn');
+    if (pdfBtn) pdfBtn.addEventListener('click', () => win.print());
+
+    // 删除
+    doc.addEventListener('click', (e) => {
+      const btn = e.target.closest('.delete-btn');
+      if (btn) { const pair = btn.closest('.msg-pair'); if (pair) pair.remove(); }
+    });
+
+    // Markdown 下载
+    const mdBtn = doc.getElementById('downloadMdBtn');
+    if (mdBtn) {
+      mdBtn.addEventListener('click', () => {
+        const lines = [];
+        lines.push(`# ${NLM.i18n.get('cartPanelTitle')}`);
+        lines.push(`> ${NLM.i18n.get('exportTime', [new Date().toLocaleString()])}`);
+        lines.push('');
+        lines.push('---');
+        lines.push('');
+
+        const remainingPairs = Array.from(doc.querySelectorAll('.msg-pair')).map(el => el.dataset.idx);
+
+        stashItems.forEach((item, idx) => {
+          if (remainingPairs.includes(`${idx}-user`) && item.userMarkdown) {
+            lines.push(`## ${NLM.i18n.get('mdRoleUser')}\n\n${item.userMarkdown}\n\n---\n`);
+          }
+          if (remainingPairs.includes(`${idx}-model`) && item.modelMarkdown) {
+            lines.push(`## ${NLM.i18n.get('mdRoleModel')}\n\n${item.modelMarkdown}\n\n---\n`);
+          }
+        });
+
+        const finalMd = lines.join('\n');
+        const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
+        const a = doc.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+      });
+    }
+  }
+
+  /**
+   * 简易 HTML 转义（用于预览窗口中展示 Markdown 文本）
+   */
+  function escapeHtmlForPreview(text) {
+    return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  return { init, destroy, htmlToMarkdown, extractCleanHtml, openStashPreview };
 })();

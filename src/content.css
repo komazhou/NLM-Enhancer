@@ -1,9 +1,8 @@
 /* ============================================================
-   NLM Enhancer 内容脚本样式表
-   包含所有注入到 NotebookLM 页面的 UI 组件样式
+   NLM Enhancer 鍐呭鑴氭湰鏍峰紡琛?   鍖呭惈鎵€鏈夋敞鍏ュ埌 NotebookLM 椤甸潰鐨?UI 缁勪欢鏍峰紡
    ============================================================ */
 
-/* === 选中文本引用按钮 === */
+/* === 閫変腑鏂囨湰寮曠敤鎸夐挳 === */
 .nlm-quote-btn {
   position: fixed;
   z-index: 99999;
@@ -19,7 +18,7 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: auto;
 
-  /* 毛玻璃暗色风格 */
+  /* 姣涚幓鐠冩殫鑹查鏍?*/
   background: rgba(30, 30, 30, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -47,7 +46,7 @@
   visibility: hidden !important;
 }
 
-/* 亮色模式适配 */
+/* 浜壊妯″紡閫傞厤 */
 @media (prefers-color-scheme: light) {
   .nlm-quote-btn {
     background: rgba(255, 255, 255, 0.92);
@@ -61,7 +60,7 @@
 }
 
 
-/* === 对话时间轴导航 === */
+/* === 瀵硅瘽鏃堕棿杞村鑸?=== */
 .nlm-timeline-bar {
   position: fixed;
   z-index: 99990;
@@ -69,7 +68,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 12px; /* 宽度从 16px 修改为 12px */
+  width: 12px; /* 瀹藉害浠?16px 淇敼涓?12px */
   gap: 8px;
   padding: 0;
   background: rgba(128, 128, 128, 0.05); 
@@ -121,7 +120,7 @@
   overflow: hidden;
 }
 
-/* 亮色模式适配 */
+/* 浜壊妯″紡閫傞厤 */
 @media (prefers-color-scheme: light) {
   .nlm-timeline-bar::before {
     background: rgba(0, 0, 0, 0.08);
@@ -162,7 +161,7 @@
   padding: 0;
 }
 
-/* 消息容器悬停时显示删除按钮 */
+/* 娑堟伅瀹瑰櫒鎮仠鏃舵樉绀哄垹闄ゆ寜閽?*/
 .chat-message-pair:hover .nlm-delete-msg-btn,
 .individual-message:hover .nlm-delete-msg-btn {
   opacity: 1;
@@ -237,7 +236,7 @@
 }
 
 
-/* === 高亮闪烁动画 === */
+/* === 楂樹寒闂儊鍔ㄧ敾 === */
 @keyframes nlm-flash {
   0% { background-color: transparent; }
   30% { background-color: rgba(138, 180, 248, 0.15); }
@@ -249,7 +248,7 @@
 }
 
 
-/* === 导出按钮 === */
+/* === 瀵煎嚭鎸夐挳 === */
 .nlm-export-btn {
   position: fixed;
   z-index: 99990;
@@ -260,8 +259,8 @@
   height: 28px;
   padding: 0 12px;
   border: none;
-  border-radius: 8px 8px 0 0; /* 仅顶部圆角，如果底边紧贴输入框 */
-  /* 或者使用全圆角，根据美观度决定。用户说带圆弧样式。 */
+  border-radius: 8px 8px 0 0; /* 浠呴《閮ㄥ渾瑙掞紝濡傛灉搴曡竟绱ц创杈撳叆妗?*/
+  /* 鎴栬€呬娇鐢ㄥ叏鍦嗚锛屾牴鎹編瑙傚害鍐冲畾銆傜敤鎴疯甯﹀渾寮ф牱寮忋€?*/
   border-radius: 6px;
   cursor: pointer;
   font-family: 'Google Sans', sans-serif;
@@ -297,7 +296,7 @@
 }
 
 
-/* === 提示词库 === */
+/* === 鎻愮ず璇嶅簱 === */
 .nlm-prompt-trigger {
   position: fixed;
   z-index: 99990;
@@ -461,7 +460,7 @@
 }
 
 
-/* === 提示词添加对话框 === */
+/* === 鎻愮ず璇嶆坊鍔犲璇濇 === */
 .nlm-prompt-dialog {
   position: fixed;
   inset: 0;
@@ -566,8 +565,8 @@
 
 
 
-/* === 公式悬停样式 === */
-/* 使用 ::after 伪元素实现稳定的悬停框，不依赖 outline（避免被 NotebookLM 的 DOM 更新打断） */
+/* === 鍏紡鎮仠鏍峰紡 === */
+/* 浣跨敤 ::after 浼厓绱犲疄鐜扮ǔ瀹氱殑鎮仠妗嗭紝涓嶄緷璧?outline锛堥伩鍏嶈 NotebookLM 鐨?DOM 鏇存柊鎵撴柇锛?*/
 .katex,
 .math-inline,
 .math-block,
@@ -607,7 +606,7 @@ mjx-container:hover::after,
   background-color: rgba(138, 180, 248, 0.06);
 }
 
-/* 点击时闪烁反馈 */
+/* 鐐瑰嚮鏃堕棯鐑佸弽棣?*/
 .nlm-formula-clicked::after {
   border-color: rgba(52, 168, 83, 0.8) !important;
   background-color: rgba(52, 168, 83, 0.1) !important;
@@ -627,7 +626,7 @@ mjx-container:hover::after,
 }
 
 
-/* === 提问搜索功能 === */
+/* === 鎻愰棶鎼滅储鍔熻兘 === */
 .nlm-timeline-search-trigger {
   position: fixed;
   z-index: 99992;
@@ -777,3 +776,169 @@ mjx-container:hover::after,
   .nlm-search-item-num { color: rgba(0, 0, 0, 0.2); }
   .nlm-search-item:hover { background: rgba(0, 0, 0, 0.04); }
 }
+
+
+/* === 鐭ヨ瘑璐墿杞?- 鑽父鏆傚瓨鎸夐挳 === */
+.nlm-stash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 5;
+  white-space: nowrap;
+}
+.nlm-stash-btn svg { flex-shrink: 0; }
+.nlm-stash-label { line-height: 1; }
+
+.chat-message-pair:hover .nlm-stash-btn,
+.individual-message:hover .nlm-stash-btn { opacity: 1; }
+
+.nlm-stash-btn:hover {
+  opacity: 1 !important;
+  color: #8ab4f8;
+  background: rgba(138, 180, 248, 0.1);
+  border-color: rgba(138, 180, 248, 0.3);
+  transform: translateY(-1px);
+}
+.nlm-stash-btn:active { transform: scale(0.97); }
+
+.nlm-stash-btn.nlm-stashed {
+  opacity: 1 !important;
+  color: #34a853;
+  background: rgba(52, 168, 83, 0.1);
+  border-color: rgba(52, 168, 83, 0.3);
+}
+.nlm-stash-btn.nlm-stashed:hover {
+  color: #ea4335;
+  background: rgba(234, 67, 53, 0.08);
+  border-color: rgba(234, 67, 53, 0.3);
+}
+.nlm-stash-btn-absolute { position: absolute; top: 8px; right: 42px; }
+
+@media (prefers-color-scheme: light) {
+  .nlm-stash-btn { color: rgba(0,0,0,0.4); border-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.02); }
+  .nlm-stash-btn:hover { color: #1a73e8; background: rgba(26,115,232,0.06); border-color: rgba(26,115,232,0.25); }
+  .nlm-stash-btn.nlm-stashed { color: #0d652d; background: rgba(13,101,45,0.06); border-color: rgba(13,101,45,0.2); }
+  .nlm-stash-btn.nlm-stashed:hover { color: #c5221f; background: rgba(197,34,31,0.06); border-color: rgba(197,34,31,0.2); }
+}
+
+/* === 鐭ヨ瘑璐墿杞?- 鍏ㄥ眬鎮诞寰芥爣锛堥敋瀹氫富瀵硅瘽鏍忥級 === */
+.nlm-cart-badge {
+  position: fixed;
+  z-index: 99990;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #e8eaed;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+}
+.nlm-cart-badge:hover { background: rgba(55,55,55,0.95); transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.nlm-cart-badge:active { transform: scale(0.95); }
+
+.nlm-cart-count {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; background: linear-gradient(135deg, #ea4335, #d93025); color: #fff;
+  font-size: 11px; font-weight: 700; font-family: 'Google Sans', sans-serif;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(234,67,53,0.4);
+  animation: nlm-badge-in 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes nlm-badge-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.nlm-cart-bounce { animation: nlm-bounce 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+@keyframes nlm-bounce { 0% { transform: scale(1); } 40% { transform: scale(1.2); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
+
+@media (prefers-color-scheme: light) {
+  .nlm-cart-badge { background: rgba(255,255,255,0.92); color: #1f1f1f; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+  .nlm-cart-badge:hover { background: rgba(245,245,245,0.98); }
+}
+
+/* === 鐭ヨ瘑璐墿杞?- 鏆傚瓨鍒楄〃闈㈡澘 === */
+.nlm-cart-panel {
+  position: fixed; z-index: 99995; bottom: 80px; right: 24px; width: 360px; max-height: 520px;
+  border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+  background: rgba(28,28,30,0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
+  color: #e8eaed; font-family: 'Google Sans', sans-serif;
+  animation: nlm-cart-panel-in 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes nlm-cart-panel-in { from { opacity: 0; transform: translateY(16px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.nlm-cart-panel-closing { opacity: 0; transform: translateY(16px) scale(0.95); transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+
+.nlm-cart-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.nlm-cart-panel-header h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.nlm-cart-header-actions { display: flex; gap: 4px; }
+.nlm-cart-action-btn { width: 30px; height: 30px; border: none; border-radius: 8px; background: rgba(255,255,255,0.06); color: #e8eaed; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; font-size: 14px; }
+.nlm-cart-action-btn:hover { background: rgba(255,255,255,0.14); }
+.nlm-cart-clear-btn:hover { background: rgba(234,67,53,0.15); color: #f28b82; }
+
+.nlm-cart-list { flex: 1; overflow-y: auto; padding: 6px; max-height: 360px; }
+.nlm-cart-list::-webkit-scrollbar { width: 4px; }
+.nlm-cart-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.nlm-cart-item { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 10px; transition: all 0.2s; position: relative; }
+.nlm-cart-item:hover { background: rgba(255,255,255,0.05); }
+
+.nlm-cart-item-check { display: flex; align-items: center; flex-shrink: 0; width: 18px; height: 18px; margin-top: 2px; position: relative; cursor: pointer; }
+.nlm-cart-item-check input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.nlm-cart-checkmark { width: 16px; height: 16px; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 4px; transition: all 0.2s; position: relative; }
+.nlm-cart-item-check input:checked ~ .nlm-cart-checkmark { background: #8ab4f8; border-color: #8ab4f8; }
+.nlm-cart-item-check input:checked ~ .nlm-cart-checkmark::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #1f1f1f; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+.nlm-cart-item-body { flex: 1; min-width: 0; }
+.nlm-cart-item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.nlm-cart-item-role { font-size: 14px; }
+.nlm-cart-item-time { font-size: 11px; color: rgba(255,255,255,0.35); flex: 1; }
+.nlm-cart-item-delete { width: 22px; height: 22px; border: none; border-radius: 50%; background: transparent; color: rgba(255,255,255,0.3); font-size: 16px; cursor: pointer; display: none; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; }
+.nlm-cart-item:hover .nlm-cart-item-delete { display: flex; }
+.nlm-cart-item-delete:hover { background: rgba(234,67,53,0.15); color: #f28b82; }
+.nlm-cart-item-summary { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.nlm-cart-empty { padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.35); font-size: 13px; }
+
+.nlm-cart-panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+.nlm-cart-selected-count { font-size: 12px; color: rgba(255,255,255,0.4); }
+.nlm-cart-preview-btn { padding: 6px 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font-family: 'Google Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.nlm-cart-preview-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.nlm-cart-preview-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
+
+@media (prefers-color-scheme: light) {
+  .nlm-cart-panel { background: rgba(255,255,255,0.97); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 12px 40px rgba(0,0,0,0.15); color: #1f1f1f; }
+  .nlm-cart-panel-header { border-bottom-color: rgba(0,0,0,0.06); }
+  .nlm-cart-action-btn { background: rgba(0,0,0,0.04); color: #1f1f1f; }
+  .nlm-cart-action-btn:hover { background: rgba(0,0,0,0.08); }
+  .nlm-cart-clear-btn:hover { background: rgba(234,67,53,0.08); color: #c5221f; }
+  .nlm-cart-item:hover { background: rgba(0,0,0,0.03); }
+  .nlm-cart-item-time { color: rgba(0,0,0,0.35); }
+  .nlm-cart-item-delete { color: rgba(0,0,0,0.25); }
+  .nlm-cart-item-delete:hover { background: rgba(234,67,53,0.08); color: #c5221f; }
+  .nlm-cart-item-summary { color: rgba(0,0,0,0.5); }
+  .nlm-cart-empty { color: rgba(0,0,0,0.3); }
+  .nlm-cart-checkmark { border-color: rgba(0,0,0,0.2); }
+  .nlm-cart-item-check input:checked ~ .nlm-cart-checkmark { background: #1a73e8; border-color: #1a73e8; }
+  .nlm-cart-item-check input:checked ~ .nlm-cart-checkmark::after { border-color: #fff; }
+  .nlm-cart-panel-footer { border-top-color: rgba(0,0,0,0.06); }
+  .nlm-cart-selected-count { color: rgba(0,0,0,0.4); }
+}
+

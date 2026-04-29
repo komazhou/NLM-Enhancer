@@ -62,7 +62,7 @@
   "exportDefaultTitle": { "message": "Exported Conversation" },
   "mdRoleUser": { "message": "👤 **User**" },
   "mdRoleModel": { "message": "🤖 **NotebookLM**" },
-  "btnExport": { "message": "Export" },
+  "btnExport": { "message": "Export All" },
   "promptVaultTitle": { "message": "Prompt Vault" },
   "promptVaultPanelTitle": { "message": "⚡ Prompt Vault" },
   "btnAddPrompt": { "message": "Add custom prompt" },
@@ -91,5 +91,23 @@
   "confirmHideMessage": { "message": "Hide this conversation round? (Only hidden during this page session)" },
   "btnSearchQuestions": { "message": "Search questions" },
   "searchPlaceholder": { "message": "Search questions..." },
-  "searchNoResults": { "message": "No matching questions found" }
+  "searchNoResults": { "message": "No matching questions found" },
+  "featureStashCart": { "message": "Knowledge Cart" },
+  "featureStashCartDesc": { "message": "Stash selected Q&A blocks for merged export" },
+  "stashTooltip": { "message": "Stash for merged export" },
+  "stashBtnLabel": { "message": "Stash" },
+  "stashBtnStashed": { "message": "Stashed" },
+  "toastStashed": { "message": "✓ Stashed" },
+  "toastUnstashed": { "message": "✓ Removed from cart" },
+  "cartPanelTitle": { "message": "📦 Knowledge Cart" },
+  "cartEmpty": { "message": "No stashed items yet" },
+  "cartExportAll": { "message": "Export Selected" },
+  "cartSelectAll": { "message": "Select / Deselect All" },
+  "cartPreviewMerged": { "message": "Export Selected" },
+  "cartClearAll": { "message": "Clear All" },
+  "toastCartCleared": { "message": "✓ Cart cleared" },
+  "stashItemCount": {
+    "message": "$COUNT$ items stashed",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  }
 }

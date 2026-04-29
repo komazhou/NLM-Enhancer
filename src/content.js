@@ -31,6 +31,10 @@
       NLM.Export.init();
     }
 
+    if (settings.stashCartEnabled) {
+      NLM.StashCart.init();
+    }
+
     if (settings.promptVaultEnabled) {
       await NLM.PromptVault.init();
     }
@@ -68,6 +72,11 @@
       if (changes.exportEnabled) {
         if (changes.exportEnabled.newValue) NLM.Export.init();
         else NLM.Export.destroy();
+      }
+
+      if (changes.stashCartEnabled) {
+        if (changes.stashCartEnabled.newValue) NLM.StashCart.init();
+        else NLM.StashCart.destroy();
       }
 
       if (changes.promptVaultEnabled) {

@@ -60,7 +60,7 @@
   "exportDefaultTitle": { "message": "导出的对话" },
   "mdRoleUser": { "message": "👤 **用户**" },
   "mdRoleModel": { "message": "🤖 **NotebookLM**" },
-  "btnExport": { "message": "导出" },
+  "btnExport": { "message": "全量导出" },
   "promptVaultTitle": { "message": "提示词库" },
   "promptVaultPanelTitle": { "message": "⚡ 提示词库" },
   "btnAddPrompt": { "message": "添加自定义提示词" },
@@ -89,5 +89,23 @@
   "confirmHideMessage": { "message": "是否隐藏此对话回合？（仅在本次页面加载期间隐藏）" },
   "btnSearchQuestions": { "message": "搜索历史提问" },
   "searchPlaceholder": { "message": "搜索提问..." },
-  "searchNoResults": { "message": "未找到相关提问" }
+  "searchNoResults": { "message": "未找到相关提问" },
+  "featureStashCart": { "message": "知识购物车" },
+  "featureStashCartDesc": { "message": "暂存对话区块，合并导出" },
+  "stashTooltip": { "message": "暂存以合并导出" },
+  "stashBtnLabel": { "message": "暂存" },
+  "stashBtnStashed": { "message": "已暂存" },
+  "toastStashed": { "message": "✓ 已暂存" },
+  "toastUnstashed": { "message": "✓ 已移出购物车" },
+  "cartPanelTitle": { "message": "📦 知识购物车" },
+  "cartEmpty": { "message": "暂无暂存内容" },
+  "cartExportAll": { "message": "合并导出" },
+  "cartSelectAll": { "message": "全选 / 取消全选" },
+  "cartPreviewMerged": { "message": "合并导出" },
+  "cartClearAll": { "message": "全部清空" },
+  "toastCartCleared": { "message": "✓ 购物车已清空" },
+  "stashItemCount": {
+    "message": "已暂存 $COUNT$ 项",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  }
 }
