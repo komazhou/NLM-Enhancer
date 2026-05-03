@@ -234,7 +234,7 @@ NLM.Export = (() => {
             .btn-pdf { background: #1a73e8; color: white; }
             .btn-pdf:hover { background: #1765cc; }
             
-            .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
+            .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; position: relative; }
             h1 { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: 700; border-radius: 4px; padding: 4px; transition: background 0.2s; outline: none; }
             h1[contenteditable="true"]:hover { background: #f1f3f4; cursor: text; }
             h1[contenteditable="true"]:focus { background: #fff; box-shadow: 0 0 0 2px #1a73e8; }
@@ -242,11 +242,6 @@ NLM.Export = (() => {
             
             .msg-pair { position: relative; margin-bottom: 20px; border-radius: 12px; transition: background 0.2s; }
             .msg-pair:hover { background: #fdfdfd; }
-            .msg-pair:hover .delete-btn { opacity: 1; }
-            
-            .delete-btn { position: absolute; left: -45px; top: 10px; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #dadce0; color: #d93025; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0 !important; border: 1px solid #eee; }
-            .delete-btn:hover { background: #fce8e6; border-color: #f19f97; transform: scale(1.1); }
-            .delete-btn svg { pointer-events: none; width: 18px; height: 18px; }
             
             .msg { padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; }
             .user { background: #f8f9fa; border-left: 4px solid #1a73e8; }
@@ -254,10 +249,32 @@ NLM.Export = (() => {
             .role { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #5f6368; text-transform: uppercase; }
             .content { font-size: 15px; line-height: 1.7; }
             
-            pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; position: relative; }
+            /* 精准删除遮罩样式 */
+            .nlm-delete-mask {
+              position: absolute; display: none; background: rgba(234, 67, 53, 0.15);
+              border: 1px solid #ea4335; pointer-events: none; z-index: 10000;
+              align-items: center; justify-content: center;
+              border-radius: 2px; box-sizing: border-box;
+            }
+            .nlm-delete-label {
+              position: fixed; background: rgba(31, 31, 31, 0.9); color: white; padding: 6px 12px;
+              border-radius: 4px; font-size: 11px; font-weight: 500; display: none;
+              align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              pointer-events: none; white-space: nowrap; z-index: 10001;
+              transform: translate(15px, 15px);
+            }
+            .nlm-delete-label svg { width: 14px; height: 14px; stroke: white; }
+            
+            /* 模式切换按钮样式与垃圾桶光标 */
+            .btn-mode-toggle { background: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; }
+            .btn-mode-toggle.active { background: #fce8e6; color: #d93025; border-color: #f19f97; }
+            
+            .nlm-delete-target-hover {
+              cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ea4335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>') 12 12, crosshair !important;
+            }
             
             @media print {
-              .toolbar, .delete-btn { display: none !important; }
+              .toolbar, .nlm-delete-mask { display: none !important; }
               .preview-container { box-shadow: none; margin: 0; padding: 20px; width: 100%; max-width: none; }
               .msg-pair { page-break-inside: avoid; }
             }
@@ -267,6 +284,7 @@ NLM.Export = (() => {
           <div class="toolbar">
             <div class="toolbar-title">${NLM.i18n.get('exportToolbarTitle')}</div>
             <div class="btn-group">
+              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="开启后可通过红色遮罩精准删除内容">✂️ 精准删除模式</button>
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
               <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
@@ -284,9 +302,6 @@ NLM.Export = (() => {
       const cleanHtml = extractCleanHtml(msg.element);
       html += `
         <div class="msg-pair" data-idx="${idx}">
-          <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          </button>
           <div class="msg ${roleClass}">
             <div class="role">${roleName}</div>
             <div class="content">${cleanHtml}</div>
@@ -325,13 +340,76 @@ NLM.Export = (() => {
       });
     }
 
-    doc.addEventListener('click', (e) => {
-      const btn = e.target.closest('.delete-btn');
-      if (btn) {
-        const pair = btn.closest('.msg-pair');
-        if (pair) pair.remove();
+    // --- 精准删除 (光标跟随模式) 逻辑 ---
+    const mask = doc.createElement('div');
+    mask.className = 'nlm-delete-mask';
+    doc.body.appendChild(mask);
+
+    const label = doc.createElement('div');
+    label.className = 'nlm-delete-label';
+    label.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>${NLM.i18n.get('btnDeleteMessage') || 'Click to delete'}`;
+    doc.body.appendChild(label);
+
+    let isDeleteMode = true; 
+    let currentTarget = null;
+
+    const toggleBtn = doc.getElementById('toggleDeleteMode');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        isDeleteMode = !isDeleteMode;
+        toggleBtn.classList.toggle('active', isDeleteMode);
+        doc.body.style.cursor = isDeleteMode ? 'crosshair' : 'default';
+        if (!isDeleteMode) {
+          mask.style.display = 'none';
+          label.style.display = 'none';
+        }
+      });
+      doc.body.style.cursor = 'crosshair';
+    }
+
+    doc.addEventListener('mouseover', (e) => {
+      if (!isDeleteMode) return;
+      
+      const target = e.target;
+      const isInside = target.closest('#messages-container') || target.closest('.preview-container h1') || target.closest('.preview-container .meta');
+      
+      if (isInside && target.id !== 'messages-container') {
+        if (currentTarget) currentTarget.classList.remove('nlm-delete-target-hover');
+        currentTarget = target;
+        currentTarget.classList.add('nlm-delete-target-hover');
+        
+        const rect = target.getBoundingClientRect();
+        mask.style.display = 'block';
+        mask.style.top = (rect.top + win.scrollY) + 'px';
+        mask.style.left = (rect.left + win.scrollX) + 'px';
+        mask.style.width = rect.width + 'px';
+        mask.style.height = rect.height + 'px';
+        label.style.display = 'flex';
+      } else {
+        if (currentTarget) currentTarget.classList.remove('nlm-delete-target-hover');
+        mask.style.display = 'none';
+        label.style.display = 'none';
+        currentTarget = null;
       }
     });
+
+    doc.addEventListener('mousemove', (e) => {
+      if (isDeleteMode && currentTarget) {
+        label.style.left = e.clientX + 'px';
+        label.style.top = e.clientY + 'px';
+      }
+    });
+
+    doc.addEventListener('click', (e) => {
+      if (isDeleteMode && currentTarget) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentTarget.remove();
+        mask.style.display = 'none';
+        label.style.display = 'none';
+        currentTarget = null;
+      }
+    }, true);
 
     const mdBtn = doc.getElementById('downloadMdBtn');
     if (mdBtn) {
@@ -427,8 +505,7 @@ NLM.Export = (() => {
     
     // 初始预览标题：笔记本名称 + 知识购物车
     const defaultTitle = `${notebookTitle} - ${NLM.i18n.get('cartPanelTitle')}`;
-    const date = new Date().toISOString().slice(0, 10);
-
+    
     let html = `
       <!DOCTYPE html>
       <html>
@@ -447,28 +524,49 @@ NLM.Export = (() => {
             .btn-word:hover { background: #d2e3fc; }
             .btn-pdf { background: #1a73e8; color: white; }
             .btn-pdf:hover { background: #1765cc; }
-            .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
+            .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; position: relative; }
             h1 { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: 700; border-radius: 4px; padding: 4px; transition: background 0.2s; outline: none; }
             h1[contenteditable="true"]:hover { background: #f1f3f4; cursor: text; }
             h1[contenteditable="true"]:focus { background: #fff; box-shadow: 0 0 0 2px #1a73e8; }
             .meta { text-align: center; color: #70757a; font-size: 13px; margin-bottom: 50px; }
             .msg-pair { position: relative; margin-bottom: 20px; border-radius: 12px; transition: background 0.2s; }
             .msg-pair:hover { background: #fdfdfd; }
-            .msg-pair:hover .delete-btn { opacity: 1; }
-            .delete-btn { position: absolute; left: -45px; top: 10px; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #eee; color: #d93025; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0 !important; }
-            .delete-btn:hover { background: #fce8e6; border-color: #f19f97; transform: scale(1.1); }
-            .delete-btn svg { pointer-events: none; width: 18px; height: 18px; }
+            
             .msg { padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; }
             .user { background: #f8f9fa; border-left: 4px solid #1a73e8; }
             .model { background: #fff; border-bottom: 1px solid #f1f3f4; }
             .role { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #5f6368; text-transform: uppercase; }
             .content { font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
             pre { background: #f1f3f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; }
+            
+            /* 精准删除遮罩样式 */
+            .nlm-delete-mask {
+              position: absolute; display: none; background: rgba(234, 67, 53, 0.15);
+              border: 1px solid #ea4335; pointer-events: none; z-index: 10000;
+              align-items: center; justify-content: center;
+              border-radius: 2px; box-sizing: border-box;
+            }
+            .nlm-delete-label {
+              position: fixed; background: rgba(31, 31, 31, 0.9); color: white; padding: 6px 12px;
+              border-radius: 4px; font-size: 11px; font-weight: 500; display: none;
+              align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              pointer-events: none; white-space: nowrap; z-index: 10001;
+              transform: translate(15px, 15px);
+            }
+            .nlm-delete-label svg { width: 14px; height: 14px; stroke: white; }
+            
+            /* 模式切换按钮样式与垃圾桶光标 */
+            .btn-mode-toggle { background: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; }
+            .btn-mode-toggle.active { background: #fce8e6; color: #d93025; border-color: #f19f97; }
+            
+            .nlm-delete-target-hover {
+              cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ea4335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>') 12 12, crosshair !important;
+            }
+            
             .stash-divider { border: none; border-top: 2px dashed #dadce0; margin: 30px 0; }
             @media print {
-              .toolbar, .delete-btn { display: none !important; }
+              .toolbar, .nlm-delete-mask { display: none !important; }
               .preview-container { box-shadow: none; margin: 0; padding: 20px; width: 100%; max-width: none; }
-              .msg-pair { page-break-inside: avoid; }
             }
           </style>
         </head>
@@ -476,6 +574,7 @@ NLM.Export = (() => {
           <div class="toolbar">
             <div class="toolbar-title">${NLM.i18n.get('cartPanelTitle')}</div>
             <div class="btn-group">
+              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="开启后可通过红色遮罩精准删除内容">✂️ 精准删除模式</button>
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
               <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
@@ -488,14 +587,10 @@ NLM.Export = (() => {
     `;
 
     stashItems.forEach((item, idx) => {
-      // 每个暂存块可能包含 user + model
       if (item.userHtml || item.userMarkdown) {
         const contentToShow = item.userHtml ? item.userHtml : escapeHtmlForPreview(item.userMarkdown);
         html += `
           <div class="msg-pair" data-idx="${idx}-user">
-            <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
             <div class="msg user">
               <div class="role">${NLM.i18n.get('roleUser')}</div>
               <div class="content">${contentToShow}</div>
@@ -506,9 +601,6 @@ NLM.Export = (() => {
         const contentToShow = item.modelHtml ? item.modelHtml : escapeHtmlForPreview(item.modelMarkdown);
         html += `
           <div class="msg-pair" data-idx="${idx}-model">
-            <button class="delete-btn" title="${NLM.i18n.get('btnDeleteMessage')}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
             <div class="msg model">
               <div class="role">${NLM.i18n.get('roleModel')}</div>
               <div class="content">${contentToShow}</div>
@@ -548,11 +640,76 @@ NLM.Export = (() => {
       });
     }
 
-    // 删除
-    doc.addEventListener('click', (e) => {
-      const btn = e.target.closest('.delete-btn');
-      if (btn) { const pair = btn.closest('.msg-pair'); if (pair) pair.remove(); }
+    // --- 精准删除 (光标跟随模式) 逻辑 ---
+    const mask = doc.createElement('div');
+    mask.className = 'nlm-delete-mask';
+    doc.body.appendChild(mask);
+
+    const label = doc.createElement('div');
+    label.className = 'nlm-delete-label';
+    label.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>${NLM.i18n.get('btnDeleteMessage') || 'Click to delete'}`;
+    doc.body.appendChild(label);
+
+    let isDeleteMode = true; 
+    let currentTarget = null;
+
+    const toggleBtn = doc.getElementById('toggleDeleteMode');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        isDeleteMode = !isDeleteMode;
+        toggleBtn.classList.toggle('active', isDeleteMode);
+        doc.body.style.cursor = isDeleteMode ? 'crosshair' : 'default';
+        if (!isDeleteMode) {
+          mask.style.display = 'none';
+          label.style.display = 'none';
+        }
+      });
+      doc.body.style.cursor = 'crosshair';
+    }
+
+    doc.addEventListener('mouseover', (e) => {
+      if (!isDeleteMode) return;
+      
+      const target = e.target;
+      const isInside = target.closest('#messages-container') || target.closest('.preview-container h1') || target.closest('.preview-container .meta');
+      
+      if (isInside && target.id !== 'messages-container') {
+        if (currentTarget) currentTarget.classList.remove('nlm-delete-target-hover');
+        currentTarget = target;
+        currentTarget.classList.add('nlm-delete-target-hover');
+        
+        const rect = target.getBoundingClientRect();
+        mask.style.display = 'block';
+        mask.style.top = (rect.top + win.scrollY) + 'px';
+        mask.style.left = (rect.left + win.scrollX) + 'px';
+        mask.style.width = rect.width + 'px';
+        mask.style.height = rect.height + 'px';
+        label.style.display = 'flex';
+      } else {
+        if (currentTarget) currentTarget.classList.remove('nlm-delete-target-hover');
+        mask.style.display = 'none';
+        label.style.display = 'none';
+        currentTarget = null;
+      }
     });
+
+    doc.addEventListener('mousemove', (e) => {
+      if (isDeleteMode && currentTarget) {
+        label.style.left = e.clientX + 'px';
+        label.style.top = e.clientY + 'px';
+      }
+    });
+
+    doc.addEventListener('click', (e) => {
+      if (isDeleteMode && currentTarget) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentTarget.remove();
+        mask.style.display = 'none';
+        label.style.display = 'none';
+        currentTarget = null;
+      }
+    }, true);
 
     // Markdown 下载
     const mdBtn = doc.getElementById('downloadMdBtn');
