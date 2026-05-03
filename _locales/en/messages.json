@@ -109,5 +109,12 @@
   "stashItemCount": {
     "message": "$COUNT$ items stashed",
     "placeholders": { "COUNT": { "content": "$1" } }
-  }
+  },
+  "featureQuestionHistory": { "message": "Question History" },
+  "featureQuestionHistoryDesc": { "message": "Automatically record your submitted questions." },
+  "questionHistoryTitle": { "message": "History" },
+  "questionHistoryPanelTitle": { "message": "🕒 Question History" },
+  "questionHistoryEmpty": { "message": "No history yet" },
+  "btnHistory": { "message": "History" },
+  "toastQuestionRecorded": { "message": "✓ Recorded to history" }
 }

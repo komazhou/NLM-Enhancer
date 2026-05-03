@@ -87,6 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     ctrlEnterSend: false,
     uiTweaksEnabled: false,
     preventScrollEnabled: false,
+    stashCartEnabled: true,
+    questionHistoryEnabled: true,
     formulaCopyFormat: 'latex',
     chatWidthPercent: 70,
     fontSizePercent: 100,

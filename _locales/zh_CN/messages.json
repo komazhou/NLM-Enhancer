@@ -107,5 +107,12 @@
   "stashItemCount": {
     "message": "已暂存 $COUNT$ 项",
     "placeholders": { "COUNT": { "content": "$1" } }
-  }
+  },
+  "featureQuestionHistory": { "message": "历史问题记录" },
+  "featureQuestionHistoryDesc": { "message": "自动记录您提交的问题，刷新页面也不怕丢失。" },
+  "questionHistoryTitle": { "message": "历史记录" },
+  "questionHistoryPanelTitle": { "message": "🕒 历史问题记录" },
+  "questionHistoryEmpty": { "message": "暂无历史记录" },
+  "btnHistory": { "message": "历史" },
+  "toastQuestionRecorded": { "message": "✓ 已记录到历史" }
 }

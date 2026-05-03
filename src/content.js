@@ -39,6 +39,10 @@
       await NLM.PromptVault.init();
     }
 
+    if (settings.questionHistoryEnabled) {
+      await NLM.QuestionHistory.init();
+    }
+
     // 以下模块自行管理 enabled 状态
     await NLM.DraftSave.init();
     await NLM.SendBehavior.init();
@@ -82,6 +86,11 @@
       if (changes.promptVaultEnabled) {
         if (changes.promptVaultEnabled.newValue) NLM.PromptVault.init();
         else NLM.PromptVault.destroy();
+      }
+
+      if (changes.questionHistoryEnabled) {
+        if (changes.questionHistoryEnabled.newValue) NLM.QuestionHistory.init();
+        else NLM.QuestionHistory.destroy();
       }
     });
 
