@@ -109,6 +109,44 @@ NLM.Export = (() => {
     return clone.innerHTML;
   }
 
+  function downloadMarkdownFromPreview(doc, defaultTitle) {
+    const currentTitle = doc.getElementById('editableTitle').innerText.trim() || defaultTitle;
+    const lines = [];
+    const metaEl = doc.querySelector('.meta');
+    lines.push('# ' + currentTitle);
+    if (metaEl && metaEl.innerText) {
+      lines.push('> ' + metaEl.innerText);
+    }
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    
+    doc.querySelectorAll('.msg-pair').forEach(pair => {
+      const isUser = pair.querySelector('.user') !== null;
+      const role = isUser ? NLM.i18n.get('mdRoleUser') : NLM.i18n.get('mdRoleModel');
+      const contentEl = pair.querySelector('.content').cloneNode(true);
+      
+      const finalMarkdownText = htmlToMarkdown(contentEl);
+      
+      lines.push('## ' + role);
+      lines.push('');
+      lines.push(finalMarkdownText);
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+    });
+    
+    const finalMd = lines.join('\n');
+    const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
+    const a = doc.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    
+    const date = new Date().toISOString().slice(0, 10);
+    const safeFilename = currentTitle.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_').slice(0, 50);
+    a.download = `${safeFilename}_${date}.md`; 
+    a.click();
+  }
+
   function openExportPreview() {
     const messages = NLM.DOM.findAllMessages();
     if (messages.length === 0) {
@@ -239,39 +277,7 @@ NLM.Export = (() => {
     const mdBtn = doc.getElementById('downloadMdBtn');
     if (mdBtn) {
       mdBtn.addEventListener('click', () => {
-        const currentTitle = doc.getElementById('editableTitle').innerText.trim() || defaultTitle;
-        const lines = [];
-        const metaEl = doc.querySelector('.meta');
-        lines.push('# ' + currentTitle);
-        lines.push('> ' + (metaEl ? metaEl.innerText : ''));
-        lines.push('');
-        lines.push('---');
-        lines.push('');
-        
-        doc.querySelectorAll('.msg-pair').forEach(pair => {
-          const isUser = pair.querySelector('.user') !== null;
-          const role = isUser ? NLM.i18n.get('mdRoleUser') : NLM.i18n.get('mdRoleModel');
-          const contentEl = pair.querySelector('.content').cloneNode(true);
-          
-          // 调用最新修复的解析引擎
-          const finalMarkdownText = htmlToMarkdown(contentEl);
-          
-          lines.push('## ' + role);
-          lines.push('');
-          lines.push(finalMarkdownText);
-          lines.push('');
-          lines.push('---');
-          lines.push('');
-        });
-        
-        const finalMd = lines.join('\n');
-        const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
-        const a = doc.createElement('a'); 
-        a.href = URL.createObjectURL(blob); 
-        
-        const safeFilename = currentTitle.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_').slice(0, 50);
-        a.download = `${safeFilename}_${date}.md`; 
-        a.click();
+        downloadMarkdownFromPreview(doc, defaultTitle);
       });
     }
 
@@ -483,31 +489,7 @@ NLM.Export = (() => {
     const mdBtn = doc.getElementById('downloadMdBtn');
     if (mdBtn) {
       mdBtn.addEventListener('click', () => {
-        const currentTitle = doc.getElementById('editableTitle').innerText.trim() || defaultTitle;
-        const lines = [];
-        lines.push(`# ${currentTitle}`);
-        lines.push(`> ${NLM.i18n.get('exportTime', [new Date().toLocaleString()])}`);
-        lines.push('');
-        lines.push('---');
-        lines.push('');
-
-        const remainingPairs = Array.from(doc.querySelectorAll('.msg-pair')).map(el => el.dataset.idx);
-
-        stashItems.forEach((item, idx) => {
-          if (remainingPairs.includes(`${idx}-user`) && item.userMarkdown) {
-            lines.push(`## ${NLM.i18n.get('mdRoleUser')}\n\n${item.userMarkdown}\n\n---\n`);
-          }
-          if (remainingPairs.includes(`${idx}-model`) && item.modelMarkdown) {
-            lines.push(`## ${NLM.i18n.get('mdRoleModel')}\n\n${item.modelMarkdown}\n\n---\n`);
-          }
-        });
-
-        const finalMd = lines.join('\n');
-        const blob = new Blob([finalMd], { type: 'text/markdown;charset=utf-8' });
-        const a = doc.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
+        downloadMarkdownFromPreview(doc, defaultTitle);
       });
     }
   }
