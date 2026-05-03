@@ -117,5 +117,15 @@
   "questionHistoryEmpty": { "message": "No history yet" },
   "btnHistory": { "message": "History" },
   "btnSaveWord": { "message": "Export Word" },
-  "toastQuestionRecorded": { "message": "✓ Recorded to history" }
+  "toastQuestionRecorded": { "message": "✓ Recorded to history" },
+  "searchPromptPlaceholder": { "message": "Search prompts..." },
+  "btnExportJson": { "message": "Export JSON" },
+  "btnImportJson": { "message": "Import JSON" },
+  "btnEdit": { "message": "Edit" },
+  "btnPin": { "message": "Pin" },
+  "btnUnpin": { "message": "Unpin" },
+  "dialogEditPromptTitle": { "message": "Edit Prompt" },
+  "dialogPromptTagsPlaceholder": { "message": "Tags (comma separated, e.g., Code, Review)" },
+  "toastImportSuccess": { "message": "✓ Imported successfully" },
+  "toastImportError": { "message": "✗ Import failed: Invalid file format" }
 }

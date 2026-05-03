@@ -5,7 +5,8 @@
 
 (async () => {
   const LOG = '[NLM Enhancer]';
-  console.log(LOG, '扩展已加载，正在初始化...');
+  const VERSION = chrome.runtime.getManifest().version;
+  console.log(`${LOG} v${VERSION} 扩展已加载，正在初始化...`);
 
   try {
     // 先初始化 i18n 模块，确保后续模块可以获取翻译

@@ -115,5 +115,15 @@
   "questionHistoryEmpty": { "message": "暂无历史记录" },
   "btnHistory": { "message": "历史" },
   "btnSaveWord": { "message": "导出 Word" },
-  "toastQuestionRecorded": { "message": "✓ 已记录到历史" }
+  "toastQuestionRecorded": { "message": "✓ 已记录到历史" },
+  "searchPromptPlaceholder": { "message": "搜索提示词..." },
+  "btnExportJson": { "message": "导出 JSON" },
+  "btnImportJson": { "message": "导入 JSON" },
+  "btnEdit": { "message": "编辑" },
+  "btnPin": { "message": "置顶" },
+  "btnUnpin": { "message": "取消置顶" },
+  "dialogEditPromptTitle": { "message": "编辑提示词" },
+  "dialogPromptTagsPlaceholder": { "message": "标签（用逗号分隔，如：代码, 润色）" },
+  "toastImportSuccess": { "message": "✓ 导入成功" },
+  "toastImportError": { "message": "✗ 导入失败：文件格式错误" }
 }

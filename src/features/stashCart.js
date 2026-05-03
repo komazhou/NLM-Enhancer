@@ -272,7 +272,6 @@ NLM.StashCart = (() => {
           const exportBtn = document.querySelector('.nlm-export-btn');
           const exportHeight = exportBtn ? exportBtn.offsetHeight : 0;
           const exportMargin = exportBtn ? 6 : 0;
-          
           // 对齐到输入框右侧，预留一点边距
           cartBadge.style.left = (rect.right - 48 - 2) + "px"; 
           // 放在导出按钮上方，保持 12px 间隔
@@ -298,6 +297,17 @@ NLM.StashCart = (() => {
 
   // --- 购物车列表面板（含复选框 + 预览合并） ---
 
+  let cartPanelSize = { width: 360, height: 520 };
+
+  async function loadData() {
+    const sizeData = await NLM.Storage.get('stashCartPanelSize');
+    if (sizeData) cartPanelSize = sizeData;
+  }
+
+  async function saveData() {
+    await NLM.Storage.set('stashCartPanelSize', cartPanelSize);
+  }
+
   function toggleCartPanel() {
     if (cartPanel) { closeCartPanel(); return; }
     openCartPanel();
@@ -305,53 +315,93 @@ NLM.StashCart = (() => {
 
   async function openCartPanel() {
     if (cartPanel) return;
+    // 互斥逻辑
+    if (NLM.PromptVault && NLM.PromptVault.closePanel) NLM.PromptVault.closePanel();
+    if (NLM.QuestionHistory && NLM.QuestionHistory.closePanel) NLM.QuestionHistory.closePanel();
+
     const items = await loadStashData();
+    await loadData();
 
     cartPanel = document.createElement('div');
     cartPanel.className = 'nlm-cart-panel';
+    if (cartBadge) {
+      const rect = cartBadge.getBoundingClientRect();
+      const bottomOffset = window.innerHeight - rect.top;
+      // 购物车徽标在右侧，面板向左展开，左下角对齐徽标左侧
+      cartPanel.style.left = `${rect.left}px`;
+      cartPanel.style.bottom = `${bottomOffset}px`;
+      cartPanel.style.width = `${cartPanelSize.width}px`;
+      cartPanel.style.height = `${cartPanelSize.height}px`;
+    }
 
-    // 头部
-    const header = document.createElement('div');
-    header.className = 'nlm-cart-panel-header';
-    header.innerHTML = `
-      <h3>${NLM.i18n.get('cartPanelTitle')}</h3>
-      <div class="nlm-cart-header-actions">
-        <button class="nlm-cart-action-btn nlm-cart-selectall-btn" title="${NLM.i18n.get('cartSelectAll')}">☑</button>
-        <button class="nlm-cart-action-btn nlm-cart-clear-btn" title="${NLM.i18n.get('cartClearAll')}">${getSvgTrash()}</button>
+    renderCartContent(items);
+    document.body.appendChild(cartPanel);
+    setupResizeHandler();
+    setTimeout(() => document.addEventListener('click', handleOutsideClick), 100);
+  }
+
+  function setupResizeHandler() {
+    const handle = cartPanel.querySelector('.nlm-resize-handle-tr');
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+
+    handle.addEventListener('mousedown', (e) => {
+      isResizing = true; startX = e.clientX; startY = e.clientY;
+      startWidth = cartPanel.offsetWidth; startHeight = cartPanel.offsetHeight;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+      e.preventDefault();
+    });
+
+    function onMouseMove(e) {
+      if (!isResizing) return;
+      const dx = e.clientX - startX;
+      const dy = startY - e.clientY;
+      const newW = Math.max(300, startWidth + dx);
+      const newH = Math.max(300, startHeight + dy);
+      cartPanel.style.width = `${newW}px`;
+      cartPanel.style.height = `${newH}px`;
+      cartPanelSize = { width: newW, height: newH };
+    }
+
+    function onMouseUp() {
+      if (isResizing) { isResizing = false; saveData(); document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+    }
+  }
+
+  function renderCartContent(items) {
+    if (!cartPanel) return;
+    cartPanel.innerHTML = `
+      <div class="nlm-resize-handle-tr">
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <line x1="2" y1="0" x2="12" y2="10" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3" />
+          <line x1="6" y1="0" x2="12" y2="6" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3" />
+          <line x1="10" y1="0" x2="12" y2="2" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3" />
+        </svg>
+      </div>
+      <div class="nlm-cart-panel-header">
+        <h3>${NLM.i18n.get('cartPanelTitle')}</h3>
+        <div class="nlm-cart-header-actions">
+          <button class="nlm-cart-action-btn nlm-cart-selectall-btn" title="${NLM.i18n.get('cartSelectAll')}">☑</button>
+          <button class="nlm-cart-action-btn nlm-cart-clear-btn" title="${NLM.i18n.get('cartClearAll')}">${getSvgTrash()}</button>
+        </div>
+      </div>
+      <div class="nlm-cart-list">
+        ${items.length === 0 ? `<div class="nlm-cart-empty">${NLM.i18n.get('cartEmpty')}</div>` : ''}
+      </div>
+      <div class="nlm-cart-panel-footer">
+        <span class="nlm-cart-selected-count"></span>
+        <button class="nlm-cart-preview-btn">${NLM.i18n.get('cartPreviewMerged')}</button>
       </div>
     `;
 
-    // 列表
-    const list = document.createElement('div');
-    list.className = 'nlm-cart-list';
+    const listEl = cartPanel.querySelector('.nlm-cart-list');
+    items.forEach(item => listEl.appendChild(createCartItemElement(item)));
 
-    if (items.length === 0) {
-      list.innerHTML = `<div class="nlm-cart-empty">${NLM.i18n.get('cartEmpty')}</div>`;
-    } else {
-      items.forEach(item => list.appendChild(createCartItemElement(item)));
-    }
-
-    // 底部操作栏
-    const footer = document.createElement('div');
-    footer.className = 'nlm-cart-panel-footer';
-    footer.innerHTML = `
-      <span class="nlm-cart-selected-count"></span>
-      <button class="nlm-cart-preview-btn">${NLM.i18n.get('cartPreviewMerged')}</button>
-    `;
-
-    cartPanel.appendChild(header);
-    cartPanel.appendChild(list);
-    cartPanel.appendChild(footer);
-    document.body.appendChild(cartPanel);
-
-    // 事件绑定
-    header.querySelector('.nlm-cart-selectall-btn').addEventListener('click', toggleSelectAll);
-    header.querySelector('.nlm-cart-clear-btn').addEventListener('click', clearAllStashed);
-    footer.querySelector('.nlm-cart-preview-btn').addEventListener('click', previewMergedContent);
-
+    cartPanel.querySelector('.nlm-cart-selectall-btn').addEventListener('click', toggleSelectAll);
+    cartPanel.querySelector('.nlm-cart-clear-btn').addEventListener('click', clearAllStashed);
+    cartPanel.querySelector('.nlm-cart-preview-btn').addEventListener('click', previewMergedContent);
     updateSelectedCount();
-
-    setTimeout(() => document.addEventListener('click', handleOutsideClick), 100);
   }
 
   function closeCartPanel() {
@@ -574,7 +624,7 @@ NLM.StashCart = (() => {
 
     setTimeout(restoreStashedState, 500);
     isInitialized = true;
-    console.log(LOG, '已启动');
+    console.log(LOG, '已启动 (v1.3.0)');
   }
 
   function destroy() {
@@ -589,5 +639,5 @@ NLM.StashCart = (() => {
     isInitialized = false;
   }
 
-  return { init, destroy };
+  return { init, destroy, closeCartPanel };
 })();
