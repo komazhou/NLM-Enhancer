@@ -116,5 +116,6 @@
   "questionHistoryPanelTitle": { "message": "🕒 Question History" },
   "questionHistoryEmpty": { "message": "No history yet" },
   "btnHistory": { "message": "History" },
+  "btnSaveWord": { "message": "Export Word" },
   "toastQuestionRecorded": { "message": "✓ Recorded to history" }
 }

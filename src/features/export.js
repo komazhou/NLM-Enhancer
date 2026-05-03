@@ -147,6 +147,55 @@ NLM.Export = (() => {
     a.click();
   }
 
+  function downloadWordFromPreview(doc, defaultTitle) {
+    const currentTitle = doc.getElementById('editableTitle').innerText.trim() || defaultTitle;
+    // 克隆消息容器以进行清理
+    const containerClone = doc.getElementById('messages-container').cloneNode(true);
+    // 移除所有删除按钮
+    containerClone.querySelectorAll('.delete-btn').forEach(el => el.remove());
+
+    const contentHtml = containerClone.innerHTML;
+    const metaText = doc.querySelector('.meta') ? doc.querySelector('.meta').innerText : '';
+    
+    // 构建 Word 兼容的 HTML 模板
+    const html = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>${currentTitle}</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.5; color: #1f1f1f; }
+          h1 { text-align: center; color: #1a73e8; font-size: 22pt; margin-bottom: 5pt; }
+          .meta { text-align: center; color: #70757a; font-size: 10pt; margin-bottom: 30pt; }
+          .msg-pair { margin-bottom: 15pt; border-bottom: 0.5pt solid #dadce0; padding-bottom: 10pt; }
+          .role { font-weight: bold; color: #5f6368; font-size: 9pt; text-transform: uppercase; margin-bottom: 4pt; }
+          .user { background-color: #f8f9fa; padding: 10pt; border-left: 3pt solid #1a73e8; }
+          .model { background-color: #ffffff; padding: 10pt; }
+          .content { font-size: 11pt; }
+          pre { background-color: #f1f3f4; padding: 8pt; border-radius: 4pt; font-family: 'Consolas', 'Courier New', monospace; font-size: 10pt; }
+          code { background-color: #f1f3f4; font-family: 'Consolas', 'Courier New', monospace; }
+          ul, ol { margin-left: 20pt; }
+        </style>
+      </head>
+      <body>
+        <h1>${currentTitle}</h1>
+        <div class="meta">${metaText}</div>
+        <div id="messages-container">${contentHtml}</div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
+    const a = doc.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    
+    const date = new Date().toISOString().slice(0, 10);
+    const safeFilename = currentTitle.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_').slice(0, 50);
+    a.download = `${safeFilename}_${date}.doc`;
+    a.click();
+  }
+
   function openExportPreview() {
     const messages = NLM.DOM.findAllMessages();
     if (messages.length === 0) {
@@ -180,6 +229,8 @@ NLM.Export = (() => {
             button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
             .btn-md { background: #fff; border: 1px solid #dadce0; color: #3c4043; }
             .btn-md:hover { background: #f8f9fa; border-color: #bdc1c6; }
+            .btn-word { background: #e8f0fe; border: 1px solid #1a73e8; color: #1a73e8; }
+            .btn-word:hover { background: #d2e3fc; }
             .btn-pdf { background: #1a73e8; color: white; }
             .btn-pdf:hover { background: #1765cc; }
             
@@ -217,6 +268,7 @@ NLM.Export = (() => {
             <div class="toolbar-title">${NLM.i18n.get('exportToolbarTitle')}</div>
             <div class="btn-group">
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
+              <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
             </div>
           </div>
@@ -263,6 +315,13 @@ NLM.Export = (() => {
     if (pdfBtn) {
       pdfBtn.addEventListener('click', () => {
         win.print();
+      });
+    }
+
+    const wordBtn = doc.getElementById('downloadWordBtn');
+    if (wordBtn) {
+      wordBtn.addEventListener('click', () => {
+        downloadWordFromPreview(doc, defaultTitle);
       });
     }
 
@@ -384,6 +443,8 @@ NLM.Export = (() => {
             button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
             .btn-md { background: #fff; border: 1px solid #dadce0; color: #3c4043; }
             .btn-md:hover { background: #f8f9fa; border-color: #bdc1c6; }
+            .btn-word { background: #e8f0fe; border: 1px solid #1a73e8; color: #1a73e8; }
+            .btn-word:hover { background: #d2e3fc; }
             .btn-pdf { background: #1a73e8; color: white; }
             .btn-pdf:hover { background: #1765cc; }
             .preview-container { max-width: 850px; margin: 30px auto; background: #fff; padding: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
@@ -416,6 +477,7 @@ NLM.Export = (() => {
             <div class="toolbar-title">${NLM.i18n.get('cartPanelTitle')}</div>
             <div class="btn-group">
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
+              <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
             </div>
           </div>
@@ -478,6 +540,13 @@ NLM.Export = (() => {
     // PDF
     const pdfBtn = doc.getElementById('downloadPdfBtn');
     if (pdfBtn) pdfBtn.addEventListener('click', () => win.print());
+
+    const wordBtn = doc.getElementById('downloadWordBtn');
+    if (wordBtn) {
+      wordBtn.addEventListener('click', () => {
+        downloadWordFromPreview(doc, defaultTitle);
+      });
+    }
 
     // 删除
     doc.addEventListener('click', (e) => {

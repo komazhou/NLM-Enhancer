@@ -114,5 +114,6 @@
   "questionHistoryPanelTitle": { "message": "🕒 历史问题记录" },
   "questionHistoryEmpty": { "message": "暂无历史记录" },
   "btnHistory": { "message": "历史" },
+  "btnSaveWord": { "message": "导出 Word" },
   "toastQuestionRecorded": { "message": "✓ 已记录到历史" }
 }
