@@ -218,7 +218,7 @@ NLM.QuestionHistory = (() => {
     setupCapture();
     posTimer = requestAnimationFrame(updateBtnPosition);
     isInitialized = true;
-    console.log(LOG, '已启动 (v1.3.0)');
+    console.log(LOG, '已启动 (v1.3.1.1)');
   }
 
   function destroy() {

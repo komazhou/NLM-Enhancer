@@ -162,14 +162,30 @@ NLM.StashCart = (() => {
         }
       });
 
+      // 2. 注入复制按钮
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'nlm-copy-msg-btn';
+      const copyTitle = NLM.i18n.get('copyMsgTooltip');
+      copyBtn.title = (copyTitle && copyTitle !== 'copyMsgTooltip') ? copyTitle : '复制回答 (含公式适配)';
+      const copyLabel = NLM.i18n.get('copyMsgLabel');
+      const copyLabelText = (copyLabel && copyLabel !== 'copyMsgLabel') ? copyLabel : '复制';
+      copyBtn.innerHTML = `${getSvgCopy()}<span class="nlm-stash-label">${copyLabelText}</span>`;
+      copyBtn.addEventListener('click', (e) => copyFullMessage(pair, copyBtn, e));
+
       // 注入到 ActionBar
       const actionBar = pair.querySelector('.mat-mdc-card-actions, .message-actions, [class*="actions"]');
       if (actionBar) {
         actionBar.insertBefore(btn, actionBar.firstChild);
+        actionBar.insertBefore(copyBtn, btn);
       } else {
         pair.style.position = 'relative';
         btn.classList.add('nlm-stash-btn-absolute');
         pair.appendChild(btn);
+        // 绝对定位模式下，复制按钮放在暂存左侧
+        copyBtn.style.position = 'absolute';
+        copyBtn.style.top = '8px';
+        copyBtn.style.right = '110px';
+        pair.appendChild(copyBtn);
       }
     });
   }
@@ -237,6 +253,44 @@ NLM.StashCart = (() => {
       NLM.DOM.showToast(NLM.i18n.get('toastUnstashed'), rect.left, rect.top);
     } catch (err) {
       console.error(LOG, '取消暂存失败:', err);
+    }
+  }
+
+  // --- 全量复制消息 ---
+  async function copyFullMessage(pair, btn, event) {
+    try {
+      // 这里的逻辑复用了 formulaCopy.js 中的 Selection Copy 核心思路
+      // 优先定位回答部分 (to-user-message-card-content)，如果没找到再定位通用内容
+      const modelNode = pair.querySelector('.to-user-message-card-content');
+      const contentEl = (modelNode ? modelNode.querySelector('.message-text-content, .message-content, .mat-mdc-card-content') : null) 
+                       || pair.querySelector('.message-text-content, .message-content, .mat-mdc-card-content') 
+                       || pair;
+      
+      if (!contentEl) return;
+
+      // 借用全局提供的公式处理函数
+      if (window.NLM && window.NLM.FormulaCopy && window.NLM.FormulaCopy.handleCopyFromElement) {
+        const success = await window.NLM.FormulaCopy.handleCopyFromElement(contentEl);
+        if (success) {
+          btn.classList.add('nlm-copied');
+          const oldHtml = btn.innerHTML;
+          btn.innerHTML = `${getSvgCheck()}<span class="nlm-stash-label">${NLM.i18n.get('copiedLabel')}</span>`;
+          setTimeout(() => {
+            btn.classList.remove('nlm-copied');
+            btn.innerHTML = oldHtml;
+          }, 2000);
+          
+          const rect = btn.getBoundingClientRect();
+          NLM.DOM.showToast(NLM.i18n.get('toastCopied'), rect.left, rect.top, true);
+        }
+      } else {
+        // 退而求其次，普通复制
+        const text = contentEl.innerText;
+        await navigator.clipboard.writeText(text);
+        NLM.DOM.showToast('普通复制成功', event.clientX, event.clientY, true);
+      }
+    } catch (err) {
+      console.error(LOG, '复制消息失败:', err);
     }
   }
 
@@ -602,6 +656,18 @@ NLM.StashCart = (() => {
     </svg>`;
   }
 
+  function getSvgCopy() {
+    return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>`;
+  }
+
+  function getSvgCheck() {
+    return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>`;
+  }
+
   function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -624,7 +690,7 @@ NLM.StashCart = (() => {
 
     setTimeout(restoreStashedState, 500);
     isInitialized = true;
-    console.log(LOG, '已启动 (v1.3.0)');
+    console.log(LOG, '已启动 (v1.3.1.1)');
   }
 
   function destroy() {

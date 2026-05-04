@@ -127,5 +127,8 @@
   "dialogEditPromptTitle": { "message": "Edit Prompt" },
   "dialogPromptTagsPlaceholder": { "message": "Tags (comma separated, e.g., Code, Review)" },
   "toastImportSuccess": { "message": "✓ Imported successfully" },
-  "toastImportError": { "message": "✗ Import failed: Invalid file format" }
+  "toastImportError": { "message": "✗ Import failed: Invalid file format" },
+  "copyMsgLabel": { "message": "Copy" },
+  "copyMsgTooltip": { "message": "Copy Answer (with Formula Support)" },
+  "copiedLabel": { "message": "Copied" }
 }

@@ -125,5 +125,8 @@
   "dialogEditPromptTitle": { "message": "编辑提示词" },
   "dialogPromptTagsPlaceholder": { "message": "标签（用逗号分隔，如：代码, 润色）" },
   "toastImportSuccess": { "message": "✓ 导入成功" },
-  "toastImportError": { "message": "✗ 导入失败：文件格式错误" }
+  "toastImportError": { "message": "✗ 导入失败：文件格式错误" },
+  "copyMsgLabel": { "message": "复制" },
+  "copyMsgTooltip": { "message": "复制回答 (含公式适配)" },
+  "copiedLabel": { "message": "已复制" }
 }

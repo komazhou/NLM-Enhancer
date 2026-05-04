@@ -1049,17 +1049,14 @@ mjx-container:hover::after,
   font-family: 'Google Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  opacity: 0;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
   position: relative;
   z-index: 5;
   white-space: nowrap;
 }
 .nlm-stash-btn svg { flex-shrink: 0; }
 .nlm-stash-label { line-height: 1; }
-
-.chat-message-pair:hover .nlm-stash-btn,
-.individual-message:hover .nlm-stash-btn { opacity: 1; }
 
 .nlm-stash-btn:hover {
   opacity: 1 !important;
@@ -1082,6 +1079,42 @@ mjx-container:hover::after,
   border-color: rgba(234, 67, 53, 0.3);
 }
 .nlm-stash-btn-absolute { position: absolute; top: 8px; right: 42px; }
+
+/* === 消息全量复制按钮 === */
+.nlm-copy-msg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.nlm-copy-msg-btn:hover {
+  color: #8ab4f8;
+  background: rgba(138, 180, 248, 0.1);
+  border-color: rgba(138, 180, 248, 0.3);
+}
+.nlm-copy-msg-btn.nlm-copied {
+  color: #34a853;
+  background: rgba(52, 168, 83, 0.1);
+  border-color: rgba(52, 168, 83, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  .nlm-copy-msg-btn { color: rgba(0,0,0,0.4); border-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.02); }
+  .nlm-copy-msg-btn:hover { color: #1a73e8; background: rgba(26,115,232,0.06); border-color: rgba(26,115,232,0.25); }
+}
 
 @media (prefers-color-scheme: light) {
   .nlm-stash-btn { color: rgba(0,0,0,0.4); border-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.02); }
