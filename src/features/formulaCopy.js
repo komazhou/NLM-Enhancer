@@ -945,33 +945,29 @@ NLM.FormulaV2 = (() => {
       // 处理 Word 兼容的 MathML
       let wordMml = mml;
       try {
-        // 清洗零宽字符，注意不要误删 Unicode 数学符号
+        // 清洗零宽字符
         wordMml = wordMml.replace(/[\u2061\u2062\u2063\u2064\u200B]/g, '');
         const parsed = new DOMParser().parseFromString(wordMml, 'application/xml');
         if (parsed.getElementsByTagName('parsererror').length === 0) {
           const root = parsed.documentElement;
           
-          // 1. 深度清洗：移除 annotation 和 annotation-xml
+          // 深度清洗冗余包装
           Array.from(root.querySelectorAll('annotation, annotation-xml')).forEach(a => a.parentNode?.removeChild(a));
-          
-          // 2. 解除语义和布局包装：Word 不支持 semantics, mpadded, mstyle，会导致乱码或方块
-          Array.from(root.querySelectorAll('semantics, mpadded, mstyle')).forEach(node => {
-            const children = Array.from(node.childNodes);
-            if (children.length > 0) {
+          const redundantTags = ['semantics', 'mpadded', 'mstyle', 'mrow'];
+          redundantTags.forEach(tagName => {
+            Array.from(root.querySelectorAll(tagName)).forEach(node => {
+              if (tagName === 'mrow' && node.childNodes.length !== 1) return;
               const fragment = document.createDocumentFragment();
-              children.forEach(c => fragment.appendChild(c));
+              Array.from(node.childNodes).forEach(c => fragment.appendChild(c));
               node.replaceWith(fragment);
-            } else {
-              node.parentNode?.removeChild(node);
-            }
+            });
           });
-          
-          // 3. 构建带 mml: 前缀的 Word 格式文档
+
+          // 构建带 mml: 前缀的 Word 标准格式
           const output = document.implementation.createDocument(MATHML_NS, 'mml:math', null);
           const outRoot = output.documentElement;
           for (const attr of Array.from(root.attributes)) {
-            if (['class', 'style', 'xmlns'].includes(attr.name)) continue;
-            outRoot.setAttribute(attr.name, attr.value);
+            if (!['class', 'style', 'xmlns'].includes(attr.name)) outRoot.setAttribute(attr.name, attr.value);
           }
 
           function cloneWithPrefix(doc, node) {
@@ -979,16 +975,10 @@ NLM.FormulaV2 = (() => {
             if (node.nodeType !== 1) return null;
             
             const el = doc.createElementNS(MATHML_NS, 'mml:' + node.localName);
+            if (node.localName === 'mover') el.setAttribute('accent', 'true');
             
-            // 针对 Word 的深度修正：
-            // 1. 修复 \bar{S} 等装饰符号：必须对 mover 声明 accent="true"，否则 Word 可能显示为乱码或方块
-            if (node.localName === 'mover') {
-              el.setAttribute('accent', 'true');
-            }
-            
-            // 2. 移除干扰 Word 解析的冗余属性
             for (const attr of Array.from(node.attributes)) {
-              if (['class', 'style', 'stretchy', 'mathvariant', 'lspace', 'rspace', 'voffset'].includes(attr.name)) continue;
+              if (['class', 'style', 'stretchy', 'mathvariant', 'lspace', 'rspace', 'voffset', 'movablelimits'].includes(attr.name)) continue;
               if (attr.name.startsWith('xmlns')) continue;
               el.setAttribute(attr.name, attr.value);
             }
@@ -1005,11 +995,11 @@ NLM.FormulaV2 = (() => {
             if (cloned) outRoot.appendChild(cloned);
           }
 
-          // 最终修复：针对 Word 的重音符号 Bug，锁定致胜字符
-          // 经过 A/B 测试验证，只有 Macron (&#x00AF;) 能在 Word 中完美还原横杠
+          // 4. 最终序列化与字符纠偏 (保留横杠修复)
           wordMml = new XMLSerializer().serializeToString(outRoot)
             .replace(/[\u0080-\uFFFF]/g, m => '&#x' + m.charCodeAt(0).toString(16).padStart(4, '0').toUpperCase() + ';')
-            .replace(/(&#x203E;|&#x0304;|&#x0305;)/g, '&#x00AF;'); 
+            .replace(/(&#x203E;|&#x0304;|&#x0305;)/g, '&#x00AF;')
+            .replace(/(&#x200B;|&#x2061;|&#x2062;|&#x2063;|&#x2064;|&#xFEFF;)/g, ''); 
         }
       } catch (e) {
         // 解析失败保留原始 mml
