@@ -965,41 +965,52 @@ NLM.Export = (() => {
       <div class="nlm-modal">
         <div class="nlm-modal-header">
           <div class="nlm-modal-title">
-            <span style="font-size: 20px;">${type === 'flashcard' ? '🎴' : '📝'}</span>
+            <span style="font-size: 18px;">${type === 'flashcard' ? '🎴' : '📝'}</span>
             <span>导出${type === 'flashcard' ? '闪卡' : '测验'}</span>
           </div>
           <div class="nlm-modal-close">
-            <mat-icon class="material-symbols-outlined">close</mat-icon>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </div>
         </div>
         <div class="nlm-modal-body">
           <div class="nlm-source-info">
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              <span class="nlm-source-label">来源：${sourceTitle}</span>
+            <span class="nlm-source-label">来源内容</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="nlm-source-name">${sourceTitle}</span>
+              <span style="font-size: 12px; color: #6366f1; font-weight: 600;">${cardCount || '--'} 组</span>
             </div>
-            <span class="nlm-card-count">${cardCount || '--'} 张卡片</span>
           </div>
           
-          <div style="font-size: 13px; font-weight: 500; margin-bottom: 12px; color: #5f6368;">导出格式</div>
-          <div class="nlm-format-grid">
-            <div class="nlm-format-option selected" data-format="csv">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">选择格式</div>
+          <div class="nlm-format-list">
+            <div class="nlm-format-item selected" data-format="csv">
               <span class="nlm-format-icon">📊</span>
-              <span class="nlm-format-name">CSV</span>
-              <span class="nlm-format-desc">通用表格</span>
+              <div class="nlm-format-info">
+                <span class="nlm-format-name">CSV 表格</span>
+                <span class="nlm-format-desc">适用于 Excel / Notion 导入</span>
+              </div>
             </div>
-            <div class="nlm-format-option" data-format="md">
-              <span class="nlm-format-icon">📝</span>
-              <span class="nlm-format-name">Markdown</span>
-              <span class="nlm-format-desc">笔记应用</span>
+            <div class="nlm-format-item" data-format="md">
+              <span class="nlm-format-icon">📜</span>
+              <div class="nlm-format-info">
+                <span class="nlm-format-name">Markdown 笔记</span>
+                <span class="nlm-format-desc">纯文本格式，支持 Obsidian</span>
+              </div>
             </div>
-            <div class="nlm-format-option" data-format="anki">
+            <div class="nlm-format-item" data-format="anki">
               <span class="nlm-format-icon">🧠</span>
-              <span class="nlm-format-name">Anki</span>
-              <span class="nlm-format-desc">记忆卡片</span>
+              <div class="nlm-format-info">
+                <span class="nlm-format-name">Anki 记忆包</span>
+                <span class="nlm-format-desc">专业记忆算法优化</span>
+              </div>
             </div>
           </div>
           
-          <button class="nlm-export-confirm-btn">导出文件</button>
+          <div class="nlm-export-action">
+            <button class="nlm-export-confirm-btn">开始导出</button>
+          </div>
         </div>
       </div>
     `;
@@ -1012,13 +1023,13 @@ NLM.Export = (() => {
     closeBtn.onclick = () => overlay.remove();
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
     
-    const options = overlay.querySelectorAll('.nlm-format-option');
+    const items = overlay.querySelectorAll('.nlm-format-item');
     let selectedFormat = 'csv';
-    options.forEach(opt => {
-      opt.onclick = () => {
-        options.forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        selectedFormat = opt.dataset.format;
+    items.forEach(item => {
+      item.onclick = () => {
+        items.forEach(o => o.classList.remove('selected'));
+        item.classList.add('selected');
+        selectedFormat = item.dataset.format;
       };
     });
     
