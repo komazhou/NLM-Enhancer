@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NLM Enhancer 对话提问搜索模块
  * 在面板左侧提供搜索图标，展开后可搜索并跳转到历史提问
  */
@@ -164,8 +164,8 @@ NLM.TimelineSearch = (() => {
     if (chatArea && triggerIcon) {
       const rect = chatArea.getBoundingClientRect();
       
-      // 图标贴合在聊天区域左边缘，垂直居中
-      triggerIcon.style.left = `${rect.left}px`;
+      // 图标贴合在聊天区域左边缘外侧，垂直居中
+      triggerIcon.style.left = `${rect.left - 36}px`;
       triggerIcon.style.top = `${rect.top + rect.height / 2}px`;
       triggerIcon.style.display = 'flex';
 

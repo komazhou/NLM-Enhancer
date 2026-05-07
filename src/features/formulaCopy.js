@@ -49,7 +49,9 @@ NLM.FormulaCopy = (() => {
             '\u03bc': '\\mu ', 'μ': '\\mu ', '\u03c9': '\\omega ', 'ω': '\\omega ',
             '\u03a9': '\\Omega ', 'Ω': '\\Omega ', '\u2192': '\\rightarrow ', '→': '\\rightarrow ',
             '\u222b': '\\int ', '∫': '\\int ', '\u2211': '\\sum ', '∑': '\\sum ',
-            '\u220f': '\\prod ', '∏': '\\prod '
+            '\u220f': '\\prod ', '∏': '\\prod ',
+            '\u222a': '\\cup ', '∪': '\\cup ', '\u2229': '\\cap ', '∩': '\\cap ',
+            '\u2208': '\\in ', '∈': '\\in ', '\u2209': '\\notin ', '∉': '\\notin '
           };
           let p = '';
           for (let c of text) p += symbolMap[c] || c;
@@ -270,7 +272,8 @@ NLM.FormulaCopy = (() => {
           'lim': '\\lim ', 'max': '\\max ', 'min': '\\min ',
           '→': '\\to ', '∞': '\\infty ', '≈': '\\approx ', '≠': '\\neq ',
           '≤': '\\leq ', '≥': '\\geq ', '×': '\\times ', '÷': '\\div ',
-          '±': '\\pm ', '⋅': '\\cdot '
+          '±': '\\pm ', '⋅': '\\cdot ', '∪': '\\cup ', '∩': '\\cap ',
+          '∈': '\\in ', '∉': '\\notin ', '⊂': '\\subset ', '⊃': '\\supset '
         };
         return moMap[text] || text;
       case 'msub': 
@@ -455,6 +458,22 @@ NLM.FormulaCopy = (() => {
     // 修复 Bug 3: 将 Unicode 撇号 ′ (U+2032) 和中文单引号 ’ (U+2019) 替换为标准 ASCII 单引号 '
     // 修复 Bug 4: 消除冗余的 ^{'} 语法（MathType 不支持），直接替换为 ' 或 ^{\prime}
     raw = raw.replace(/[′’]/g, "'").replace(/\^{'}/g, "'");
+
+    // 修复：将常见的 Unicode 数学符号替换为 LaTeX 命令，增强 MathType 兼容性
+    const unicodeLatexMap = {
+      'ε': '\\varepsilon ', 'ϵ': '\\varepsilon ',
+      '∪': '\\cup ', '∩': '\\cap ', '∈': '\\in ', '∉': '\\notin ',
+      '⊂': '\\subset ', '⊃': '\\supset ', '⊆': '\\subseteq ', '⊇': '\\supseteq ',
+      '∅': '\\emptyset ', '∀': '\\forall ', '∃': '\\exists ', '¬': '\\neg ',
+      '∨': '\\vee ', '∧': '\\wedge ', '∞': '\\infty ', '≈': '\\approx ',
+      '≠': '\\neq ', '≤': '\\leq ', '≥': '\\geq ', '±': '\\pm ', '×': '\\times ', '÷': '\\div '
+    };
+    for (const [u, l] of Object.entries(unicodeLatexMap)) {
+      if (raw.includes(u)) raw = raw.split(u).join(l);
+    }
+
+    // 满足用户偏好：使用 \varepsilon 代替 \epsilon
+    raw = raw.replace(/\\epsilon\b/g, '\\varepsilon ');
 
     if (!raw) return { text: '', html: '' };
 
@@ -700,6 +719,14 @@ NLM.FormulaCopy = (() => {
     }
 
     let htmlContent = htmlWrapper.innerHTML;
+    
+    // 如果是 MathML (Word) 格式，处理 Markdown 语法
+    if (effectiveFormat === 'mathml') {
+      htmlContent = htmlContent
+        .replace(/[·\s]*\*\*([步S][骤t][ep]?\s?\d+[:：][^*]*)\*\*/g, '<br><b>$1</b> ') // 恢复软回车，且不在标题后加换行
+        .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); // 通用加粗
+    }
+
     for (const [ph, mmlObj] of Object.entries(htmlPlaceholders)) {
       const val = (typeof mmlObj === 'object') ? (mmlObj.html || mmlObj.text) : mmlObj;
       htmlContent = htmlContent.replace(ph, val);
@@ -719,6 +746,12 @@ NLM.FormulaCopy = (() => {
 
     if (effectiveFormat === 'latex') {
       text = cleanExtractedText(text);
+    } else if (effectiveFormat === 'mathml') {
+      // 文本模式清理 Markdown
+      text = text
+        .replace(/[·\s]*\*\*([步S][骤t][ep]?\s?\d+[:：][^*]*)\*\*/g, '\n$1 ') // 步骤标题
+        .replace(/\*\*/g, '')
+        .trim();
     } else {
       text = text.trim();
     }
@@ -754,7 +787,12 @@ NLM.FormulaCopy = (() => {
     }
 
     const fragment = range.cloneContents();
-    if (!fragment.querySelector('.katex, [data-math], mjx-container, .MathJax, math, [nodeName="math"], [nodeName="mml:math"]')) return;
+    
+    // 扩大拦截范围：如果包含公式，或者包含 Markdown 符号 **，则拦截并处理
+    const hasMath = !!fragment.querySelector('.katex, [data-math], mjx-container, .MathJax, math, [nodeName="math"], [nodeName="mml:math"]');
+    const hasMarkdown = fragment.textContent.includes('**');
+    
+    if (!hasMath && !hasMarkdown) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -891,7 +929,7 @@ NLM.FormulaV2 = (() => {
       
       // 核心修复：将 Unicode 数学字符转换为 ASCII LaTeX 指令，从源头消除乱码风险
       const mathMap = {
-        'ε': '\\epsilon ', 'ϵ': '\\epsilon ', 'μ': '\\mu ', 'σ': '\\sigma ', 'α': '\\alpha ', 'β': '\\beta ', 'γ': '\\gamma ',
+        'ε': '\\varepsilon ', 'ϵ': '\\varepsilon ', 'μ': '\\mu ', 'σ': '\\sigma ', 'α': '\\alpha ', 'β': '\\beta ', 'γ': '\\gamma ',
         'δ': '\\delta ', 'θ': '\\theta ', 'λ': '\\lambda ', 'π': '\\pi ', 'ω': '\\omega ', 'Δ': '\\Delta ', '∆': '\\Delta ',
         '×': '\\times ', '±': '\\pm ', '÷': '\\div ', '∞': '\\infty ', '≈': '\\approx ', '≠': '\\neq ',
         '≤': '\\leq ', '≥': '\\geq ', '∫': '\\int ', '∑': '\\sum ', '∏': '\\prod ', '∂': '\\partial ',
@@ -900,6 +938,9 @@ NLM.FormulaV2 = (() => {
       for (const [uni, tex] of Object.entries(mathMap)) {
         clean = clean.split(uni).join(tex);
       }
+
+      // 满足用户偏好：使用 \varepsilon 代替 \epsilon
+      clean = clean.replace(/\\epsilon\b/g, '\\varepsilon ');
 
       // 修复 Unicode 撇号等常见语法错误
       clean = clean.replace(/[′’]/g, "'").replace(/\^{'}/g, "'");
