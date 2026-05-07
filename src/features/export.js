@@ -1007,6 +1007,13 @@ NLM.Export = (() => {
               </div>
             </div>
           </div>
+
+          <!-- 推荐模板提示 (动态显示) -->
+          <div class="nlm-anki-template-tip" id="anki-template-tip" style="display: none;">
+            <span class="nlm-tip-badge">RECOMMENDED</span>
+            <span class="nlm-tip-text">配合推荐模板效果更佳</span>
+            <a href="https://github.com/komazhou/NLM-Enhancer/raw/main/assets/NLM_Anki_Template.apkg" target="_blank" class="nlm-template-link">获取模板</a>
+          </div>
           
           <div class="nlm-export-action">
             <button class="nlm-export-confirm-btn">开始导出</button>
@@ -1024,12 +1031,18 @@ NLM.Export = (() => {
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
     
     const items = overlay.querySelectorAll('.nlm-format-item');
+    const templateTip = overlay.querySelector('#anki-template-tip');
     let selectedFormat = 'csv';
     items.forEach(item => {
       item.onclick = () => {
         items.forEach(o => o.classList.remove('selected'));
         item.classList.add('selected');
         selectedFormat = item.dataset.format;
+        
+        // 动态显示/隐藏模板下载链接
+        if (templateTip) {
+          templateTip.style.display = (selectedFormat === 'anki') ? 'flex' : 'none';
+        }
       };
     });
     
