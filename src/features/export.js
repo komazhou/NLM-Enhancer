@@ -9,7 +9,105 @@ window.NLM = NLM;
 NLM.Export = (() => {
   const LOG = '[NLM Enhancer Export]';
 
+  // === Iframe 安全门 ===
+  if (window.self !== window.top) {
+    function decodeHtmlEntities(text) {
+      if (!text) return '';
+      const textArea = document.createElement('textarea');
+      textArea.innerHTML = text;
+      return textArea.value;
+    }
+
+    function tryPushData() {
+      try {
+        const appRoot = document.querySelector('app-root');
+        if (appRoot && appRoot.hasAttribute('data-app-data')) {
+          let appDataStr = appRoot.getAttribute('data-app-data');
+          if (appDataStr) {
+            // 解码 HTML 实体（如 &quot; -> "）
+            appDataStr = decodeHtmlEntities(appDataStr);
+            const appData = JSON.parse(appDataStr);
+            
+            const quizList = appData.quiz || appData.questions || [];
+            const flashList = appData.flashcards || appData.cards || [];
+
+            let cards = [];
+            if (flashList.length > 0) {
+              cards = flashList.map(c => ({
+                front: c.f || c.front || '',
+                back: c.b || c.back || ''
+              }));
+            } else if (quizList.length > 0) {
+              cards = quizList.map(q => {
+                const text = q.q || q.question || '';
+                const opts = q.answerOptions || q.options || [];
+                const options = opts.map(opt => opt.text || opt).join(' | ');
+                const answerObj = opts.find(opt => opt.isCorrect);
+                const answer = answerObj ? (answerObj.text || answerObj) : '';
+                const rationale = answerObj ? (answerObj.rationale || '') : '';
+                const hint = q.hint || '';
+                return { 
+                  question: text, 
+                  options, 
+                  answer, 
+                  rationale, 
+                  hint,
+                  rawOptions: opts // 保留原始数组用于 Anki 富文本生成
+                };
+              });
+            }
+
+            if (cards.length > 0) {
+              window.top.postMessage({ 
+                type: 'NLM_DATA_SYNC', 
+                data: appData,
+                processedCards: cards 
+              }, '*');
+              return true;
+            }
+          }
+        }
+      } catch (e) { console.error(LOG, 'Push error:', e); }
+      return false;
+    }
+
+    // 持续监控 app-root 的出现
+    const observer = new MutationObserver(() => {
+      if (tryPushData()) observer.disconnect();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    
+    // 同时也响应主页面的手动请求
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'NLM_GET_CARD_DATA') {
+        tryPushData();
+      }
+    });
+
+    return { init() {}, destroy() {}, htmlToMarkdown() { return ''; }, extractCleanHtml() { return ''; }, openStashPreview() {} };
+  }
+
+  // === 主页面全局变量 ===
+  let latestAppData = null;
+  let latestProcessedCards = [];
+  
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'NLM_DATA_SYNC') {
+      latestAppData = event.data.data;
+      latestProcessedCards = event.data.processedCards || [];
+      console.log(LOG, 'App data synced:', latestProcessedCards.length, 'cards');
+      
+      const countEl = document.querySelector('.nlm-card-count');
+      if (countEl) {
+        countEl.textContent = `${latestProcessedCards.length} 张卡片`;
+      }
+    }
+  });
+
+  // === 以下为主页面逻辑 ===
+
   // --- 重构：健壮的 HTML 转 Markdown 解析引擎 ---
+
   function htmlToMarkdown(element) {
     function walk(node, listDepth = 0) {
       // 1. 纯文本节点直接返回
@@ -111,6 +209,22 @@ NLM.Export = (() => {
     }
 
     return clone.innerHTML;
+  }
+  /**
+   * 通用文件下载辅助函数
+   */
+  function downloadBlob(content, filename, type = 'text/plain;charset=utf-8') {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 0);
   }
 
   function downloadMarkdownFromPreview(doc, defaultTitle) {
@@ -453,6 +567,8 @@ NLM.Export = (() => {
   let exportBtn = null;
   let studioObserver = null;
 
+
+
   function update() {
     if (exportBtn) {
       const container = NLM.DOM.findChatInputContainer();
@@ -794,22 +910,320 @@ NLM.Export = (() => {
       footer.appendChild(btn); 
     });
 
-    // 2. 报告底部注入（仅当 artifact-viewer 内包含 report-viewer 时）
+    // 2. 报告底部注入
     const artifactFooters = document.querySelectorAll('.artifact-viewer-container .artifact-footer:not([data-has-nlm-export])');
     artifactFooters.forEach(footer => {
       const viewer = footer.closest('.artifact-viewer-container') || footer.closest('artifact-viewer');
       if (!viewer) return;
-      // 仅对报告类型注入（检测是否包含 report-viewer）
-      if (!viewer.querySelector('report-viewer')) return;
       
-      footer.dataset.hasNlmExport = 'true';
-      const btn = createExportBtn('导出报告', () => {
-        const artifactViewer = footer.closest('artifact-viewer') || footer.closest('.artifact-viewer-container');
-        if (artifactViewer) openArtifactExportPreview(artifactViewer);
-      });
-      // 插入到反馈按钮之前
-      footer.appendChild(btn);
+      // A. 报告类型 (Report)
+      if (viewer.querySelector('report-viewer')) {
+        footer.dataset.hasNlmExport = 'true';
+        const btn = createExportBtn('导出报告', () => {
+          openArtifactExportPreview(viewer);
+        });
+        footer.appendChild(btn);
+        return;
+      }
+      
+      // B. 应用类型 (闪卡 Flashcard / 测验 Quiz) - 它们都在 app-viewer 的 iframe 里
+      const appViewer = viewer.querySelector('app-viewer');
+      if (appViewer) {
+        footer.dataset.hasNlmExport = 'true';
+        // 尝试通过标题或内容猜测类型
+        const title = viewer.querySelector('.artifact-title')?.value || '';
+        const isQuiz = title.includes('测验') || title.toLowerCase().includes('quiz');
+        const label = isQuiz ? '导出测验' : '导出闪卡';
+        
+        const btn = createExportBtn(label, () => {
+          showCardExportModal(viewer, isQuiz ? 'quiz' : 'flashcard');
+        });
+        footer.appendChild(btn);
+      }
     });
+  }
+
+
+  /**
+   * 显示卡片/测验导出专用弹窗
+   */
+  function showCardExportModal(container, type) {
+    const titleInput = container.querySelector('input.artifact-title');
+    const sourceTitle = titleInput ? titleInput.value.trim() : (type === 'flashcard' ? '闪卡' : '测验');
+    
+    // 创建遮罩层
+    const overlay = document.createElement('div');
+    overlay.className = 'nlm-modal-overlay';
+    
+    // 从全局缓存获取数量
+    let cardCount = 0;
+    if (latestAppData) {
+      cardCount = (latestAppData.quiz || latestAppData.flashcards || []).length;
+    }
+
+    const modalHtml = `
+      <div class="nlm-modal">
+        <div class="nlm-modal-header">
+          <div class="nlm-modal-title">
+            <span style="font-size: 20px;">${type === 'flashcard' ? '🎴' : '📝'}</span>
+            <span>导出${type === 'flashcard' ? '闪卡' : '测验'}</span>
+          </div>
+          <div class="nlm-modal-close">
+            <mat-icon class="material-symbols-outlined">close</mat-icon>
+          </div>
+        </div>
+        <div class="nlm-modal-body">
+          <div class="nlm-source-info">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="nlm-source-label">来源：${sourceTitle}</span>
+            </div>
+            <span class="nlm-card-count">${cardCount || '--'} 张卡片</span>
+          </div>
+          
+          <div style="font-size: 13px; font-weight: 500; margin-bottom: 12px; color: #5f6368;">导出格式</div>
+          <div class="nlm-format-grid">
+            <div class="nlm-format-option selected" data-format="csv">
+              <span class="nlm-format-icon">📊</span>
+              <span class="nlm-format-name">CSV</span>
+              <span class="nlm-format-desc">通用表格</span>
+            </div>
+            <div class="nlm-format-option" data-format="md">
+              <span class="nlm-format-icon">📝</span>
+              <span class="nlm-format-name">Markdown</span>
+              <span class="nlm-format-desc">笔记应用</span>
+            </div>
+            <div class="nlm-format-option" data-format="anki">
+              <span class="nlm-format-icon">🧠</span>
+              <span class="nlm-format-name">Anki</span>
+              <span class="nlm-format-desc">记忆卡片</span>
+            </div>
+          </div>
+          
+          <button class="nlm-export-confirm-btn">导出文件</button>
+        </div>
+      </div>
+    `;
+    
+    overlay.innerHTML = modalHtml;
+    document.body.appendChild(overlay);
+    
+    // 事件处理
+    const closeBtn = overlay.querySelector('.nlm-modal-close');
+    closeBtn.onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    
+    const options = overlay.querySelectorAll('.nlm-format-option');
+    let selectedFormat = 'csv';
+    options.forEach(opt => {
+      opt.onclick = () => {
+        options.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedFormat = opt.dataset.format;
+      };
+    });
+    
+    const confirmBtn = overlay.querySelector('.nlm-export-confirm-btn');
+    confirmBtn.onclick = () => {
+      handleCardExport(type, selectedFormat, sourceTitle);
+      overlay.remove();
+    };
+  }
+
+  /**
+   * 处理具体的卡片导出逻辑（基于本地缓存）
+   */
+  async function handleCardExport(type, format, title) {
+    if (!latestProcessedCards || latestProcessedCards.length === 0) {
+      NLM.DOM.showToast('尚未提取到数据，请稍候或刷新页面后再次进入。', window.innerWidth / 2, 100, false);
+      return;
+    }
+
+    NLM.DOM.showToast(`准备导出 ${latestProcessedCards.length} 条数据...`, window.innerWidth / 2, 100, true);
+    
+    // 如果是 Anki 格式，对内容进行深度加工（公式转换 + 样式注入）
+    const finalData = format === 'anki' ? latestProcessedCards.map(c => {
+      const process = (txt) => (txt || '').replace(/\$([^\$]+)\$/g, '\\($1\\)');
+      const newItem = {};
+      
+      // 1. 处理基础字段 (仅处理字符串类型，跳过 rawOptions 数组等)
+      for (let key in c) { 
+        if (typeof c[key] === 'string') {
+          newItem[key] = process(c[key]); 
+        } else {
+          newItem[key] = c[key]; // 原样保留非字符串字段
+        }
+      }
+
+      // 2. 如果是测验，生成带动态乱序、多选支持和交互式提示的 HTML
+      if (type === 'quiz' && c.rawOptions) {
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const isMulti = c.rawOptions.filter(o => o.isCorrect).length > 1;
+
+        const commonScript = `
+          function nlmShuffle(containerId) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            var isBack = containerId === 'quiz-results';
+            var seed = isBack ? sessionStorage.getItem('nlm_seed') : Date.now();
+            if (!isBack) sessionStorage.setItem('nlm_seed', seed);
+            
+            var n = parseInt(seed);
+            function seededRandom() {
+              var x = Math.sin(n++) * 10000;
+              return x - Math.floor(x);
+            }
+            
+            var items = Array.from(container.children);
+            items.sort(function() { return seededRandom() - 0.5; });
+            items.forEach(function(item, i) { 
+              container.appendChild(item);
+              var letterSpan = item.querySelector('.nlm-anki-letter');
+              if (letterSpan) letterSpan.innerText = String.fromCharCode(65 + i) + '.';
+            });
+          }
+        `;
+
+        // 正面选项 HTML
+        newItem.options = `<div class="nlm-anki-options" id="quiz-options">` + 
+          c.rawOptions.map((opt, i) => `
+            <div class="nlm-anki-opt-item" data-orig-index="${i}" onclick="selectNlmOption(${i}, ${isMulti})">
+              <span class="nlm-anki-letter"></span>
+              <span class="nlm-anki-text">${process(opt.text)}</span>
+            </div>`).join('') + `</div>
+            <script>
+              ${commonScript}
+              function selectNlmOption(idx, multi) {
+                var current = JSON.parse(sessionStorage.getItem('nlm_choices') || '[]');
+                if (multi) {
+                  var pos = current.indexOf(idx);
+                  if (pos > -1) current.splice(pos, 1);
+                  else current.push(idx);
+                } else {
+                  current = [idx];
+                }
+                sessionStorage.setItem('nlm_choices', JSON.stringify(current));
+                document.querySelectorAll('.nlm-anki-opt-item').forEach(el => {
+                  var itemIdx = parseInt(el.getAttribute('data-orig-index'));
+                  el.style.borderColor = current.includes(itemIdx) ? '#1a73e8' : '';
+                  el.style.background = current.includes(itemIdx) ? '#e8f0fe' : '';
+                });
+              }
+              nlmShuffle('quiz-options');
+              sessionStorage.removeItem('nlm_choices');
+            </script>`;
+
+        // 背面选项 HTML
+        newItem.rationale = `<div class="nlm-anki-results" id="quiz-results">` + 
+          c.rawOptions.map((opt, i) => `
+            <div class="nlm-anki-res-item ${opt.isCorrect ? 'is-correct' : ''}" data-orig-index="${i}">
+              <div class="nlm-anki-res-header">
+                <span class="nlm-anki-letter"></span>
+                <span class="nlm-anki-text">${process(opt.text)}</span>
+                ${opt.isCorrect ? '<span class="nlm-anki-badge">正确答案</span>' : ''}
+                <span class="user-badge" style="display:none; margin-left:8px; font-size:12px; color:#d93025; font-weight:bold;">(你的选择)</span>
+              </div>
+              ${opt.rationale ? `<div class="nlm-anki-rationale">${process(opt.rationale)}</div>` : ''}
+            </div>`).join('') + `</div>
+            <script>
+              ${commonScript}
+              (function() {
+                nlmShuffle('quiz-results');
+                var choices = JSON.parse(sessionStorage.getItem('nlm_choices') || '[]');
+                choices.forEach(function(choice) {
+                  var item = document.querySelector('.nlm-anki-res-item[data-orig-index="' + choice + '"]');
+                  if (item) {
+                    if (!item.classList.contains('is-correct')) {
+                      item.style.borderColor = '#d93025';
+                      item.style.background = '#fce8e6';
+                    }
+                    var badge = item.querySelector('.user-badge');
+                    if (badge) badge.style.display = 'inline';
+                  }
+                });
+              })();
+            </script>`;
+      }
+
+      // 3. 处理极简交互式提示 (Hint)
+      if (newItem.hint) {
+        const hText = newItem.hint;
+        newItem.hint = `
+          <div class="nlm-anki-hint-wrap" style="margin-top:10px; font-size:14px;">
+            <span style="color:#1a73e8; cursor:pointer; font-weight:500;" onclick="this.style.display='none'; this.nextElementSibling.style.display='inline';">💡 提示</span>
+            <span style="display:none; color:#5f6368;">💡 提示：${hText}</span>
+          </div>`;
+      }
+      
+      return newItem;
+    }) : latestProcessedCards;
+
+    generateAndDownloadCards(finalData, format, title, type);
+  }
+
+
+  /**
+   * 根据格式生成并下载文件
+   */
+  function generateAndDownloadCards(data, format, title, type) {
+    const date = new Date().toISOString().slice(0, 10);
+    const safeTitle = title.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_');
+    let content = '';
+    let extension = '';
+    let mimeType = 'text/plain;charset=utf-8';
+
+    if (format === 'csv' || format === 'anki') {
+      const separator = format === 'anki' ? '\t' : ',';
+      extension = format === 'anki' ? 'txt' : 'csv';
+      
+      // 生成头部（Anki 不需要头部，通用 CSV 需要）
+      const rows = [];
+      if (format === 'csv') {
+        if (type === 'flashcard') rows.push(['正面', '背面'].join(separator));
+        else rows.push(['问题', '选项', '正确答案', '提示', '解析'].join(separator));
+      }
+
+      data.forEach(item => {
+        if (type === 'flashcard') {
+          rows.push([`"${(item.front || '').replace(/"/g, '""')}"`, `"${(item.back || '').replace(/"/g, '""')}"`].join(separator));
+        } else {
+          rows.push([
+            `"${(item.question || '').replace(/"/g, '""')}"`, 
+            `"${(item.options || '').replace(/"/g, '""')}"`, 
+            `"${(item.answer || '').replace(/"/g, '""')}"`,
+            `"${(item.hint || '').replace(/"/g, '""')}"`,
+            `"${(item.rationale || '').replace(/"/g, '""')}"`
+          ].join(separator));
+        }
+      });
+      
+      content = (format === 'csv' ? '\ufeff' : '') + rows.join('\n'); // CSV 增加 BOM
+      mimeType = format === 'csv' ? 'text/csv;charset=utf-8' : 'text/tab-separated-values;charset=utf-8';
+    } 
+    else if (format === 'md') {
+      extension = 'md';
+      const lines = [`# ${title}`, `> 导出日期: ${date}`, ''];
+      data.forEach((item, index) => {
+        lines.push(`## ${type === 'flashcard' ? '卡片' : '题目'} ${index + 1}`);
+        if (type === 'flashcard') {
+          lines.push(`**正面**: ${item.front}`);
+          lines.push('');
+          lines.push(`**背面**: ${item.back}`);
+        } else {
+          lines.push(`**问题**: ${item.question}`);
+          if (item.options) lines.push(`**选项**: ${item.options}`);
+          lines.push(`**正确答案**: ${item.answer}`);
+          if (item.hint) lines.push(`**提示**: ${item.hint}`);
+          if (item.rationale) lines.push(`**解析**: ${item.rationale}`);
+        }
+        lines.push('');
+        lines.push('---');
+        lines.push('');
+      });
+      content = lines.join('\n');
+      mimeType = 'text/markdown;charset=utf-8';
+    }
+
+    downloadBlob(content, `${safeTitle}_${date}.${extension}`, mimeType);
   }
 
   /**
