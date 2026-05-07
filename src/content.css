@@ -1297,3 +1297,14 @@ mjx-container:hover::after,
   .nlm-history-clear-btn:hover { background: rgba(234,67,53,0.08); }
 }
 
+/* === Studio 面板展开时隐藏所有 NLM 浮动 UI === */
+body.nlm-studio-expanded .nlm-export-btn,
+body.nlm-studio-expanded .nlm-prompt-trigger,
+body.nlm-studio-expanded .nlm-history-trigger,
+body.nlm-studio-expanded .nlm-cart-badge,
+body.nlm-studio-expanded .nlm-cart-panel,
+body.nlm-studio-expanded .nlm-timeline-bar,
+body.nlm-studio-expanded .nlm-timeline-search-trigger,
+body.nlm-studio-expanded .nlm-timeline-search-panel {
+  display: none !important;
+}
