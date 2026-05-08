@@ -18,11 +18,17 @@ NLM.i18n = (() => {
    */
   async function init() {
     try {
-      const [enData, zhData] = await Promise.all([
-        fetch(chrome.runtime.getURL('_locales/en/messages.json')).then(r => r.json()),
-        fetch(chrome.runtime.getURL('_locales/zh_CN/messages.json')).then(r => r.json()),
+      const fetchJson = (lang) => fetch(chrome.runtime.getURL(`_locales/${lang}/messages.json`)).then(r => r.json());
+      
+      const [enData, zhData, twData, jaData, esData, koData] = await Promise.all([
+        fetchJson('en'),
+        fetchJson('zh_CN'),
+        fetchJson('zh_TW'),
+        fetchJson('ja'),
+        fetchJson('es'),
+        fetchJson('ko')
       ]);
-      langPacks = { en: enData, zh_CN: zhData };
+      langPacks = { en: enData, zh_CN: zhData, zh_TW: twData, ja: jaData, es: esData, ko: koData };
 
       // 读取用户语言偏好
       const stored = await new Promise(r => chrome.storage.sync.get({ uiLanguage: 'auto' }, r));
@@ -49,7 +55,12 @@ NLM.i18n = (() => {
   function resolveLocale(lang) {
     if (lang && lang !== 'auto') return lang;
     const browserLang = chrome.i18n.getUILanguage();
-    return browserLang.startsWith('zh') ? 'zh_CN' : 'en';
+    if (browserLang.includes('TW') || browserLang.includes('HK')) return 'zh_TW';
+    if (browserLang.startsWith('zh')) return 'zh_CN';
+    if (browserLang.startsWith('ja')) return 'ja';
+    if (browserLang.startsWith('es')) return 'es';
+    if (browserLang.startsWith('ko')) return 'ko';
+    return 'en';
   }
 
   /**

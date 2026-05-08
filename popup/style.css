@@ -34,34 +34,52 @@ body {
   justify-content: space-between;
 }
 
-.lang-switch {
+.lang-container {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+}
+
+.lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
   color: #e8eaed;
-  cursor: pointer;
+  padding: 4px 28px 4px 10px;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
+  cursor: pointer;
   transition: all 0.2s ease;
-  flex-shrink: 0;
+  outline: none;
 }
 
-.lang-switch:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(138, 180, 248, 0.3);
+.lang-select:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(138, 180, 248, 0.4);
 }
 
-.lang-icon {
-  font-size: 14px;
+.lang-select:focus {
+  border-color: #8ab4f8;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
 }
 
-.lang-label {
-  letter-spacing: 0.3px;
+/* 下拉箭头 */
+.lang-container::after {
+  content: '▼';
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
+.lang-select option {
+  background: #1e1e21;
+  color: #e8eaed;
+  padding: 8px;
 }
 
 .logo-area {

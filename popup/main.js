@@ -5,33 +5,46 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
   // === i18n 本地化系统 ===
-  // 加载两个语言包
-  const [enMessages, zhMessages] = await Promise.all([
-    fetch(chrome.runtime.getURL('_locales/en/messages.json')).then(r => r.json()),
-    fetch(chrome.runtime.getURL('_locales/zh_CN/messages.json')).then(r => r.json()),
+  const fetchJson = (lang) => fetch(chrome.runtime.getURL(`_locales/${lang}/messages.json`)).then(r => r.json());
+  
+  const [enMsg, zhMsg, twMsg, jaMsg, esMsg, koMsg] = await Promise.all([
+    fetchJson('en'), fetchJson('zh_CN'), fetchJson('zh_TW'), fetchJson('ja'), fetchJson('es'), fetchJson('ko')
   ]);
 
-  const LANG_PACKS = { en: enMessages, zh_CN: zhMessages };
+  const LANG_PACKS = { 
+    en: enMsg, zh_CN: zhMsg, zh_TW: twMsg, ja: jaMsg, es: esMsg, ko: koMsg 
+  };
 
-  // 获取用户保存的语言偏好，默认跟随浏览器
+  // 获取用户保存的语言偏好
   const stored = await new Promise(r => chrome.storage.sync.get({ uiLanguage: 'auto' }, r));
   let currentLang = stored.uiLanguage;
 
-  // auto 模式时，根据浏览器语言决定
+  // 平台检测 (用于 Ctrl/Cmd 文本替换)
+  const isMac = /Mac|iPhone|iPod|iPad/.test(navigator.platform);
+
   function resolveLocale(lang) {
     if (lang !== 'auto') return lang;
     const browserLang = chrome.i18n.getUILanguage();
-    return (browserLang.startsWith('zh')) ? 'zh_CN' : 'en';
+    if (browserLang.includes('TW') || browserLang.includes('HK')) return 'zh_TW';
+    if (browserLang.startsWith('zh')) return 'zh_CN';
+    if (browserLang.startsWith('ja')) return 'ja';
+    if (browserLang.startsWith('es')) return 'es';
+    if (browserLang.startsWith('ko')) return 'ko';
+    return 'en';
   }
 
-  // 获取指定 key 的翻译文本
   function getMsg(key, substitutions) {
     const locale = resolveLocale(currentLang);
     const pack = LANG_PACKS[locale] || LANG_PACKS.en;
     const entry = pack[key] || LANG_PACKS.en[key];
     if (!entry) return key;
     let msg = entry.message;
-    // 处理 placeholder 替换
+
+    // 平台适配：如果是 Mac，将 Ctrl 替换为 Cmd
+    if (isMac && msg.includes('Ctrl')) {
+      msg = msg.replace(/Ctrl/g, 'Cmd');
+    }
+
     if (substitutions && entry.placeholders) {
       Object.entries(entry.placeholders).forEach(([name, ph]) => {
         const idx = parseInt(ph.content.replace('$', '')) - 1;
@@ -43,7 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return msg;
   }
 
-  // 将翻译应用到所有 data-i18n 元素
   function applyI18n() {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
       const key = el.dataset.i18n;
@@ -52,24 +64,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.title = getMsg('popupTitle');
 
-    // 更新语言按钮标签
-    const label = document.getElementById('langLabel');
-    if (label) {
-      const resolved = resolveLocale(currentLang);
-      label.textContent = resolved === 'zh_CN' ? '中文' : 'EN';
-    }
+    // 同步下拉框状态
+    const select = document.getElementById('langSelect');
+    if (select) select.value = currentLang;
   }
 
-  // 初始化 i18n
   applyI18n();
 
-  // === 语言切换按钮 ===
-  const langBtn = document.getElementById('langSwitch');
-  if (langBtn) {
-    langBtn.addEventListener('click', () => {
-      const resolved = resolveLocale(currentLang);
-      // 切换语言
-      currentLang = (resolved === 'en') ? 'zh_CN' : 'en';
+  // === 语言切换下拉框 ===
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', () => {
+      currentLang = langSelect.value;
       chrome.storage.sync.set({ uiLanguage: currentLang });
       applyI18n();
     });

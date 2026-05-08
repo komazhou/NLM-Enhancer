@@ -508,20 +508,49 @@ NLM.FormulaCopy = (() => {
     return result;
   }
 
+  /**
+   * 稳健的剪贴板写入函数
+   * 优先使用 Modern Clipboard API，对 Safari 进行 Promise 包装优化
+   * 失败时回退到传统的 execCommand('copy')
+   */
   async function copyToClipboard(text, html) {
+    if (!text) return false;
+    
     try {
-      if (navigator.clipboard?.write) {
-        const items = { 'text/plain': new Blob([text], { type: 'text/plain' }) };
+      // 现代异步剪贴板 API
+      if (navigator.clipboard && window.ClipboardItem) {
+        const data = {
+          'text/plain': new Blob([text], { type: 'text/plain' })
+        };
         if (html) {
           const finalHtml = (html.includes('mml:') || html.includes('<math')) ? wrapMathMLForWordHtml(html) : html;
-          items['text/html'] = new Blob([finalHtml], { type: 'text/html' });
+          data['text/html'] = new Blob([finalHtml], { type: 'text/html' });
         }
-        await navigator.clipboard.write([new ClipboardItem(items)]);
+        await navigator.clipboard.write([new ClipboardItem(data)]);
         return true;
       }
-      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-      return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      console.warn(LOG, 'Modern Clipboard API failed, trying fallback:', e);
+    }
+
+    // 传统兜底方案 (Sync Fallback)
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      // 必须确保元素在页面上可见且可选中，但对用户不可见
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return success;
+    } catch (err) {
+      console.error(LOG, 'Clipboard fallback failed:', err);
+      return false;
+    }
   }
 
   async function handleClick(event) {
