@@ -130,5 +130,26 @@
   "toastImportError": { "message": "✗ Import failed: Invalid file format" },
   "copyMsgLabel": { "message": "Copy" },
   "copyMsgTooltip": { "message": "Copy Answer (with Formula Support)" },
-  "copiedLabel": { "message": "Copied" }
+  "copiedLabel": { "message": "Copied" },
+  "modalExportCards": { "message": "Export Flashcards" },
+  "modalExportQuiz": { "message": "Export Quiz" },
+  "modalSourceLabel": { "message": "Source" },
+  "modalGroupCount": {
+    "message": "$COUNT$ Groups",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "modalSelectFormat": { "message": "Select Format" },
+  "modalFormatCsvName": { "message": "CSV Table" },
+  "modalFormatCsvDesc": { "message": "Best for Excel / Notion import" },
+  "modalFormatMdName": { "message": "Markdown Note" },
+  "modalFormatMdDesc": { "message": "Plain text, supports Obsidian" },
+  "modalFormatAnkiName": { "message": "Anki Package" },
+  "modalFormatAnkiDesc": { "message": "Optimized for SRS learning" },
+  "modalRecommendedTip": { "message": "Better with recommended template" },
+  "modalGetTemplate": { "message": "Get Template" },
+  "modalBtnStartExport": { "message": "Start Export" },
+  "btnExportNote": { "message": "Export Note" },
+  "btnExportReport": { "message": "Export Report" },
+  "btnExportQuiz": { "message": "Export Quiz" },
+  "btnExportFlashcard": { "message": "Export Flashcards" }
 }

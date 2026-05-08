@@ -128,5 +128,26 @@
   "toastImportError": { "message": "✗ 导入失败：文件格式错误" },
   "copyMsgLabel": { "message": "复制" },
   "copyMsgTooltip": { "message": "复制回答 (含公式适配)" },
-  "copiedLabel": { "message": "已复制" }
+  "copiedLabel": { "message": "已复制" },
+  "modalExportCards": { "message": "导出闪卡" },
+  "modalExportQuiz": { "message": "导出测验" },
+  "modalSourceLabel": { "message": "来源内容" },
+  "modalGroupCount": {
+    "message": "$COUNT$ 组",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "modalSelectFormat": { "message": "选择格式" },
+  "modalFormatCsvName": { "message": "CSV 表格" },
+  "modalFormatCsvDesc": { "message": "适用于 Excel / Notion 导入" },
+  "modalFormatMdName": { "message": "Markdown 笔记" },
+  "modalFormatMdDesc": { "message": "纯文本格式，支持 Obsidian" },
+  "modalFormatAnkiName": { "message": "Anki 记忆包" },
+  "modalFormatAnkiDesc": { "message": "专业记忆算法优化" },
+  "modalRecommendedTip": { "message": "配合推荐模板效果更佳" },
+  "modalGetTemplate": { "message": "获取模板" },
+  "modalBtnStartExport": { "message": "开始导出" },
+  "btnExportNote": { "message": "导出笔记" },
+  "btnExportReport": { "message": "导出报告" },
+  "btnExportQuiz": { "message": "导出测验" },
+  "btnExportFlashcard": { "message": "导出闪卡" }
 }

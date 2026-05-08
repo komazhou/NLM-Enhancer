@@ -8,6 +8,7 @@ window.NLM = NLM;
 
 NLM.Export = (() => {
   const LOG = '[NLM Enhancer Export]';
+  const i18n = NLM.i18n;
 
   // === Iframe 安全门 ===
   if (window.self !== window.top) {
@@ -903,7 +904,7 @@ NLM.Export = (() => {
     const noteFooters = document.querySelectorAll('.studio-panel .panel-footer.note-view-footer:not([data-has-nlm-export])');
     noteFooters.forEach(footer => {
       footer.dataset.hasNlmExport = 'true';
-      const btn = createExportBtn('导出笔记', () => {
+      const btn = createExportBtn(i18n.get('btnExportNote'), () => {
         const panel = footer.closest('.studio-panel');
         if (panel) openArtifactExportPreview(panel);
       });
@@ -919,7 +920,7 @@ NLM.Export = (() => {
       // A. 报告类型 (Report)
       if (viewer.querySelector('report-viewer')) {
         footer.dataset.hasNlmExport = 'true';
-        const btn = createExportBtn('导出报告', () => {
+        const btn = createExportBtn(i18n.get('btnExportReport'), () => {
           openArtifactExportPreview(viewer);
         });
         footer.appendChild(btn);
@@ -933,7 +934,7 @@ NLM.Export = (() => {
         // 尝试通过标题或内容猜测类型
         const title = viewer.querySelector('.artifact-title')?.value || '';
         const isQuiz = title.includes('测验') || title.toLowerCase().includes('quiz');
-        const label = isQuiz ? '导出测验' : '导出闪卡';
+        const label = isQuiz ? i18n.get('btnExportQuiz') : i18n.get('btnExportFlashcard');
         
         const btn = createExportBtn(label, () => {
           showCardExportModal(viewer, isQuiz ? 'quiz' : 'flashcard');
@@ -966,7 +967,7 @@ NLM.Export = (() => {
         <div class="nlm-modal-header">
           <div class="nlm-modal-title">
             <span style="font-size: 18px;">${type === 'flashcard' ? '🎴' : '📝'}</span>
-            <span>导出${type === 'flashcard' ? '闪卡' : '测验'}</span>
+            <span>${type === 'flashcard' ? i18n.get('modalExportCards') : i18n.get('modalExportQuiz')}</span>
           </div>
           <div class="nlm-modal-close">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -976,34 +977,34 @@ NLM.Export = (() => {
         </div>
         <div class="nlm-modal-body">
           <div class="nlm-source-info">
-            <span class="nlm-source-label">来源内容</span>
+            <span class="nlm-source-label">${i18n.get('modalSourceLabel')}</span>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span class="nlm-source-name">${sourceTitle}</span>
-              <span style="font-size: 12px; color: #6366f1; font-weight: 600;">${cardCount || '--'} 组</span>
+              <span style="font-size: 12px; color: #6366f1; font-weight: 600;">${i18n.get('modalGroupCount', [cardCount || '--'])}</span>
             </div>
           </div>
           
-          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">选择格式</div>
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">${i18n.get('modalSelectFormat')}</div>
           <div class="nlm-format-list">
             <div class="nlm-format-item selected" data-format="csv">
               <span class="nlm-format-icon">📊</span>
               <div class="nlm-format-info">
-                <span class="nlm-format-name">CSV 表格</span>
-                <span class="nlm-format-desc">适用于 Excel / Notion 导入</span>
+                <span class="nlm-format-name">${i18n.get('modalFormatCsvName')}</span>
+                <span class="nlm-format-desc">${i18n.get('modalFormatCsvDesc')}</span>
               </div>
             </div>
             <div class="nlm-format-item" data-format="md">
               <span class="nlm-format-icon">📜</span>
               <div class="nlm-format-info">
-                <span class="nlm-format-name">Markdown 笔记</span>
-                <span class="nlm-format-desc">纯文本格式，支持 Obsidian</span>
+                <span class="nlm-format-name">${i18n.get('modalFormatMdName')}</span>
+                <span class="nlm-format-desc">${i18n.get('modalFormatMdDesc')}</span>
               </div>
             </div>
             <div class="nlm-format-item" data-format="anki">
               <span class="nlm-format-icon">🧠</span>
               <div class="nlm-format-info">
-                <span class="nlm-format-name">Anki 记忆包</span>
-                <span class="nlm-format-desc">专业记忆算法优化</span>
+                <span class="nlm-format-name">${i18n.get('modalFormatAnkiName')}</span>
+                <span class="nlm-format-desc">${i18n.get('modalFormatAnkiDesc')}</span>
               </div>
             </div>
           </div>
@@ -1011,12 +1012,12 @@ NLM.Export = (() => {
           <!-- 推荐模板提示 (动态显示) -->
           <div class="nlm-anki-template-tip" id="anki-template-tip" style="display: none;">
             <span class="nlm-tip-badge">RECOMMENDED</span>
-            <span class="nlm-tip-text">配合推荐模板效果更佳</span>
-            <a href="https://github.com/komazhou/NLM-Enhancer/raw/main/assets/NLM_Anki_Template.apkg" target="_blank" class="nlm-template-link">获取模板</a>
+            <span class="nlm-tip-text">${i18n.get('modalRecommendedTip')}</span>
+            <a href="https://github.com/komazhou/NLM-Enhancer/raw/main/assets/NLM_Anki_Template.apkg" target="_blank" class="nlm-template-link">${i18n.get('modalGetTemplate')}</a>
           </div>
           
           <div class="nlm-export-action">
-            <button class="nlm-export-confirm-btn">开始导出</button>
+            <button class="nlm-export-confirm-btn">${i18n.get('modalBtnStartExport')}</button>
           </div>
         </div>
       </div>
