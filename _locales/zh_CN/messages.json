@@ -481,13 +481,13 @@
     "message": "⚠ 自动获取失败，请点击下方选择本地视频"
   },
   "sectionTools": {
-    "message": "🧰 工具箱"
+    "message": "🎬 去水印"
   },
   "toolLocalRemoval": {
-    "message": "本地去水印 (AI)"
+    "message": "视频去水印"
   },
   "toolLocalRemovalDesc": {
-    "message": "支持本地视频、图片等多种格式的无损去水印。"
+    "message": "视频去广告，其他待完善"
   },
   "btnOpen": {
     "message": "开启"
