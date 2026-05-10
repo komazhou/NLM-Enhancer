@@ -21,6 +21,7 @@ NLM.Storage = (() => {
     preventScrollEnabled: false,
     stashCartEnabled: true,
     questionHistoryEnabled: true,
+    videoWatermarkEnabled: true,
 
     // 公式复制格式: 'latex' | 'mathml' | 'no-dollar' | 'notion'
     formulaCopyFormat: 'latex',

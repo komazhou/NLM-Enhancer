@@ -5,149 +5,479 @@
   "extDesc": {
     "message": "NotebookLM 拡張ツール：LaTeX 数式エクスポート、チャットタイムライン、プロンプト保管庫、メッセージ管理。"
   },
-  "popupTitle": { "message": "NLM Enhancer 設定" },
-  "sectionCoreFeatures": { "message": "🔧 コア機能" },
-  "sectionInputExperience": { "message": "⚙️ 入力とエクスペリエンス" },
-  "featureQuoteReply": { "message": "選択範囲を引用" },
-  "featureQuoteReplyDesc": { "message": "テキスト選択時に引用ボタンを表示" },
-  "featureFormulaCopy": { "message": "数式クリックコピー" },
-  "featureFormulaCopyDesc": { "message": "数式をクリックして LaTeX ソースをコピー" },
-  "formulaCopyFormat": { "message": "コピー形式" },
-  "formatLatexRecommended": { "message": "LaTeX $...$ [推奨]" },
-  "formatMathmlExperimental": { "message": "MathML (Word) [試験的]" },
-  "formatPlainText": { "message": "プレーンテキスト ($ なし)" },
-  "formatNotion": { "message": "Notion $$...$$" },
-  "featureTimeline": { "message": "チャットタイムライン" },
-  "featureTimelineDesc": { "message": "サイドバーのドットで会話を素早く移動" },
-  "featureExport": { "message": "チャットを書き出し" },
-  "featureExportDesc": { "message": "ワンクリックで Markdown にエクスポート" },
-  "featurePromptVault": { "message": "プロンプト保管庫" },
-  "featurePromptVaultDesc": { "message": "プリセットプロンプトを素早く挿入" },
-  "featureDraftSave": { "message": "下書き保存" },
-  "featureDraftSaveDesc": { "message": "入力内容を自動保存" },
-  "featureCtrlEnterSend": { "message": "Ctrl+Enter で送信" },
-  "featureCtrlEnterSendDesc": { "message": "Enter で改行、誤送信を防止" },
-  "featurePreventScroll": { "message": "自動スクロール防止" },
-  "featurePreventScrollDesc": { "message": "生成中の自動スクロールを抑制" },
-  "btnQuote": { "message": "引用" },
-  "quotePrefix": { "message": "【引用内容】:\n" },
-  "quoteLineWrapOpen": { "message": "「" },
-  "quoteLineWrapClose": { "message": "」" },
-  "toastFormulaCopied": { "message": "✓ 数式をコピーしました" },
-  "toastCopyFailed": { "message": "✗ コピーに失敗しました" },
-  "toastNoLatex": { "message": "✗ ソースを抽出できません" },
+  "popupTitle": {
+    "message": "NLM Enhancer 設定"
+  },
+  "sectionCoreFeatures": {
+    "message": "🔧 コア機能"
+  },
+  "sectionInputExperience": {
+    "message": "⚙️ 入力とエクスペリエンス"
+  },
+  "featureQuoteReply": {
+    "message": "選択範囲を引用"
+  },
+  "featureQuoteReplyDesc": {
+    "message": "テキスト選択時に引用ボタンを表示"
+  },
+  "featureFormulaCopy": {
+    "message": "数式クリックコピー"
+  },
+  "featureFormulaCopyDesc": {
+    "message": "数式をクリックして LaTeX ソースをコピー"
+  },
+  "formulaCopyFormat": {
+    "message": "コピー形式"
+  },
+  "formatLatexRecommended": {
+    "message": "LaTeX $...$ [推奨]"
+  },
+  "formatMathmlExperimental": {
+    "message": "MathML (Word) [試験的]"
+  },
+  "formatPlainText": {
+    "message": "プレーンテキスト ($ なし)"
+  },
+  "formatNotion": {
+    "message": "Notion $$...$$"
+  },
+  "featureTimeline": {
+    "message": "チャットタイムライン"
+  },
+  "featureTimelineDesc": {
+    "message": "サイドバーのドットで会話を素早く移動"
+  },
+  "featureExport": {
+    "message": "チャットを書き出し"
+  },
+  "featureExportDesc": {
+    "message": "ワンクリックで Markdown にエクスポート"
+  },
+  "featurePromptVault": {
+    "message": "プロンプト保管庫"
+  },
+  "featurePromptVaultDesc": {
+    "message": "プリセットプロンプトを素早く挿入"
+  },
+  "featureDraftSave": {
+    "message": "下書き保存"
+  },
+  "featureDraftSaveDesc": {
+    "message": "入力内容を自動保存"
+  },
+  "featureCtrlEnterSend": {
+    "message": "Ctrl+Enter で送信"
+  },
+  "featureCtrlEnterSendDesc": {
+    "message": "Enter で改行、誤送信を防止"
+  },
+  "featurePreventScroll": {
+    "message": "自動スクロール防止"
+  },
+  "featurePreventScrollDesc": {
+    "message": "生成中の自動スクロールを抑制"
+  },
+  "btnQuote": {
+    "message": "引用"
+  },
+  "quotePrefix": {
+    "message": "【引用内容】:\n"
+  },
+  "quoteLineWrapOpen": {
+    "message": "「"
+  },
+  "quoteLineWrapClose": {
+    "message": "」"
+  },
+  "toastFormulaCopied": {
+    "message": "✓ 数式をコピーしました"
+  },
+  "toastCopyFailed": {
+    "message": "✗ コピーに失敗しました"
+  },
+  "toastNoLatex": {
+    "message": "✗ ソースを抽出できません"
+  },
   "timelineQuestion": {
     "message": "質問 $INDEX$",
-    "placeholders": { "INDEX": { "content": "$1" } }
+    "placeholders": {
+      "INDEX": {
+        "content": "$1"
+      }
+    }
   },
-  "toastNoConversation": { "message": "会話内容が見つかりません" },
+  "toastNoConversation": {
+    "message": "会話内容が見つかりません"
+  },
   "exportPreviewTitle": {
     "message": "プレビュー - $TITLE$",
-    "placeholders": { "TITLE": { "content": "$1" } }
+    "placeholders": {
+      "TITLE": {
+        "content": "$1"
+      }
+    }
   },
-  "exportToolbarTitle": { "message": "チャット書き出しプレビュー" },
-  "btnDownloadMd": { "message": "Markdown をダウンロード" },
-  "btnSavePdf": { "message": "PDF として保存" },
-  "exportPreview": { "message": "プレビュー" },
+  "exportToolbarTitle": {
+    "message": "チャット書き出しプレビュー"
+  },
+  "btnDownloadMd": {
+    "message": "Markdown をダウンロード"
+  },
+  "btnSavePdf": {
+    "message": "PDF として保存"
+  },
+  "exportPreview": {
+    "message": "プレビュー"
+  },
   "exportTime": {
     "message": "エクスポート日時: $TIME$",
-    "placeholders": { "TIME": { "content": "$1" } }
+    "placeholders": {
+      "TIME": {
+        "content": "$1"
+      }
+    }
   },
-  "roleUser": { "message": "ユーザー" },
-  "roleModel": { "message": "NotebookLM" },
-  "btnDeleteMessage": { "message": "このメッセージを削除" },
-  "toastPopupBlocked": { "message": "ポップアップがブロックされました。許可してください。" },
-  "exportDefaultTitle": { "message": "エクスポートされた会話" },
-  "mdRoleUser": { "message": "👤 **ユーザー**" },
-  "mdRoleModel": { "message": "🤖 **NotebookLM**" },
-  "btnExport": { "message": "すべてエクスポート" },
-  "promptVaultTitle": { "message": "プロンプト保管庫" },
-  "promptVaultPanelTitle": { "message": "⚡ プロンプト保管庫" },
-  "btnAddPrompt": { "message": "カスタムプロンプトを追加" },
-  "btnDelete": { "message": "削除" },
-  "toastInputNotFound": { "message": "入力ボックスが見つかりません" },
-  "toastInserted": { "message": "✓ 挿入されました" },
-  "dialogAddPromptTitle": { "message": "カスタムプロンプトの追加" },
-  "dialogPromptTitlePlaceholder": { "message": "タイトル（例：📌 コードレビュー）" },
-  "dialogPromptTextPlaceholder": { "message": "プロンプト内容..." },
-  "btnCancel": { "message": "キャンセル" },
-  "btnSave": { "message": "保存" },
-  "toastSaved": { "message": "✓ 保存されました" },
-  "builtinPrompt1Title": { "message": "📊 キー情報の抽出（表形式）" },
-  "builtinPrompt1Text": { "message": "アップロードされた文書から重要なデータと中心的な主張を抽出し、番号、要点、詳細説明の3列の表形式で提示してください。" },
-  "builtinPrompt2Title": { "message": "🧠 ファインマン・テクニックで解説" },
-  "builtinPrompt2Text": { "message": "この分野を全く知らない人に対して説明するように、ファインマン・テクニックを使って文書の核となる概念を説明してください。" },
-  "builtinPrompt3Title": { "message": "❓ 思考問題を生成" },
-  "builtinPrompt3Text": { "message": "アップロードされた文書に基づき、内容の理解と定着を助けるための深い思考問題や議論のポイントを10個生成してください。" },
-  "builtinPrompt4Title": { "message": "📝 構造化された要約" },
-  "builtinPrompt4Text": { "message": "文書の要約を、背景、主要な主張、重要な証拠、結論の構成で作成してください。各セクションは3文以内に収めてください。" },
-  "builtinPrompt5Title": { "message": "🔍 比較分析" },
-  "builtinPrompt5Text": { "message": "文書内の異なる視点や提案、理論を比較し、それぞれのメリット、デメリット、適用シナリオをリストアップしてください。" },
-  "builtinPrompt6Title": { "message": "🎯 アクションプラン" },
-  "builtinPrompt6Text": { "message": "文書の提案と結論に基づき、具体的なステップ、タイムライン、期待される成果を含む実行可能なアクションプランを作成してください。" },
-  "btnHideMessage": { "message": "この回を非表示（ローカルのみ）" },
-  "confirmHideMessage": { "message": "この会話を非表示にしますか？（このセッション中のみ有効です）" },
-  "btnSearchQuestions": { "message": "質問を検索" },
-  "searchPlaceholder": { "message": "質問を検索..." },
-  "searchNoResults": { "message": "該当する質問が見つかりません" },
-  "featureStashCart": { "message": "ナレッジカート" },
-  "featureStashCartDesc": { "message": "選択した回答を一時保存して一括エクスポート" },
-  "stashTooltip": { "message": "一括エクスポート用に一時保存" },
-  "stashBtnLabel": { "message": "保存" },
-  "stashBtnStashed": { "message": "保存済み" },
-  "toastStashed": { "message": "✓ カートに追加されました" },
-  "toastUnstashed": { "message": "✓ カートから削除されました" },
-  "cartPanelTitle": { "message": "📦 ナレッジカート" },
-  "cartEmpty": { "message": "カートにアイテムがありません" },
-  "cartExportAll": { "message": "選択項目をエクスポート" },
-  "cartSelectAll": { "message": "すべて選択 / 解除" },
-  "cartPreviewMerged": { "message": "一括エクスポート" },
-  "cartClearAll": { "message": "すべてクリア" },
-  "toastCartCleared": { "message": "✓ カートをクリアしました" },
+  "roleUser": {
+    "message": "ユーザー"
+  },
+  "roleModel": {
+    "message": "NotebookLM"
+  },
+  "btnDeleteMessage": {
+    "message": "このメッセージを削除"
+  },
+  "toastPopupBlocked": {
+    "message": "ポップアップがブロックされました。許可してください。"
+  },
+  "exportDefaultTitle": {
+    "message": "エクスポートされた会話"
+  },
+  "mdRoleUser": {
+    "message": "👤 **ユーザー**"
+  },
+  "mdRoleModel": {
+    "message": "🤖 **NotebookLM**"
+  },
+  "btnExport": {
+    "message": "すべてエクスポート"
+  },
+  "promptVaultTitle": {
+    "message": "プロンプト保管庫"
+  },
+  "promptVaultPanelTitle": {
+    "message": "⚡ プロンプト保管庫"
+  },
+  "btnAddPrompt": {
+    "message": "カスタムプロンプトを追加"
+  },
+  "btnDelete": {
+    "message": "削除"
+  },
+  "toastInputNotFound": {
+    "message": "入力ボックスが見つかりません"
+  },
+  "toastInserted": {
+    "message": "✓ 挿入されました"
+  },
+  "dialogAddPromptTitle": {
+    "message": "カスタムプロンプトの追加"
+  },
+  "dialogPromptTitlePlaceholder": {
+    "message": "タイトル（例：📌 コードレビュー）"
+  },
+  "dialogPromptTextPlaceholder": {
+    "message": "プロンプト内容..."
+  },
+  "btnCancel": {
+    "message": "キャンセル"
+  },
+  "btnSave": {
+    "message": "保存"
+  },
+  "toastSaved": {
+    "message": "✓ 保存されました"
+  },
+  "builtinPrompt1Title": {
+    "message": "📊 キー情報の抽出（表形式）"
+  },
+  "builtinPrompt1Text": {
+    "message": "アップロードされた文書から重要なデータと中心的な主張を抽出し、番号、要点、詳細説明の3列の表形式で提示してください。"
+  },
+  "builtinPrompt2Title": {
+    "message": "🧠 ファインマン・テクニックで解説"
+  },
+  "builtinPrompt2Text": {
+    "message": "この分野を全く知らない人に対して説明するように、ファインマン・テクニックを使って文書の核となる概念を説明してください。"
+  },
+  "builtinPrompt3Title": {
+    "message": "❓ 思考問題を生成"
+  },
+  "builtinPrompt3Text": {
+    "message": "アップロードされた文書に基づき、内容の理解と定着を助けるための深い思考問題や議論のポイントを10個生成してください。"
+  },
+  "builtinPrompt4Title": {
+    "message": "📝 構造化された要約"
+  },
+  "builtinPrompt4Text": {
+    "message": "文書の要約を、背景、主要な主張、重要な証拠、結論の構成で作成してください。各セクションは3文以内に収めてください。"
+  },
+  "builtinPrompt5Title": {
+    "message": "🔍 比較分析"
+  },
+  "builtinPrompt5Text": {
+    "message": "文書内の異なる視点や提案、理論を比較し、それぞれのメリット、デメリット、適用シナリオをリストアップしてください。"
+  },
+  "builtinPrompt6Title": {
+    "message": "🎯 アクションプラン"
+  },
+  "builtinPrompt6Text": {
+    "message": "文書の提案と結論に基づき、具体的なステップ、タイムライン、期待される成果を含む実行可能なアクションプランを作成してください。"
+  },
+  "btnHideMessage": {
+    "message": "この回を非表示（ローカルのみ）"
+  },
+  "confirmHideMessage": {
+    "message": "この会話を非表示にしますか？（このセッション中のみ有効です）"
+  },
+  "btnSearchQuestions": {
+    "message": "質問を検索"
+  },
+  "searchPlaceholder": {
+    "message": "質問を検索..."
+  },
+  "searchNoResults": {
+    "message": "該当する質問が見つかりません"
+  },
+  "featureStashCart": {
+    "message": "ナレッジカート"
+  },
+  "featureStashCartDesc": {
+    "message": "選択した回答を一時保存して一括エクスポート"
+  },
+  "stashTooltip": {
+    "message": "一括エクスポート用に一時保存"
+  },
+  "stashBtnLabel": {
+    "message": "保存"
+  },
+  "stashBtnStashed": {
+    "message": "保存済み"
+  },
+  "toastStashed": {
+    "message": "✓ カートに追加されました"
+  },
+  "toastUnstashed": {
+    "message": "✓ カートから削除されました"
+  },
+  "cartPanelTitle": {
+    "message": "📦 ナレッジカート"
+  },
+  "cartEmpty": {
+    "message": "カートにアイテムがありません"
+  },
+  "cartExportAll": {
+    "message": "選択項目をエクスポート"
+  },
+  "cartSelectAll": {
+    "message": "すべて選択 / 解除"
+  },
+  "cartPreviewMerged": {
+    "message": "一括エクスポート"
+  },
+  "cartClearAll": {
+    "message": "すべてクリア"
+  },
+  "toastCartCleared": {
+    "message": "✓ カートをクリアしました"
+  },
   "stashItemCount": {
     "message": "$COUNT$ 個のアイテムを保存中",
-    "placeholders": { "COUNT": { "content": "$1" } }
+    "placeholders": {
+      "COUNT": {
+        "content": "$1"
+      }
+    }
   },
-  "featureQuestionHistory": { "message": "質問履歴" },
-  "featureQuestionHistoryDesc": { "message": "送信した質問を自動的に記録します。" },
-  "questionHistoryTitle": { "message": "履歴" },
-  "questionHistoryPanelTitle": { "message": "🕒 質問履歴" },
-  "questionHistoryEmpty": { "message": "履歴がありません" },
-  "btnHistory": { "message": "履歴" },
-  "btnSaveWord": { "message": "Word で保存" },
-  "toastQuestionRecorded": { "message": "✓ 履歴に記録されました" },
-  "searchPromptPlaceholder": { "message": "プロンプトを検索..." },
-  "btnExportJson": { "message": "JSON エクスポート" },
-  "btnImportJson": { "message": "JSON インポート" },
-  "btnEdit": { "message": "編集" },
-  "btnPin": { "message": "ピン留め" },
-  "btnUnpin": { "message": "解除" },
-  "dialogEditPromptTitle": { "message": "プロンプトを編集" },
-  "dialogPromptTagsPlaceholder": { "message": "タグ（カンマ区切り、例：コード, レビュー）" },
-  "toastImportSuccess": { "message": "✓ インポート成功" },
-  "toastImportError": { "message": "✗ インポート失敗：無効な形式" },
-  "copyMsgLabel": { "message": "コピー" },
-  "copyMsgTooltip": { "message": "回答をコピー（数式対応）" },
-  "copiedLabel": { "message": "コピー済み" },
-  "modalExportCards": { "message": "フラッシュカードをエクスポート" },
-  "modalExportQuiz": { "message": "クイズをエクスポート" },
-  "modalSourceLabel": { "message": "ソース内容" },
+  "featureQuestionHistory": {
+    "message": "質問履歴"
+  },
+  "featureQuestionHistoryDesc": {
+    "message": "送信した質問を自動的に記録します。"
+  },
+  "questionHistoryTitle": {
+    "message": "履歴"
+  },
+  "questionHistoryPanelTitle": {
+    "message": "🕒 質問履歴"
+  },
+  "questionHistoryEmpty": {
+    "message": "履歴がありません"
+  },
+  "btnHistory": {
+    "message": "履歴"
+  },
+  "btnSaveWord": {
+    "message": "Word で保存"
+  },
+  "toastQuestionRecorded": {
+    "message": "✓ 履歴に記録されました"
+  },
+  "searchPromptPlaceholder": {
+    "message": "プロンプトを検索..."
+  },
+  "btnExportJson": {
+    "message": "JSON エクスポート"
+  },
+  "btnImportJson": {
+    "message": "JSON インポート"
+  },
+  "btnEdit": {
+    "message": "編集"
+  },
+  "btnPin": {
+    "message": "ピン留め"
+  },
+  "btnUnpin": {
+    "message": "解除"
+  },
+  "dialogEditPromptTitle": {
+    "message": "プロンプトを編集"
+  },
+  "dialogPromptTagsPlaceholder": {
+    "message": "タグ（カンマ区切り、例：コード, レビュー）"
+  },
+  "toastImportSuccess": {
+    "message": "✓ インポート成功"
+  },
+  "toastImportError": {
+    "message": "✗ インポート失敗：無効な形式"
+  },
+  "copyMsgLabel": {
+    "message": "コピー"
+  },
+  "copyMsgTooltip": {
+    "message": "回答をコピー（数式対応）"
+  },
+  "copiedLabel": {
+    "message": "コピー済み"
+  },
+  "modalExportCards": {
+    "message": "フラッシュカードをエクスポート"
+  },
+  "modalExportQuiz": {
+    "message": "クイズをエクスポート"
+  },
+  "modalSourceLabel": {
+    "message": "ソース内容"
+  },
   "modalGroupCount": {
     "message": "$COUNT$ グループ",
-    "placeholders": { "COUNT": { "content": "$1" } }
+    "placeholders": {
+      "COUNT": {
+        "content": "$1"
+      }
+    }
   },
-  "modalSelectFormat": { "message": "形式を選択" },
-  "modalFormatCsvName": { "message": "CSV テーブル" },
-  "modalFormatCsvDesc": { "message": "Excel / Notion インポートに最適" },
-  "modalFormatMdName": { "message": "Markdown ノート" },
-  "modalFormatMdDesc": { "message": "プレーンテキスト、Obsidian 対応" },
-  "modalFormatAnkiName": { "message": "Anki パッケージ" },
-  "modalFormatAnkiDesc": { "message": "学習アルゴリズムに最適化" },
-  "modalRecommendedTip": { "message": "推奨テンプレートの使用をお勧めします" },
-  "modalGetTemplate": { "message": "テンプレートを入手" },
-  "modalBtnStartExport": { "message": "エクスポート開始" },
-  "btnExportNote": { "message": "ノートをエクスポート" },
-  "btnExportReport": { "message": "レポートをエクスポート" },
-  "btnExportQuiz": { "message": "クイズをエクスポート" },
-  "btnExportFlashcard": { "message": "フラッシュカードをエクスポート" }
+  "modalSelectFormat": {
+    "message": "形式を選択"
+  },
+  "modalFormatCsvName": {
+    "message": "CSV テーブル"
+  },
+  "modalFormatCsvDesc": {
+    "message": "Excel / Notion インポートに最適"
+  },
+  "modalFormatMdName": {
+    "message": "Markdown ノート"
+  },
+  "modalFormatMdDesc": {
+    "message": "プレーンテキスト、Obsidian 対応"
+  },
+  "modalFormatAnkiName": {
+    "message": "Anki パッケージ"
+  },
+  "modalFormatAnkiDesc": {
+    "message": "学習アルゴリズムに最適化"
+  },
+  "modalRecommendedTip": {
+    "message": "推奨テンプレートの使用をお勧めします"
+  },
+  "modalGetTemplate": {
+    "message": "テンプレートを入手"
+  },
+  "modalBtnStartExport": {
+    "message": "エクスポート開始"
+  },
+  "btnExportNote": {
+    "message": "ノートをエクスポート"
+  },
+  "btnExportReport": {
+    "message": "レポートをエクスポート"
+  },
+  "btnExportQuiz": {
+    "message": "クイズをエクスポート"
+  },
+  "btnExportFlashcard": {
+    "message": "フラッシュカードをエクスポート"
+  },
+  "featureVideoWatermark": {
+    "message": "视频无水印下载"
+  },
+  "featureVideoWatermarkDesc": {
+    "message": "去除 NotebookLM 视频水印并下载"
+  },
+  "videoWmBtnLabel": {
+    "message": "无水印下载"
+  },
+  "videoWmModalTitle": {
+    "message": "视频无水印下载"
+  },
+  "videoWmOptionsLabel": {
+    "message": "处理选项"
+  },
+  "videoWmTrimEnd": {
+    "message": "剪掉视频结尾水印"
+  },
+  "videoWmTrimEndDesc": {
+    "message": "移除最后 2.5 秒品牌片尾"
+  },
+  "videoWmRemoveFirst": {
+    "message": "消除右下角固定水印"
+  },
+  "videoWmRemoveFirstDesc": {
+    "message": "使用 delogo 滤镜消除画面右下角的品牌水印"
+  },
+  "videoWmModeLabel": {
+    "message": "处理模式"
+  },
+  "videoWmModeFast": {
+    "message": "极速模式 (15FPS, 适合 PPT)"
+  },
+  "videoWmModeStandard": {
+    "message": "标准模式 (30FPS)"
+  },
+  "videoWmStartBtn": {
+    "message": "🚀 开始处理"
+  },
+  "videoWmNoVideo": {
+    "message": "未找到视频元素"
+  },
+  "videoWmNoOption": {
+    "message": "请至少选择一个处理选项"
+  },
+  "videoWmFetching": {
+    "message": "正在获取视频数据..."
+  },
+  "videoWmProcessingStarted": {
+    "message": "✓ 已在新标签页中开始处理"
+  },
+  "videoWmFetchError": {
+    "message": "✗ 获取视频数据失败"
+  },
+  "videoWmPickFile": {
+    "message": "选择本地视频文件（已下载的视频）"
+  },
+  "videoWmAutoFetchFailed": {
+    "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+  }
 }

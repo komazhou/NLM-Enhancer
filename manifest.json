@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.5.1",
+  "version": "1.6.0.8",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "icons": {
@@ -12,6 +12,9 @@
   "permissions": [
     "storage",
     "clipboardWrite"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup/index.html",
@@ -48,6 +51,7 @@
         "src/features/preventScroll.js",
         "src/features/deleteMessage.js",
         "src/features/timelineSearch.js",
+        "src/features/videoWatermark.js",
         "src/content.js"
       ],
       "css": [
@@ -58,8 +62,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["lib/*", "lib/fonts/*", "_locales/*/messages.json"],
+      "resources": ["lib/*", "lib/fonts/*", "_locales/*/messages.json", "processing/*"],
       "matches": ["https://notebooklm.google.com/*"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
 }

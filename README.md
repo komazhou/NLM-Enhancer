@@ -45,6 +45,7 @@ When you copy limits, integrals, or matrices from NotebookLM and paste them into
 ### 📍 Timeline Navigation & UI Control
 - **Chat Timeline**: Visual sidebar nodes allow you to jump between long messages instantly.
 - **Message Toggling**: Hide unwanted messages to keep your workspace focused.
+- **Video Watermark Removal**: Remove the Google NotebookLM brand watermark from generated video overviews and download them cleanly.
 - **Prevent Auto-Scroll**: Stop the annoying page jump when hitting "Enter" to send a new prompt.
 
 ### 💡 Prompt Vault

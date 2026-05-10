@@ -5,149 +5,479 @@
   "extDesc": {
     "message": "Herramienta de productividad para NotebookLM: exportación de fórmulas LaTeX, navegación por línea de tiempo, bóveda de prompts y gestión de mensajes."
   },
-  "popupTitle": { "message": "Configuración de NLM Enhancer" },
-  "sectionCoreFeatures": { "message": "🔧 Funciones principales" },
-  "sectionInputExperience": { "message": "⚙️ Entrada y Experiencia" },
-  "featureQuoteReply": { "message": "Citar selección" },
-  "featureQuoteReplyDesc": { "message": "Mostrar un botón de cita cuando se selecciona texto" },
-  "featureFormulaCopy": { "message": "Copiar fórmula al hacer clic" },
-  "featureFormulaCopyDesc": { "message": "Haga clic en cualquier fórmula para copiar su fuente LaTeX" },
-  "formulaCopyFormat": { "message": "Formato de copia" },
-  "formatLatexRecommended": { "message": "LaTeX $...$ [Recomendado]" },
-  "formatMathmlExperimental": { "message": "MathML (Word) [Experimental]" },
-  "formatPlainText": { "message": "Texto plano (sin $)" },
-  "formatNotion": { "message": "Notion $$...$$" },
-  "featureTimeline": { "message": "Línea de tiempo del chat" },
-  "featureTimelineDesc": { "message": "Puntos laterales para una navegación rápida entre mensajes" },
-  "featureExport": { "message": "Exportar chat" },
-  "featureExportDesc": { "message": "Exportación con un clic a Markdown" },
-  "featurePromptVault": { "message": "Bóveda de prompts" },
-  "featurePromptVaultDesc": { "message": "Inserción rápida de prompts preestablecidos" },
-  "featureDraftSave": { "message": "Recuperación de borradores" },
-  "featureDraftSaveDesc": { "message": "Guardado automático del contenido del cuadro de entrada" },
-  "featureCtrlEnterSend": { "message": "Ctrl+Enter para enviar" },
-  "featureCtrlEnterSendDesc": { "message": "Enter inserta una nueva línea para evitar envíos accidentales" },
-  "featurePreventScroll": { "message": "Evitar auto-desplazamiento" },
-  "featurePreventScrollDesc": { "message": "El desplazamiento hacia arriba durante la generación no se interrumpirá" },
-  "btnQuote": { "message": "Citar" },
-  "quotePrefix": { "message": "[Citado]:\n" },
-  "quoteLineWrapOpen": { "message": "«" },
-  "quoteLineWrapClose": { "message": "»" },
-  "toastFormulaCopied": { "message": "✓ Fórmula copiada" },
-  "toastCopyFailed": { "message": "✗ Error al copiar" },
-  "toastNoLatex": { "message": "✗ No se puede extraer la fuente" },
+  "popupTitle": {
+    "message": "Configuración de NLM Enhancer"
+  },
+  "sectionCoreFeatures": {
+    "message": "🔧 Funciones principales"
+  },
+  "sectionInputExperience": {
+    "message": "⚙️ Entrada y Experiencia"
+  },
+  "featureQuoteReply": {
+    "message": "Citar selección"
+  },
+  "featureQuoteReplyDesc": {
+    "message": "Mostrar un botón de cita cuando se selecciona texto"
+  },
+  "featureFormulaCopy": {
+    "message": "Copiar fórmula al hacer clic"
+  },
+  "featureFormulaCopyDesc": {
+    "message": "Haga clic en cualquier fórmula para copiar su fuente LaTeX"
+  },
+  "formulaCopyFormat": {
+    "message": "Formato de copia"
+  },
+  "formatLatexRecommended": {
+    "message": "LaTeX $...$ [Recomendado]"
+  },
+  "formatMathmlExperimental": {
+    "message": "MathML (Word) [Experimental]"
+  },
+  "formatPlainText": {
+    "message": "Texto plano (sin $)"
+  },
+  "formatNotion": {
+    "message": "Notion $$...$$"
+  },
+  "featureTimeline": {
+    "message": "Línea de tiempo del chat"
+  },
+  "featureTimelineDesc": {
+    "message": "Puntos laterales para una navegación rápida entre mensajes"
+  },
+  "featureExport": {
+    "message": "Exportar chat"
+  },
+  "featureExportDesc": {
+    "message": "Exportación con un clic a Markdown"
+  },
+  "featurePromptVault": {
+    "message": "Bóveda de prompts"
+  },
+  "featurePromptVaultDesc": {
+    "message": "Inserción rápida de prompts preestablecidos"
+  },
+  "featureDraftSave": {
+    "message": "Recuperación de borradores"
+  },
+  "featureDraftSaveDesc": {
+    "message": "Guardado automático del contenido del cuadro de entrada"
+  },
+  "featureCtrlEnterSend": {
+    "message": "Ctrl+Enter para enviar"
+  },
+  "featureCtrlEnterSendDesc": {
+    "message": "Enter inserta una nueva línea para evitar envíos accidentales"
+  },
+  "featurePreventScroll": {
+    "message": "Evitar auto-desplazamiento"
+  },
+  "featurePreventScrollDesc": {
+    "message": "El desplazamiento hacia arriba durante la generación no se interrumpirá"
+  },
+  "btnQuote": {
+    "message": "Citar"
+  },
+  "quotePrefix": {
+    "message": "[Citado]:\n"
+  },
+  "quoteLineWrapOpen": {
+    "message": "«"
+  },
+  "quoteLineWrapClose": {
+    "message": "»"
+  },
+  "toastFormulaCopied": {
+    "message": "✓ Fórmula copiada"
+  },
+  "toastCopyFailed": {
+    "message": "✗ Error al copiar"
+  },
+  "toastNoLatex": {
+    "message": "✗ No se puede extraer la fuente"
+  },
   "timelineQuestion": {
     "message": "Pregunta $INDEX$",
-    "placeholders": { "INDEX": { "content": "$1" } }
+    "placeholders": {
+      "INDEX": {
+        "content": "$1"
+      }
+    }
   },
-  "toastNoConversation": { "message": "No se encontró contenido de conversación" },
+  "toastNoConversation": {
+    "message": "No se encontró contenido de conversación"
+  },
   "exportPreviewTitle": {
     "message": "Vista previa - $TITLE$",
-    "placeholders": { "TITLE": { "content": "$1" } }
+    "placeholders": {
+      "TITLE": {
+        "content": "$1"
+      }
+    }
   },
-  "exportToolbarTitle": { "message": "Vista previa de exportación" },
-  "btnDownloadMd": { "message": "Descargar Markdown" },
-  "btnSavePdf": { "message": "Guardar como PDF" },
-  "exportPreview": { "message": "Vista previa" },
+  "exportToolbarTitle": {
+    "message": "Vista previa de exportación"
+  },
+  "btnDownloadMd": {
+    "message": "Descargar Markdown"
+  },
+  "btnSavePdf": {
+    "message": "Guardar como PDF"
+  },
+  "exportPreview": {
+    "message": "Vista previa"
+  },
   "exportTime": {
     "message": "Exportado el: $TIME$",
-    "placeholders": { "TIME": { "content": "$1" } }
+    "placeholders": {
+      "TIME": {
+        "content": "$1"
+      }
+    }
   },
-  "roleUser": { "message": "Usuario" },
-  "roleModel": { "message": "NotebookLM" },
-  "btnDeleteMessage": { "message": "Eliminar este mensaje" },
-  "toastPopupBlocked": { "message": "La ventana emergente fue bloqueada. Por favor, permítalas." },
-  "exportDefaultTitle": { "message": "Conversación exportada" },
-  "mdRoleUser": { "message": "👤 **Usuario**" },
-  "mdRoleModel": { "message": "🤖 **NotebookLM**" },
-  "btnExport": { "message": "Exportar todo" },
-  "promptVaultTitle": { "message": "Bóveda de prompts" },
-  "promptVaultPanelTitle": { "message": "⚡ Bóveda de prompts" },
-  "btnAddPrompt": { "message": "Agregar prompt personalizado" },
-  "btnDelete": { "message": "Eliminar" },
-  "toastInputNotFound": { "message": "Cuadro de entrada no encontrado" },
-  "toastInserted": { "message": "✓ Insertado" },
-  "dialogAddPromptTitle": { "message": "Agregar prompt personalizado" },
-  "dialogPromptTitlePlaceholder": { "message": "Título (ej. 📌 Revisión de código)" },
-  "dialogPromptTextPlaceholder": { "message": "Contenido del prompt..." },
-  "btnCancel": { "message": "Cancelar" },
-  "btnSave": { "message": "Guardar" },
-  "toastSaved": { "message": "✓ Guardado" },
-  "builtinPrompt1Title": { "message": "📊 Extraer info clave como tabla" },
-  "builtinPrompt1Text": { "message": "Extraiga todos los datos clave y argumentos principales del documento cargado y preséntelos en una tabla con columnas: Número, Punto clave y Descripción detallada." },
-  "builtinPrompt2Title": { "message": "🧠 Explicación con Técnica Feynman" },
-  "builtinPrompt2Text": { "message": "Utilice la Técnica Feynman (asuma que no sé nada sobre este tema) para explicar los conceptos más esenciales del documento anterior." },
-  "builtinPrompt3Title": { "message": "❓ Generar preguntas de discusión" },
-  "builtinPrompt3Text": { "message": "Basado en el documento cargado, genere 10 preguntas de discusión profundas para ayudarme a entender y asimilar mejor el material." },
-  "builtinPrompt4Title": { "message": "📝 Resumen estructurado" },
-  "builtinPrompt4Text": { "message": "Escriba un resumen estructurado del documento, incluyendo: Antecedentes, Argumentos principales, Evidencia clave y Conclusión. Mantenga cada sección en no más de 3 frases." },
-  "builtinPrompt5Title": { "message": "🔍 Análisis comparativo" },
-  "builtinPrompt5Text": { "message": "Compare los diferentes puntos de vista/soluciones/teorías mencionados en el documento, enumerando sus respectivos pros, contras y escenarios aplicables." },
-  "builtinPrompt6Title": { "message": "🎯 Plan de acción" },
-  "builtinPrompt6Text": { "message": "Basado en las recomendaciones y conclusiones del documento, ayúdeme a crear un plan de acción ejecutable que incluya pasos específicos, cronogramas y resultados esperados." },
-  "btnHideMessage": { "message": "Ocultar esta ronda (solo local)" },
-  "confirmHideMessage": { "message": "¿Ocultar esta ronda de conversación? (Solo se oculta durante esta sesión)" },
-  "btnSearchQuestions": { "message": "Buscar preguntas" },
-  "searchPlaceholder": { "message": "Buscar preguntas..." },
-  "searchNoResults": { "message": "No se encontraron preguntas coincidentes" },
-  "featureStashCart": { "message": "Carrito de conocimiento" },
-  "featureStashCartDesc": { "message": "Guarde bloques de Q&A seleccionados para exportación combinada" },
-  "stashTooltip": { "message": "Guardar para exportación combinada" },
-  "stashBtnLabel": { "message": "Guardar" },
-  "stashBtnStashed": { "message": "Guardado" },
-  "toastStashed": { "message": "✓ Añadido al carrito" },
-  "toastUnstashed": { "message": "✓ Eliminado del carrito" },
-  "cartPanelTitle": { "message": "📦 Carrito de conocimiento" },
-  "cartEmpty": { "message": "No hay elementos guardados" },
-  "cartExportAll": { "message": "Exportar seleccionados" },
-  "cartSelectAll": { "message": "Seleccionar / Deseleccionar todo" },
-  "cartPreviewMerged": { "message": "Exportación combinada" },
-  "cartClearAll": { "message": "Limpiar todo" },
-  "toastCartCleared": { "message": "✓ Carrito vaciado" },
+  "roleUser": {
+    "message": "Usuario"
+  },
+  "roleModel": {
+    "message": "NotebookLM"
+  },
+  "btnDeleteMessage": {
+    "message": "Eliminar este mensaje"
+  },
+  "toastPopupBlocked": {
+    "message": "La ventana emergente fue bloqueada. Por favor, permítalas."
+  },
+  "exportDefaultTitle": {
+    "message": "Conversación exportada"
+  },
+  "mdRoleUser": {
+    "message": "👤 **Usuario**"
+  },
+  "mdRoleModel": {
+    "message": "🤖 **NotebookLM**"
+  },
+  "btnExport": {
+    "message": "Exportar todo"
+  },
+  "promptVaultTitle": {
+    "message": "Bóveda de prompts"
+  },
+  "promptVaultPanelTitle": {
+    "message": "⚡ Bóveda de prompts"
+  },
+  "btnAddPrompt": {
+    "message": "Agregar prompt personalizado"
+  },
+  "btnDelete": {
+    "message": "Eliminar"
+  },
+  "toastInputNotFound": {
+    "message": "Cuadro de entrada no encontrado"
+  },
+  "toastInserted": {
+    "message": "✓ Insertado"
+  },
+  "dialogAddPromptTitle": {
+    "message": "Agregar prompt personalizado"
+  },
+  "dialogPromptTitlePlaceholder": {
+    "message": "Título (ej. 📌 Revisión de código)"
+  },
+  "dialogPromptTextPlaceholder": {
+    "message": "Contenido del prompt..."
+  },
+  "btnCancel": {
+    "message": "Cancelar"
+  },
+  "btnSave": {
+    "message": "Guardar"
+  },
+  "toastSaved": {
+    "message": "✓ Guardado"
+  },
+  "builtinPrompt1Title": {
+    "message": "📊 Extraer info clave como tabla"
+  },
+  "builtinPrompt1Text": {
+    "message": "Extraiga todos los datos clave y argumentos principales del documento cargado y preséntelos en una tabla con columnas: Número, Punto clave y Descripción detallada."
+  },
+  "builtinPrompt2Title": {
+    "message": "🧠 Explicación con Técnica Feynman"
+  },
+  "builtinPrompt2Text": {
+    "message": "Utilice la Técnica Feynman (asuma que no sé nada sobre este tema) para explicar los conceptos más esenciales del documento anterior."
+  },
+  "builtinPrompt3Title": {
+    "message": "❓ Generar preguntas de discusión"
+  },
+  "builtinPrompt3Text": {
+    "message": "Basado en el documento cargado, genere 10 preguntas de discusión profundas para ayudarme a entender y asimilar mejor el material."
+  },
+  "builtinPrompt4Title": {
+    "message": "📝 Resumen estructurado"
+  },
+  "builtinPrompt4Text": {
+    "message": "Escriba un resumen estructurado del documento, incluyendo: Antecedentes, Argumentos principales, Evidencia clave y Conclusión. Mantenga cada sección en no más de 3 frases."
+  },
+  "builtinPrompt5Title": {
+    "message": "🔍 Análisis comparativo"
+  },
+  "builtinPrompt5Text": {
+    "message": "Compare los diferentes puntos de vista/soluciones/teorías mencionados en el documento, enumerando sus respectivos pros, contras y escenarios aplicables."
+  },
+  "builtinPrompt6Title": {
+    "message": "🎯 Plan de acción"
+  },
+  "builtinPrompt6Text": {
+    "message": "Basado en las recomendaciones y conclusiones del documento, ayúdeme a crear un plan de acción ejecutable que incluya pasos específicos, cronogramas y resultados esperados."
+  },
+  "btnHideMessage": {
+    "message": "Ocultar esta ronda (solo local)"
+  },
+  "confirmHideMessage": {
+    "message": "¿Ocultar esta ronda de conversación? (Solo se oculta durante esta sesión)"
+  },
+  "btnSearchQuestions": {
+    "message": "Buscar preguntas"
+  },
+  "searchPlaceholder": {
+    "message": "Buscar preguntas..."
+  },
+  "searchNoResults": {
+    "message": "No se encontraron preguntas coincidentes"
+  },
+  "featureStashCart": {
+    "message": "Carrito de conocimiento"
+  },
+  "featureStashCartDesc": {
+    "message": "Guarde bloques de Q&A seleccionados para exportación combinada"
+  },
+  "stashTooltip": {
+    "message": "Guardar para exportación combinada"
+  },
+  "stashBtnLabel": {
+    "message": "Guardar"
+  },
+  "stashBtnStashed": {
+    "message": "Guardado"
+  },
+  "toastStashed": {
+    "message": "✓ Añadido al carrito"
+  },
+  "toastUnstashed": {
+    "message": "✓ Eliminado del carrito"
+  },
+  "cartPanelTitle": {
+    "message": "📦 Carrito de conocimiento"
+  },
+  "cartEmpty": {
+    "message": "No hay elementos guardados"
+  },
+  "cartExportAll": {
+    "message": "Exportar seleccionados"
+  },
+  "cartSelectAll": {
+    "message": "Seleccionar / Deseleccionar todo"
+  },
+  "cartPreviewMerged": {
+    "message": "Exportación combinada"
+  },
+  "cartClearAll": {
+    "message": "Limpiar todo"
+  },
+  "toastCartCleared": {
+    "message": "✓ Carrito vaciado"
+  },
   "stashItemCount": {
     "message": "$COUNT$ elementos guardados",
-    "placeholders": { "COUNT": { "content": "$1" } }
+    "placeholders": {
+      "COUNT": {
+        "content": "$1"
+      }
+    }
   },
-  "featureQuestionHistory": { "message": "Historial de preguntas" },
-  "featureQuestionHistoryDesc": { "message": "Registre automáticamente sus preguntas enviadas." },
-  "questionHistoryTitle": { "message": "Historial" },
-  "questionHistoryPanelTitle": { "message": "🕒 Historial de preguntas" },
-  "questionHistoryEmpty": { "message": "No hay historial aún" },
-  "btnHistory": { "message": "Historial" },
-  "btnSaveWord": { "message": "Exportar a Word" },
-  "toastQuestionRecorded": { "message": "✓ Registrado en el historial" },
-  "searchPromptPlaceholder": { "message": "Buscar prompts..." },
-  "btnExportJson": { "message": "Exportar JSON" },
-  "btnImportJson": { "message": "Importar JSON" },
-  "btnEdit": { "message": "Editar" },
-  "btnPin": { "message": "Fijar" },
-  "btnUnpin": { "message": "Desfijar" },
-  "dialogEditPromptTitle": { "message": "Editar prompt" },
-  "dialogPromptTagsPlaceholder": { "message": "Etiquetas (separadas por comas, ej. Código, Revisión)" },
-  "toastImportSuccess": { "message": "✓ Importado con éxito" },
-  "toastImportError": { "message": "✗ Error al importar: formato inválido" },
-  "copyMsgLabel": { "message": "Copiar" },
-  "copyMsgTooltip": { "message": "Copiar respuesta (con soporte para fórmulas)" },
-  "copiedLabel": { "message": "Copiado" },
-  "modalExportCards": { "message": "Exportar tarjetas" },
-  "modalExportQuiz": { "message": "Exportar cuestionario" },
-  "modalSourceLabel": { "message": "Contenido fuente" },
+  "featureQuestionHistory": {
+    "message": "Historial de preguntas"
+  },
+  "featureQuestionHistoryDesc": {
+    "message": "Registre automáticamente sus preguntas enviadas."
+  },
+  "questionHistoryTitle": {
+    "message": "Historial"
+  },
+  "questionHistoryPanelTitle": {
+    "message": "🕒 Historial de preguntas"
+  },
+  "questionHistoryEmpty": {
+    "message": "No hay historial aún"
+  },
+  "btnHistory": {
+    "message": "Historial"
+  },
+  "btnSaveWord": {
+    "message": "Exportar a Word"
+  },
+  "toastQuestionRecorded": {
+    "message": "✓ Registrado en el historial"
+  },
+  "searchPromptPlaceholder": {
+    "message": "Buscar prompts..."
+  },
+  "btnExportJson": {
+    "message": "Exportar JSON"
+  },
+  "btnImportJson": {
+    "message": "Importar JSON"
+  },
+  "btnEdit": {
+    "message": "Editar"
+  },
+  "btnPin": {
+    "message": "Fijar"
+  },
+  "btnUnpin": {
+    "message": "Desfijar"
+  },
+  "dialogEditPromptTitle": {
+    "message": "Editar prompt"
+  },
+  "dialogPromptTagsPlaceholder": {
+    "message": "Etiquetas (separadas por comas, ej. Código, Revisión)"
+  },
+  "toastImportSuccess": {
+    "message": "✓ Importado con éxito"
+  },
+  "toastImportError": {
+    "message": "✗ Error al importar: formato inválido"
+  },
+  "copyMsgLabel": {
+    "message": "Copiar"
+  },
+  "copyMsgTooltip": {
+    "message": "Copiar respuesta (con soporte para fórmulas)"
+  },
+  "copiedLabel": {
+    "message": "Copiado"
+  },
+  "modalExportCards": {
+    "message": "Exportar tarjetas"
+  },
+  "modalExportQuiz": {
+    "message": "Exportar cuestionario"
+  },
+  "modalSourceLabel": {
+    "message": "Contenido fuente"
+  },
   "modalGroupCount": {
     "message": "$COUNT$ Grupos",
-    "placeholders": { "COUNT": { "content": "$1" } }
+    "placeholders": {
+      "COUNT": {
+        "content": "$1"
+      }
+    }
   },
-  "modalSelectFormat": { "message": "Seleccionar formato" },
-  "modalFormatCsvName": { "message": "Tabla CSV" },
-  "modalFormatCsvDesc": { "message": "Ideal para Excel / Notion" },
-  "modalFormatMdName": { "message": "Nota Markdown" },
-  "modalFormatMdDesc": { "message": "Texto plano, compatible con Obsidian" },
-  "modalFormatAnkiName": { "message": "Paquete Anki" },
-  "modalFormatAnkiDesc": { "message": "Optimizado para aprendizaje SRS" },
-  "modalRecommendedTip": { "message": "Mejor con la plantilla recomendada" },
-  "modalGetTemplate": { "message": "Obtener plantilla" },
-  "modalBtnStartExport": { "message": "Iniciar exportación" },
-  "btnExportNote": { "message": "Exportar nota" },
-  "btnExportReport": { "message": "Exportar reporte" },
-  "btnExportQuiz": { "message": "Exportar cuestionario" },
-  "btnExportFlashcard": { "message": "Exportar tarjetas" }
+  "modalSelectFormat": {
+    "message": "Seleccionar formato"
+  },
+  "modalFormatCsvName": {
+    "message": "Tabla CSV"
+  },
+  "modalFormatCsvDesc": {
+    "message": "Ideal para Excel / Notion"
+  },
+  "modalFormatMdName": {
+    "message": "Nota Markdown"
+  },
+  "modalFormatMdDesc": {
+    "message": "Texto plano, compatible con Obsidian"
+  },
+  "modalFormatAnkiName": {
+    "message": "Paquete Anki"
+  },
+  "modalFormatAnkiDesc": {
+    "message": "Optimizado para aprendizaje SRS"
+  },
+  "modalRecommendedTip": {
+    "message": "Mejor con la plantilla recomendada"
+  },
+  "modalGetTemplate": {
+    "message": "Obtener plantilla"
+  },
+  "modalBtnStartExport": {
+    "message": "Iniciar exportación"
+  },
+  "btnExportNote": {
+    "message": "Exportar nota"
+  },
+  "btnExportReport": {
+    "message": "Exportar reporte"
+  },
+  "btnExportQuiz": {
+    "message": "Exportar cuestionario"
+  },
+  "btnExportFlashcard": {
+    "message": "Exportar tarjetas"
+  },
+  "featureVideoWatermark": {
+    "message": "视频无水印下载"
+  },
+  "featureVideoWatermarkDesc": {
+    "message": "去除 NotebookLM 视频水印并下载"
+  },
+  "videoWmBtnLabel": {
+    "message": "无水印下载"
+  },
+  "videoWmModalTitle": {
+    "message": "视频无水印下载"
+  },
+  "videoWmOptionsLabel": {
+    "message": "处理选项"
+  },
+  "videoWmTrimEnd": {
+    "message": "剪掉视频结尾水印"
+  },
+  "videoWmTrimEndDesc": {
+    "message": "移除最后 2.5 秒品牌片尾"
+  },
+  "videoWmRemoveFirst": {
+    "message": "消除右下角固定水印"
+  },
+  "videoWmRemoveFirstDesc": {
+    "message": "使用 delogo 滤镜消除画面右下角的品牌水印"
+  },
+  "videoWmModeLabel": {
+    "message": "处理模式"
+  },
+  "videoWmModeFast": {
+    "message": "极速模式 (15FPS, 适合 PPT)"
+  },
+  "videoWmModeStandard": {
+    "message": "标准模式 (30FPS)"
+  },
+  "videoWmStartBtn": {
+    "message": "🚀 开始处理"
+  },
+  "videoWmNoVideo": {
+    "message": "未找到视频元素"
+  },
+  "videoWmNoOption": {
+    "message": "请至少选择一个处理选项"
+  },
+  "videoWmFetching": {
+    "message": "正在获取视频数据..."
+  },
+  "videoWmProcessingStarted": {
+    "message": "✓ 已在新标签页中开始处理"
+  },
+  "videoWmFetchError": {
+    "message": "✗ 获取视频数据失败"
+  },
+  "videoWmPickFile": {
+    "message": "选择本地视频文件（已下载的视频）"
+  },
+  "videoWmAutoFetchFailed": {
+    "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+  }
 }
