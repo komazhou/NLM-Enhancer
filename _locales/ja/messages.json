@@ -478,6 +478,18 @@
     "message": "选择本地视频文件（已下载的视频）"
   },
   "videoWmAutoFetchFailed": {
-    "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+    "message": "⚠ 自動取得に失敗しました。下のボタンをクリックしてローカル動画を選択してください"
+  },
+  "sectionTools": {
+    "message": "🧰 ツールボックス"
+  },
+  "toolLocalRemoval": {
+    "message": "ローカル透かし除去 (AI)"
+  },
+  "toolLocalRemovalDesc": {
+    "message": "ローカルの動画、画像などの透かしをAIで除去します。"
+  },
+  "btnOpen": {
+    "message": "開く"
   }
 }

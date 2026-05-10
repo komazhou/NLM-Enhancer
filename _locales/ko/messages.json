@@ -478,6 +478,18 @@
     "message": "选择本地视频文件（已下载的视频）"
   },
   "videoWmAutoFetchFailed": {
-    "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+    "message": "⚠ 자동 가져오기에 실패했습니다. 아래 버튼을 눌러 로컬 동영상을 선택하세요"
+  },
+  "sectionTools": {
+    "message": "🧰 툴박스"
+  },
+  "toolLocalRemoval": {
+    "message": "로컬 워터마크 제거 (AI)"
+  },
+  "toolLocalRemovalDesc": {
+    "message": "로컬 동영상, 이미지 등의 워터마크를 AI로 제거합니다."
+  },
+  "btnOpen": {
+    "message": "열기"
   }
 }

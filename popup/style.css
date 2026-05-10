@@ -329,6 +329,75 @@ body {
 }
 
 
+/* === 工具卡片 === */
+.tools-section {
+  padding-bottom: 20px;
+}
+
+.tool-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  margin: 6px 8px;
+  transition: all 0.2s ease;
+}
+
+.tool-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(138, 180, 248, 0.2);
+  transform: translateY(-1px);
+}
+
+.tool-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.tool-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tool-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.tool-desc {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+}
+
+.tool-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+  flex-shrink: 0;
+}
+
+.tool-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.tool-btn:active {
+  transform: scale(0.95);
+}
+
+
 /* === 底部 === */
 .popup-footer {
   text-align: center;

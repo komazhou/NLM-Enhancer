@@ -481,5 +481,17 @@
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ Auto fetch failed, please click Select Local Video File"
+  },
+  "sectionTools": {
+    "message": "🧰 Toolbox"
+  },
+  "toolLocalRemoval": {
+    "message": "Local Removal (AI)"
+  },
+  "toolLocalRemovalDesc": {
+    "message": "AI watermark removal for local videos, images, and more."
+  },
+  "btnOpen": {
+    "message": "Open"
   }
 }

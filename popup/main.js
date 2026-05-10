@@ -180,4 +180,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   toggles.forEach((input) => {
     input.addEventListener('change', updateSubSettingVisibility);
   });
+
+  // === 工具箱：本地去水印入口 ===
+  const localRemovalBtn = document.getElementById('btn-openLocalRemoval');
+  if (localRemovalBtn) {
+    localRemovalBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('processing/index.html') });
+    });
+  }
 });

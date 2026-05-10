@@ -478,6 +478,18 @@
     "message": "选择本地视频文件（已下载的视频）"
   },
   "videoWmAutoFetchFailed": {
-    "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+    "message": "⚠ Error al obtener el video, selecciona un archivo local abajo"
+  },
+  "sectionTools": {
+    "message": "🧰 Herramientas"
+  },
+  "toolLocalRemoval": {
+    "message": "Eliminación Local (AI)"
+  },
+  "toolLocalRemovalDesc": {
+    "message": "Eliminación de marcas de agua por IA para videos e imágenes locales."
+  },
+  "btnOpen": {
+    "message": "Abrir"
   }
 }

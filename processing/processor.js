@@ -311,12 +311,53 @@
     }
   });
 
+  // === 辅助：本地文件选择器 ===
+  function showFilePicker() {
+    ui.setStatus('📁', '等待本地文件...', '请选择您想要处理的本地视频');
+    const statusDetail = ui.statusDetail();
+    statusDetail.innerHTML = '';
+    
+    const pickBtn = document.createElement('button');
+    pickBtn.className = 'btn btn-primary';
+    pickBtn.textContent = '📂 选择本地视频';
+    pickBtn.style.marginTop = '10px';
+    
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/mp4,video/x-m4v,video/*';
+    fileInput.style.display = 'none';
+    
+    pickBtn.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        dataReceived = true;
+        ui.setStatus(null, '本地视频已加载', `文件名: ${file.name}`);
+        // 伪造 options
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has('name')) params.set('name', file.name);
+        window.history.replaceState({}, '', '?' + params.toString());
+        
+        main(ev.target.result);
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    
+    statusDetail.appendChild(pickBtn);
+    statusDetail.appendChild(fileInput);
+  }
+
   if (window.opener) {
     window.opener.postMessage({ type: 'NLM_PROCESSOR_READY' }, '*');
   }
 
+  // 如果 2秒内没有收到自动推送的数据，则显示手动上传按钮
   setTimeout(() => {
-    if (!dataReceived) ui.showError('未收到视频数据', '请重新点击按钮');
-  }, 15000);
-
+    if (!dataReceived) {
+      showFilePicker();
+    }
+  }, 2000);
 })();

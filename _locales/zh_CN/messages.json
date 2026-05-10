@@ -479,5 +479,17 @@
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ 自动获取失败，请点击下方选择本地视频"
+  },
+  "sectionTools": {
+    "message": "🧰 工具箱"
+  },
+  "toolLocalRemoval": {
+    "message": "本地去水印 (AI)"
+  },
+  "toolLocalRemovalDesc": {
+    "message": "支持本地视频、图片等多种格式的无损去水印。"
+  },
+  "btnOpen": {
+    "message": "开启"
   }
 }
