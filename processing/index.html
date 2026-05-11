@@ -283,20 +283,20 @@
 <body>
   <div class="container">
     <div class="logo">🎬</div>
-    <h1>NLM Enhancer · 视频处理</h1>
-    <div class="subtitle">100% 本地处理，数据不离开浏览器</div>
+    <h1 data-i18n="wmProcessTitle">NLM Enhancer · 视频处理</h1>
+    <div class="subtitle" data-i18n="wmProcessSubtitle">请先配置处理参数，然后选择本地视频文件</div>
 
     <!-- 处理选项摘要 -->
     <div class="options-summary" id="optionsSummary"></div>
 
     <!-- 本地模式配置面板 -->
     <div class="local-config-panel" id="localConfigPanel">
-      <div class="config-title">参数配置</div>
+      <div class="config-title" data-i18n="wmOptTitle">参数配置</div>
       <div class="opt-list">
         <label class="opt-item">
           <div class="opt-info">
-            <span class="opt-name">剪掉片尾</span>
-            <span class="opt-desc">自动剪除视频最后 2.5 秒的 Google 标志</span>
+            <span class="opt-name" data-i18n="wmTrimName">剪掉片尾</span>
+            <span class="opt-desc" data-i18n="wmTrimDesc">自动剪除视频最后 2.5 秒的 Google 标志</span>
           </div>
           <div class="toggle">
             <input type="checkbox" id="localOptTrim" checked>
@@ -305,8 +305,8 @@
         </label>
         <label class="opt-item">
           <div class="opt-info">
-            <span class="opt-name">去除首帧水印</span>
-            <span class="opt-desc">擦除画面右下角的文本水印区域</span>
+            <span class="opt-name" data-i18n="wmDelogoName">去除首帧水印</span>
+            <span class="opt-desc" data-i18n="wmDelogoDesc">擦除画面右下角的文本水印区域</span>
           </div>
           <div class="toggle">
             <input type="checkbox" id="localOptDelogo" checked>
@@ -315,13 +315,13 @@
         </label>
       </div>
       
-      <div class="config-title" style="margin-top: 20px;">处理模式</div>
+      <div class="config-title" style="margin-top: 20px;" data-i18n="wmModeTitle">处理模式</div>
       <select class="select-mode" id="localFpsSelect" style="margin-bottom: 24px;">
-        <option value="15">极速模式 (15 FPS)</option>
-        <option value="30" selected>标准模式 (30 FPS)</option>
+        <option value="15" data-i18n="videoWmModeFast">极速模式 (15 FPS)</option>
+        <option value="30" selected data-i18n="wmModeStandard">标准模式 (30 FPS)</option>
       </select>
 
-      <button class="btn-big-pick" id="localPickBtn">📁 选择本地视频文件并开始</button>
+      <button class="btn-big-pick" id="localPickBtn" data-i18n="wmPickBtnText">📁 选择本地视频文件并开始</button>
     </div>
 
     <!-- 警告横幅 -->

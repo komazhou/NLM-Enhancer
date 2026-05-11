@@ -492,8 +492,23 @@
   "btnOpen": {
     "message": "本地去水印"
   },
-  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] 重磅更新！" },
+  "updateTitle": { 
+    "message": "🚀 NLM Enhancer v[VERSION] 重磅更新！",
+    "placeholders": { "VERSION": { "content": "$1" } }
+  },
   "updateFeature1": { "message": "新增獨立本地工具：支持 NotebookLM 影片全本地無水印下載" },
-  "updateFeature1Desc": { "message": "隱私 100% 安全，處理過程完全在瀏覽器本地完成，不經過任何服務器。" },
-  "updateBtn": { "message": "我知道了" }
+  "updateFeature1Desc": { "message": "隱私 100% 安全，處理过程完全在瀏覽器本地完成，不經過任何服務器。" },
+  "updateBtn": { "message": "我知道了" },
+  "wmOptTitle": { "message": "參數配置" },
+  "wmTrimName": { "message": "剪掉片尾" },
+  "wmTrimDesc": { "message": "自動剪除影片最後 2.5 秒的品牌片尾" },
+  "wmDelogoName": { "message": "去除水印" },
+  "wmDelogoDesc": { "message": "擦除畫面右下角的品牌水印區域" },
+  "wmModeTitle": { "message": "處理模式" },
+  "wmModeStandard": { "message": "標準模式 (30 FPS)" },
+  "wmLocalSource": { "message": "本地文件" },
+  "wmPickBtnText": { "message": "選擇本地影片文件並開始" },
+  "wmProcessTitle": { "message": "NLM Enhancer · 影片處理" },
+  "wmProcessSubtitle": { "message": "請先配置處理參數，然後選擇本地影片文件" },
+  "wmLocalSourceText": { "message": "本地文件" }
 }

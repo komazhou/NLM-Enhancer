@@ -14,8 +14,25 @@
     main: '../lib/ffmpeg/ffmpeg.js'
   };
 
+  // === 自动翻译工具 ===
+  function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const msg = chrome.i18n.getMessage(el.getAttribute('data-i18n'));
+      if (msg) {
+        if (el.tagName === 'BUTTON' || el.tagName === 'INPUT') {
+          // 保持原有图标，仅替换文本部分（如果需要更精确，建议只放纯文本）
+          const icon = el.textContent.match(/^[^\w\s\u4e00-\u9fa5]*/)[0]; // 提取图标
+          el.textContent = icon + ' ' + msg;
+        } else {
+          el.textContent = msg;
+        }
+      }
+    });
+  }
+
   // === UI 控制 ===
   const ui = {
+    // ... (保持引用不变)
     statusCard: () => document.getElementById('statusCard'),
     statusIcon: () => document.getElementById('statusIcon'),
     statusText: () => document.getElementById('statusText'),
@@ -49,10 +66,10 @@
     },
 
     showDone(filename) {
-      this.setStatus('✅', '处理完成！', `文件 "${filename}" 已自动下载`);
+      this.setStatus('✅', chrome.i18n.getMessage('procDone') || '处理完成！', chrome.i18n.getMessage('procAutoDownloaded') ? chrome.i18n.getMessage('procAutoDownloaded').replace('$NAME$', filename) : `文件 "${filename}" 已自动下载`);
       this.setProgress(100);
       this.doneActions().classList.remove('hidden');
-      document.title = 'NLM Enhancer - 处理完成 ✅';
+      document.title = `NLM Enhancer - ${chrome.i18n.getMessage('procDone') || 'Done'} ✅`;
     },
 
     showError(msg, detail) {
@@ -60,7 +77,7 @@
       this.errorCard().style.display = 'block';
       this.errorMsg().textContent = msg;
       if (detail) this.errorDetail().textContent = detail;
-      document.title = 'NLM Enhancer - 处理失败 ❌';
+      document.title = `NLM Enhancer - ${chrome.i18n.getMessage('procError') || 'Error'} ❌`;
     },
 
     renderOptions(options) {
@@ -88,7 +105,7 @@
 
   // === 加载 FFmpeg ===
   async function loadFFmpeg(options) {
-    ui.setStatus(null, '加载处理引擎...', '正在初始化本地 FFmpeg 核心引擎');
+    ui.setStatus(null, chrome.i18n.getMessage('procEngineLoading') || '加载处理引擎...', chrome.i18n.getMessage('procEngineInit') || '正在初始化本地 FFmpeg 核心引擎');
 
     // 1. 加载主脚本
     await loadScript(FFMPEG_PATHS.main);
@@ -142,7 +159,7 @@
 
   // === 视频处理核心 ===
   async function processVideo(ffmpeg, videoData, options) {
-    ui.setStatus(null, '正在处理视频...', '请耐心等待，处理时间取决于视频大小');
+    ui.setStatus(null, chrome.i18n.getMessage('procProcessing') || '正在处理视频...', chrome.i18n.getMessage('procWaitPatiently') || '请耐心等待，处理时间取决于视频大小');
     ui.setProgress(0);
 
     const inputName = 'input.mp4';
@@ -151,7 +168,7 @@
 
     const args = ['-i', inputName];
     const filters = [];
-    let statusMsg = '正在极速剪切视频...';
+    let statusMsg = chrome.i18n.getMessage('procCutting') || '正在极速剪切视频...';
 
     if (options.removeFirstFrameWm) {
       if (options.videoWidth && options.videoHeight) {
@@ -160,7 +177,7 @@
         const x = Math.round(options.videoWidth - w - (options.videoWidth * 0.015));
         const y = Math.round(options.videoHeight - h - (options.videoHeight * 0.02));
         filters.push(`delogo=x=${x}:y=${y}:w=${w}:h=${h}`);
-        statusMsg = `正在擦除水印 (区域: ${w}x${h})...`;
+        statusMsg = (chrome.i18n.getMessage('procErasing') || '正在擦除水印 (区域: $SIZE$)...').replace('$SIZE$', `${w}x${h}`);
       } else {
         console.warn(LOG, '无法获取视频尺寸，跳过水印擦除');
       }
@@ -168,7 +185,7 @@
 
     if (options.fps && options.fps !== 30) {
       filters.push(`fps=${options.fps}`);
-      statusMsg = options.removeFirstFrameWm ? '正在重采样并擦除水印...' : '正在调整帧率...';
+      statusMsg = options.removeFirstFrameWm ? (chrome.i18n.getMessage('procResampling') || '正在重采样并擦除水印...') : (chrome.i18n.getMessage('procAdjustingFps') || '正在调整帧率...');
     }
 
     if (filters.length > 0) {
@@ -191,7 +208,7 @@
     ui.statusDetail().textContent = statusMsg;
 
     await ffmpeg.exec(args);
-    ui.setStatus(null, '处理完成，正在打包下载...', '请稍候，正在从内存中提取视频数据');
+    ui.setStatus(null, chrome.i18n.getMessage('procPacking') || '处理完成，正在打包下载...', chrome.i18n.getMessage('procExtracting') || '请稍候，正在从内存中提取视频数据');
     
     const outputData = await ffmpeg.readFile(outputName);
     try {
@@ -269,12 +286,12 @@
 
     if (event.data && event.data.type === 'NLM_VIDEO_DATA') {
       dataReceived = true;
-      ui.setStatus(null, '视频数据已接收', '准备开始处理...');
+      ui.setStatus(null, chrome.i18n.getMessage('procLoaded') || '视频数据已接收', chrome.i18n.getMessage('procWaitPatiently') || '准备开始处理...');
       main(event.data.data);
     } 
     else if (event.data && event.data.type === 'NLM_VIDEO_URL') {
       dataReceived = true;
-      ui.setStatus(null, '正在获取原视频...', '准备下载...');
+      ui.setStatus(null, chrome.i18n.getMessage('procFetchOriginal') || '正在获取原视频...', chrome.i18n.getMessage('procDownloading') || '准备下载...');
       try {
         const response = await fetch(event.data.url, { credentials: 'include' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -292,7 +309,10 @@
           loadedBytes += value.length;
           if (totalBytes) {
             ui.setProgress((loadedBytes / totalBytes) * 100);
-            ui.setStatus(null, '正在获取原视频...', `已下载: ${(loadedBytes/1024/1024).toFixed(1)}MB / ${(totalBytes/1024/1024).toFixed(1)}MB`);
+            const detailText = (chrome.i18n.getMessage('procDownloadedSize') || '已下载: $LOADED$MB / $TOTAL$MB')
+              .replace('$LOADED$', (loadedBytes/1024/1024).toFixed(1))
+              .replace('$TOTAL$', (totalBytes/1024/1024).toFixed(1));
+            ui.setStatus(null, chrome.i18n.getMessage('procFetchOriginal') || '正在获取原视频...', detailText);
           }
         }
         
@@ -326,16 +346,16 @@
       configPanel.style.display = 'block';
       statusCard.classList.add('hidden');
       warningBanner.classList.add('hidden');
-      document.querySelector('.subtitle').textContent = '请先配置处理参数，然后选择本地视频文件';
+      document.querySelector('.subtitle').textContent = chrome.i18n.getMessage('procLocalSubtitle') || '请先配置处理参数，然后选择本地视频文件';
     } else {
       // 自动模式下的降级显示
-      ui.setStatus('📁', '等待本地文件...', '请选择您想要处理的本地视频');
+      ui.setStatus('📁', chrome.i18n.getMessage('procWaitLocal') || '等待本地文件...', chrome.i18n.getMessage('procPickLocal') || '请选择您想要处理的本地视频');
       const statusDetail = ui.statusDetail();
       statusDetail.innerHTML = '';
       
       const pickBtn = document.createElement('button');
       pickBtn.className = 'btn btn-primary';
-      pickBtn.textContent = '📂 选择本地视频';
+      pickBtn.textContent = chrome.i18n.getMessage('procBtnPick') || '📂 选择本地视频';
       pickBtn.style.marginTop = '10px';
       statusDetail.appendChild(pickBtn);
       
@@ -371,10 +391,10 @@
             configPanel.style.display = 'none';
             statusCard.classList.remove('hidden');
             warningBanner.classList.remove('hidden');
-            document.querySelector('.subtitle').textContent = '100% 本地处理，数据不离开浏览器';
+            document.querySelector('.subtitle').textContent = chrome.i18n.getMessage('procSubtitle') || '100% 本地处理，数据不离开浏览器';
           }
 
-          ui.setStatus(null, '本地视频已加载', `文件名: ${file.name}`);
+          ui.setStatus(null, chrome.i18n.getMessage('procLoaded') || '本地视频已加载', (chrome.i18n.getMessage('procFileName') || '文件名: $NAME$').replace('$NAME$', file.name));
           
           // 更新 URL 参数以备后用（可选）
           const params = new URLSearchParams(window.location.search);
@@ -389,6 +409,9 @@
       fileInput.click();
     }
   }
+
+  // 初始化并启动
+  applyTranslations();
 
   if (window.opener) {
     window.opener.postMessage({ type: 'NLM_PROCESSOR_READY' }, '*');

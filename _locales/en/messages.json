@@ -494,8 +494,23 @@
   "btnOpen": {
     "message": "Local Removal"
   },
-  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] Major Update!" },
+  "updateTitle": { 
+    "message": "🚀 NLM Enhancer v[VERSION] Major Update!",
+    "placeholders": { "VERSION": { "content": "$1" } }
+  },
   "updateFeature1": { "message": "New Standalone Local Tool: Support for watermark-free video downloads" },
   "updateFeature1Desc": { "message": "100% Privacy Secure. Processing is completed entirely locally in your browser, no servers involved." },
-  "updateBtn": { "message": "Got it" }
+  "updateBtn": { "message": "Got it" },
+  "wmOptTitle": { "message": "Configuration" },
+  "wmTrimName": { "message": "Trim End" },
+  "wmTrimDesc": { "message": "Auto-trim the last 2.5s brand ending" },
+  "wmDelogoName": { "message": "Remove Watermark" },
+  "wmDelogoDesc": { "message": "Erase the brand watermark in the bottom right" },
+  "wmModeTitle": { "message": "Processing Mode" },
+  "wmModeStandard": { "message": "Standard (30 FPS)" },
+  "wmLocalSource": { "message": "Local File" },
+  "wmPickBtnText": { "message": "Select local video and start" },
+  "wmProcessTitle": { "message": "NLM Enhancer · Video Processing" },
+  "wmProcessSubtitle": { "message": "Please configure parameters, then select a local video" },
+  "wmLocalSourceText": { "message": "Local File" }
 }

@@ -492,8 +492,26 @@
   "btnOpen": {
     "message": "開く"
   },
-  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] 大型アップデート！" },
+  "updateTitle": { 
+    "message": "🚀 NLM Enhancer v[VERSION] 大型アップデート！",
+    "placeholders": { "VERSION": { "content": "$1" } }
+  },
   "updateFeature1": { "message": "独立したローカルツールを追加：NotebookLM動画の完全ローカル・透かしなしダウンロードに対応" },
   "updateFeature1Desc": { "message": "プライバシーは100%安全。処理はすべてブラウザ内でローカルに完了し、サーバーを経由しません。" },
-  "updateBtn": { "message": "了解しました" }
+  "updateBtn": { "message": "了解しました" },
+  "wmOptTitle": { "message": "パラメータ設定" },
+  "wmTrimName": { "message": "末尾をカット" },
+  "wmTrimDesc": { "message": "動画最後の2.5秒を自動カット" },
+  "wmDelogoName": { "message": "透かしを除去" },
+  "wmDelogoDesc": { "message": "右下の透かしを消去します" },
+  "wmModeTitle": { "message": "処理モード" },
+  "wmModeStandard": { "message": "標準モード (30 FPS)" },
+  "wmLocalSource": { "message": "ローカルファイル" },
+  "videoWmStartBtn": {
+    "message": "🚀 透かしなしでダウンロードを開始"
+  },
+  "wmPickBtnText": { "message": "ローカル動画を選択して開始" },
+  "wmProcessTitle": { "message": "NLM Enhancer · 動画処理" },
+  "wmProcessSubtitle": { "message": "パラメータを設定し、ローカル動画を選択してください" },
+  "wmLocalSourceText": { "message": "ローカルファイル" }
 }

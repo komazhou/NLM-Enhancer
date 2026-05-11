@@ -492,8 +492,26 @@
   "btnOpen": {
     "message": "Abrir"
   },
-  "updateTitle": { "message": "🚀 ¡Gran actualización de NLM Enhancer v[VERSION]!" },
+  "updateTitle": { 
+    "message": "🚀 ¡Gran actualización de NLM Enhancer v[VERSION]!",
+    "placeholders": { "VERSION": { "content": "$1" } }
+  },
   "updateFeature1": { "message": "Nueva herramienta local independiente: Soporte para descarga de videos de NotebookLM sin marca de agua totalmente local" },
   "updateFeature1Desc": { "message": "Privacidad 100% segura. El procesamiento se completa íntegramente de forma local en su navegador, sin servidores involucrados." },
-  "updateBtn": { "message": "Entendido" }
+  "updateBtn": { "message": "Entendido" },
+  "wmOptTitle": { "message": "Configuración" },
+  "wmTrimName": { "message": "Recortar final" },
+  "wmTrimDesc": { "message": "Recorte automático de los últimos 2.5 s" },
+  "wmDelogoName": { "message": "Quitar marca de agua" },
+  "wmDelogoDesc": { "message": "Borra la marca de agua abajo a la derecha" },
+  "wmModeTitle": { "message": "Modo de procesamiento" },
+  "wmModeStandard": { "message": "Modo estándar (30 FPS)" },
+  "wmLocalSource": { "message": "Archivo local" },
+  "videoWmStartBtn": {
+    "message": "🚀 Iniciar descarga sin marca de agua"
+  },
+  "wmPickBtnText": { "message": "Seleccionar video local y comenzar" },
+  "wmProcessTitle": { "message": "NLM Enhancer · Procesamiento de video" },
+  "wmProcessSubtitle": { "message": "Configure los parámetros y luego seleccione un video local" },
+  "wmLocalSourceText": { "message": "Archivo local" }
 }

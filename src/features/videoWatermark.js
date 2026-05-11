@@ -121,7 +121,7 @@ NLM.VideoWatermark = (() => {
         <div class="nlm-modal-header">
           <div class="nlm-modal-title">
             <span style="font-size: 18px;">${context.mediaType === 'video' ? '🎬' : '📄'}</span>
-            <span>${i18n.get('videoWmModalTitle')}</span>
+            <span>${i18n.get('wmOptTitle')}</span>
           </div>
           <div class="nlm-modal-close">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,18 +131,18 @@ NLM.VideoWatermark = (() => {
         </div>
         <div class="nlm-modal-body">
           <div class="nlm-source-info">
-            <span class="nlm-source-label">${i18n.get('modalSourceLabel')}</span>
+            <span class="nlm-source-label">${isLocal ? i18n.get('wmLocalSourceText') : i18n.get('modalSourceLabel')}</span>
             <span class="nlm-source-name">${videoTitle}</span>
           </div>
 
           <!-- 通用处理选项 -->
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">${i18n.get('videoWmOptionsLabel')}</div>
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">${i18n.get('wmOptTitle')}</div>
 
           <div class="nlm-media-opt-list">
             <label class="nlm-media-opt-item">
               <div class="nlm-media-opt-info">
-                <span class="nlm-media-opt-name">${i18n.get('videoWmTrimEnd')}</span>
-                <span class="nlm-media-opt-desc">${i18n.get('videoWmTrimEndDesc')}</span>
+                <span class="nlm-media-opt-name">${i18n.get('wmTrimName')}</span>
+                <span class="nlm-media-opt-desc">${i18n.get('wmTrimDesc')}</span>
               </div>
               <div class="nlm-media-toggle">
                 <input type="checkbox" id="nlmOptTrim" checked>
@@ -152,8 +152,8 @@ NLM.VideoWatermark = (() => {
 
             <label class="nlm-media-opt-item">
               <div class="nlm-media-opt-info">
-                <span class="nlm-media-opt-name">${i18n.get('videoWmRemoveFirst')}</span>
-                <span class="nlm-media-opt-desc">${i18n.get('videoWmRemoveFirstDesc')}</span>
+                <span class="nlm-media-opt-name">${i18n.get('wmDelogoName')}</span>
+                <span class="nlm-media-opt-desc">${i18n.get('wmDelogoDesc')}</span>
               </div>
               <div class="nlm-media-toggle">
                 <input type="checkbox" id="nlmOptDelogo" checked>
@@ -163,10 +163,10 @@ NLM.VideoWatermark = (() => {
           </div>
 
           <!-- 处理模式 -->
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px; color: #64748b;">${i18n.get('videoWmModeLabel')}</div>
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px; color: #64748b;">${i18n.get('wmModeTitle')}</div>
           <select class="nlm-media-mode-select" id="nlmFpsSelect">
             <option value="15">${i18n.get('videoWmModeFast')}</option>
-            <option value="30" selected>${i18n.get('videoWmModeStandard')}</option>
+            <option value="30" selected>${i18n.get('wmModeStandard')}</option>
           </select>
 
           <div class="nlm-modal-actions">
@@ -179,7 +179,7 @@ NLM.VideoWatermark = (() => {
             
             <!-- 选择本地文件按钮：在 Local 模式下作为 Primary，在 Web 模式下作为 Secondary -->
             <button class="${isLocal ? 'nlm-btn-primary' : 'nlm-btn-secondary'}" id="nlmPickFile">
-              📁 ${i18n.get('videoWmPickFile')}
+              📁 ${i18n.get('wmPickBtnText')}
             </button>
           </div>
         </div>
