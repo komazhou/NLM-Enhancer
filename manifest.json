@@ -14,7 +14,8 @@
     "clipboardWrite"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://notebooklm.google.com/*",
+    "https://*.usercontent.goog/*"
   ],
   "background": {
     "service_worker": "background.js"
