@@ -151,17 +151,24 @@
 
     const args = ['-i', inputName];
     const filters = [];
+    let statusMsg = '正在极速剪切视频...';
 
-    if (options.removeFirstFrameWm && options.videoWidth && options.videoHeight) {
-      const w = Math.round(options.videoWidth * 0.16);
-      const h = Math.round(options.videoHeight * 0.08);
-      const x = Math.round(options.videoWidth - w - (options.videoWidth * 0.015));
-      const y = Math.round(options.videoHeight - h - (options.videoHeight * 0.02));
-      filters.push(`delogo=x=${x}:y=${y}:w=${w}:h=${h}`);
+    if (options.removeFirstFrameWm) {
+      if (options.videoWidth && options.videoHeight) {
+        const w = Math.round(options.videoWidth * 0.16);
+        const h = Math.round(options.videoHeight * 0.08);
+        const x = Math.round(options.videoWidth - w - (options.videoWidth * 0.015));
+        const y = Math.round(options.videoHeight - h - (options.videoHeight * 0.02));
+        filters.push(`delogo=x=${x}:y=${y}:w=${w}:h=${h}`);
+        statusMsg = `正在擦除水印 (区域: ${w}x${h})...`;
+      } else {
+        console.warn(LOG, '无法获取视频尺寸，跳过水印擦除');
+      }
     }
 
     if (options.fps && options.fps !== 30) {
       filters.push(`fps=${options.fps}`);
+      statusMsg = options.removeFirstFrameWm ? '正在重采样并擦除水印...' : '正在调整帧率...';
     }
 
     if (filters.length > 0) {
@@ -181,11 +188,7 @@
 
     args.push('-y', outputName);
     
-    if (filters.length > 0) {
-      ui.statusDetail().textContent = `处理中 (水印区域: ${filters[0].split('=')[1].split(':')[0]}x${filters[0].split('=')[1].split(':')[1]}...)`;
-    } else {
-      ui.statusDetail().textContent = '正在极速剪切视频...';
-    }
+    ui.statusDetail().textContent = statusMsg;
 
     await ffmpeg.exec(args);
     ui.setStatus(null, '处理完成，正在打包下载...', '请稍候，正在从内存中提取视频数据');
