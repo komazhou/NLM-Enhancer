@@ -491,5 +491,9 @@
   },
   "btnOpen": {
     "message": "開く"
-  }
+  },
+  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] 大型アップデート！" },
+  "updateFeature1": { "message": "独立したローカルツールを追加：NotebookLM動画の完全ローカル・透かしなしダウンロードに対応" },
+  "updateFeature1Desc": { "message": "プライバシーは100%安全。処理はすべてブラウザ内でローカルに完了し、サーバーを経由しません。" },
+  "updateBtn": { "message": "了解しました" }
 }

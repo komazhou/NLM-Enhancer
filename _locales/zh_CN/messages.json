@@ -491,5 +491,9 @@
   },
   "btnOpen": {
     "message": "本地去水印"
-  }
+  },
+  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] 重磅更新！" },
+  "updateFeature1": { "message": "新增独立本地工具：支持 NotebookLM 视频全本地无水印下载" },
+  "updateFeature1Desc": { "message": "隐私 100% 安全，处理过程完全在浏览器本地完成，不经过任何服务器。" },
+  "updateBtn": { "message": "我知道了" }
 }

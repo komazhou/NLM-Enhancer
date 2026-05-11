@@ -493,5 +493,9 @@
   },
   "btnOpen": {
     "message": "Local Removal"
-  }
+  },
+  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] Major Update!" },
+  "updateFeature1": { "message": "New Standalone Local Tool: Support for watermark-free video downloads" },
+  "updateFeature1Desc": { "message": "100% Privacy Secure. Processing is completed entirely locally in your browser, no servers involved." },
+  "updateBtn": { "message": "Got it" }
 }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.6.3.3",
+  "version": "1.6.3",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "icons": {
@@ -16,6 +16,9 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup/index.html",
     "default_icon": {
@@ -52,6 +55,7 @@
         "src/features/deleteMessage.js",
         "src/features/timelineSearch.js",
         "src/features/videoWatermark.js",
+        "src/features/updateNotifier.js",
         "src/content.js"
       ],
       "css": [

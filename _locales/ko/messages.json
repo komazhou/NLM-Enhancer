@@ -491,5 +491,9 @@
   },
   "btnOpen": {
     "message": "열기"
-  }
+  },
+  "updateTitle": { "message": "🚀 NLM Enhancer v[VERSION] 주요 업데이트!" },
+  "updateFeature1": { "message": "독립형 로컬 도구 추가: NotebookLM 동영상 완전 로컬 워터마크 제거 다운로드 지원" },
+  "updateFeature1Desc": { "message": "개인정보 100% 안전. 모든 처리는 브라우저 내에서 로컬로 완료되며 서버를 거치지 않습니다." },
+  "updateBtn": { "message": "확인했습니다" }
 }

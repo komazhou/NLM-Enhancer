@@ -491,5 +491,9 @@
   },
   "btnOpen": {
     "message": "Abrir"
-  }
+  },
+  "updateTitle": { "message": "🚀 ¡Gran actualización de NLM Enhancer v[VERSION]!" },
+  "updateFeature1": { "message": "Nueva herramienta local independiente: Soporte para descarga de videos de NotebookLM sin marca de agua totalmente local" },
+  "updateFeature1Desc": { "message": "Privacidad 100% segura. El procesamiento se completa íntegramente de forma local en su navegador, sin servidores involucrados." },
+  "updateBtn": { "message": "Entendido" }
 }
