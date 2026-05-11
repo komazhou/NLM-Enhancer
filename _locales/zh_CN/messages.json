@@ -510,5 +510,11 @@
   "wmPickBtnText": { "message": "选择本地视频文件并开始" },
   "wmProcessTitle": { "message": "NLM Enhancer · 视频处理" },
   "wmProcessSubtitle": { "message": "请先配置处理参数，然后选择本地视频文件" },
-  "wmLocalSourceText": { "message": "本地文件" }
+  "wmLocalSourceText": { "message": "本地文件" },
+  "wmTagTrim": { "message": "✂️ 剪掉结尾 2.5s" },
+  "wmTagDelogo": { "message": "🧹 去除右下角水印" },
+  "wmTagFps": { "message": "🎞️ 标准 30FPS" },
+  "wmWarnKeepOpen": { "message": "⚠️ 处理过程中请勿关闭此标签页。您可以切换回 NotebookLM 继续使用。" },
+  "wmStatusProcessing": { "message": "正在处理视频..." },
+  "wmStatusErasing": { "message": "正在擦除水印..." }
 }

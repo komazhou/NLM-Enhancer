@@ -513,5 +513,11 @@
   "wmPickBtnText": { "message": "로컬 영상 선택 후 시작" },
   "wmProcessTitle": { "message": "NLM Enhancer · 비디오 처리" },
   "wmProcessSubtitle": { "message": "매개변수를 설정한 후 로컬 비디오 파일을 선택하십시오" },
-  "wmLocalSourceText": { "message": "로컬 파일" }
+  "wmLocalSourceText": { "message": "로컬 파일" },
+  "wmTagTrim": { "message": "✂️ 엔딩 2.5초 제거" },
+  "wmTagDelogo": { "message": "🧹 워터마크 제거" },
+  "wmTagFps": { "message": "🎞️ 표준 30FPS" },
+  "wmWarnKeepOpen": { "message": "⚠️ 처리 중에는 이 탭을 닫지 마십시오. NotebookLM으로 돌아가서 계속 사용할 수 있습니다。" },
+  "wmStatusProcessing": { "message": "비디오 처리 중..." },
+  "wmStatusErasing": { "message": "워터마크 지우는 중..." }
 }

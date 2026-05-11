@@ -130,8 +130,8 @@ NLM.VideoWatermark = (() => {
           </div>
         </div>
         <div class="nlm-modal-body">
-          <div class="nlm-source-info">
-            <span class="nlm-source-label">${isLocal ? i18n.get('wmLocalSourceText') : i18n.get('modalSourceLabel')}</span>
+          <div class="nlm-source-info" ${isLocal ? 'style="display: none;"' : ''}>
+            <span class="nlm-source-label">${i18n.get('modalSourceLabel')}</span>
             <span class="nlm-source-name">${videoTitle}</span>
           </div>
 

@@ -82,9 +82,9 @@
 
     renderOptions(options) {
       const tags = [];
-      if (options.trimEnd) tags.push('✂️ 剪掉结尾 2.5s');
-      if (options.removeFirstFrameWm) tags.push('🧹 去除右下角水印');
-      tags.push(options.fps === 15 ? '⚡ 极速 15FPS' : '🎞️ 标准 30FPS');
+      if (options.trimEnd) tags.push(chrome.i18n.getMessage('wmTagTrim') || '✂️ 剪掉结尾 2.5s');
+      if (options.removeFirstFrameWm) tags.push(chrome.i18n.getMessage('wmTagDelogo') || '🧹 去除右下角水印');
+      tags.push(options.fps === 15 ? (chrome.i18n.getMessage('videoWmModeFast') || '⚡ 极速 15FPS') : (chrome.i18n.getMessage('wmTagFps') || '🎞️ 标准 30FPS'));
       this.optionsSummary().innerHTML = tags.map(t => `<span class="opt-tag">${t}</span>`).join('');
     }
   };
@@ -159,7 +159,7 @@
 
   // === 视频处理核心 ===
   async function processVideo(ffmpeg, videoData, options) {
-    ui.setStatus(null, chrome.i18n.getMessage('procProcessing') || '正在处理视频...', chrome.i18n.getMessage('procWaitPatiently') || '请耐心等待，处理时间取决于视频大小');
+    ui.setStatus(null, chrome.i18n.getMessage('wmStatusProcessing') || '正在处理视频...', chrome.i18n.getMessage('procWaitPatiently') || '请耐心等待，处理时间取决于视频大小');
     ui.setProgress(0);
 
     const inputName = 'input.mp4';
@@ -177,7 +177,7 @@
         const x = Math.round(options.videoWidth - w - (options.videoWidth * 0.015));
         const y = Math.round(options.videoHeight - h - (options.videoHeight * 0.02));
         filters.push(`delogo=x=${x}:y=${y}:w=${w}:h=${h}`);
-        statusMsg = (chrome.i18n.getMessage('procErasing') || '正在擦除水印 (区域: $SIZE$)...').replace('$SIZE$', `${w}x${h}`);
+        statusMsg = chrome.i18n.getMessage('wmStatusErasing') || '正在擦除水印...';
       } else {
         console.warn(LOG, '无法获取视频尺寸，跳过水印擦除');
       }
@@ -411,7 +411,11 @@
   }
 
   // 初始化并启动
-  applyTranslations();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyTranslations);
+  } else {
+    applyTranslations();
+  }
 
   if (window.opener) {
     window.opener.postMessage({ type: 'NLM_PROCESSOR_READY' }, '*');

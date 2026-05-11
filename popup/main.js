@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return 'en';
   }
 
+  // === 版本号自动注入 ===
+  const currentVersion = chrome.runtime.getManifest().version;
+  const versionEl = document.getElementById('app-version');
+  if (versionEl) {
+    versionEl.textContent = 'v' + currentVersion;
+  }
+
   function getMsg(key, substitutions) {
     const locale = resolveLocale(currentLang);
     const pack = LANG_PACKS[locale] || LANG_PACKS.en;

@@ -513,5 +513,11 @@
   "wmPickBtnText": { "message": "Seleccionar video local y comenzar" },
   "wmProcessTitle": { "message": "NLM Enhancer · Procesamiento de video" },
   "wmProcessSubtitle": { "message": "Configure los parámetros y luego seleccione un video local" },
-  "wmLocalSourceText": { "message": "Archivo local" }
+  "wmLocalSourceText": { "message": "Archivo local" },
+  "wmTagTrim": { "message": "✂️ Recortar 2.5s final" },
+  "wmTagDelogo": { "message": "🧹 Quitar marca de agua" },
+  "wmTagFps": { "message": "🎞️ Estándar 30FPS" },
+  "wmWarnKeepOpen": { "message": "⚠️ No cierre esta pestaña durante el procesamiento. Puede volver a NotebookLM." },
+  "wmStatusProcessing": { "message": "Procesando video..." },
+  "wmStatusErasing": { "message": "Borrando marca de agua..." }
 }

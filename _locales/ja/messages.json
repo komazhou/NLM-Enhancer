@@ -513,5 +513,11 @@
   "wmPickBtnText": { "message": "ローカル動画を選択して開始" },
   "wmProcessTitle": { "message": "NLM Enhancer · 動画処理" },
   "wmProcessSubtitle": { "message": "パラメータを設定し、ローカル動画を選択してください" },
-  "wmLocalSourceText": { "message": "ローカルファイル" }
+  "wmLocalSourceText": { "message": "ローカルファイル" },
+  "wmTagTrim": { "message": "✂️ 末尾 2.5s カット" },
+  "wmTagDelogo": { "message": "🧹 透かし除去" },
+  "wmTagFps": { "message": "🎞️ 標準 30FPS" },
+  "wmWarnKeepOpen": { "message": "⚠️ 処理中はタブを閉じないでください。NotebookLMに戻って操作を続けられます。" },
+  "wmStatusProcessing": { "message": "動画を処理しています..." },
+  "wmStatusErasing": { "message": "透かしを消去しています..." }
 }
