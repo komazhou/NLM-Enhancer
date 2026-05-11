@@ -5,6 +5,7 @@
 
 (() => {
   const LOG = '[NLM Processor]';
+  const isLocalMode = new URLSearchParams(window.location.search).get('mode') === 'local';
 
   // === FFmpeg 本地路径配置 ===
   const FFMPEG_PATHS = {
@@ -232,8 +233,8 @@
   }
 
   // === 主流程 ===
-  async function main(videoData) {
-    const options = getOptions();
+  async function main(videoData, customOptions = null) {
+    const options = customOptions || getOptions();
     ui.setProgress(0);
 
     if (!options.videoWidth || !options.videoHeight || !options.duration) {
@@ -313,41 +314,77 @@
 
   // === 辅助：本地文件选择器 ===
   function showFilePicker() {
-    ui.setStatus('📁', '等待本地文件...', '请选择您想要处理的本地视频');
-    const statusDetail = ui.statusDetail();
-    statusDetail.innerHTML = '';
-    
-    const pickBtn = document.createElement('button');
-    pickBtn.className = 'btn btn-primary';
-    pickBtn.textContent = '📂 选择本地视频';
-    pickBtn.style.marginTop = '10px';
-    
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'video/mp4,video/x-m4v,video/*';
-    fileInput.style.display = 'none';
-    
-    pickBtn.onclick = () => fileInput.click();
-    fileInput.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    const configPanel = document.getElementById('localConfigPanel');
+    const statusCard = ui.statusCard();
+    const warningBanner = document.getElementById('warningBanner');
+
+    // 如果处于显式的本地模式，优化首屏展示
+    if (isLocalMode) {
+      configPanel.style.display = 'block';
+      statusCard.classList.add('hidden');
+      warningBanner.classList.add('hidden');
+      document.querySelector('.subtitle').textContent = '请先配置处理参数，然后选择本地视频文件';
+    } else {
+      // 自动模式下的降级显示
+      ui.setStatus('📁', '等待本地文件...', '请选择您想要处理的本地视频');
+      const statusDetail = ui.statusDetail();
+      statusDetail.innerHTML = '';
       
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        dataReceived = true;
-        ui.setStatus(null, '本地视频已加载', `文件名: ${file.name}`);
-        // 伪造 options
-        const params = new URLSearchParams(window.location.search);
-        if (!params.has('name')) params.set('name', file.name);
-        window.history.replaceState({}, '', '?' + params.toString());
+      const pickBtn = document.createElement('button');
+      pickBtn.className = 'btn btn-primary';
+      pickBtn.textContent = '📂 选择本地视频';
+      pickBtn.style.marginTop = '10px';
+      statusDetail.appendChild(pickBtn);
+      
+      pickBtn.onclick = () => triggerFileInput();
+    }
+
+    const localPickBtn = document.getElementById('localPickBtn');
+    if (localPickBtn) localPickBtn.onclick = () => triggerFileInput();
+
+    function triggerFileInput() {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'video/mp4,video/x-m4v,video/*';
+      fileInput.style.display = 'none';
+      document.body.appendChild(fileInput);
+
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
         
-        main(ev.target.result);
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          dataReceived = true;
+          
+          // 从面板读取最新配置（如果是本地模式）
+          let currentOptions = getOptions();
+          if (isLocalMode) {
+            currentOptions.trimEnd = document.getElementById('localOptTrim').checked;
+            currentOptions.removeFirstFrameWm = document.getElementById('localOptDelogo').checked;
+            currentOptions.fps = parseInt(document.getElementById('localFpsSelect').value);
+            
+            // 切换 UI 状态到处理中
+            configPanel.style.display = 'none';
+            statusCard.classList.remove('hidden');
+            warningBanner.classList.remove('hidden');
+            document.querySelector('.subtitle').textContent = '100% 本地处理，数据不离开浏览器';
+          }
+
+          ui.setStatus(null, '本地视频已加载', `文件名: ${file.name}`);
+          
+          // 更新 URL 参数以备后用（可选）
+          const params = new URLSearchParams(window.location.search);
+          params.set('name', file.name);
+          window.history.replaceState({}, '', '?' + params.toString());
+          
+          main(ev.target.result, currentOptions);
+        };
+        reader.readAsArrayBuffer(file);
+        fileInput.remove();
       };
-      reader.readAsArrayBuffer(file);
-    };
-    
-    statusDetail.appendChild(pickBtn);
-    statusDetail.appendChild(fileInput);
+      fileInput.click();
+    }
   }
 
   if (window.opener) {
@@ -355,8 +392,6 @@
   }
 
   // 检查是否为显式的本地模式
-  const isLocalMode = new URLSearchParams(window.location.search).get('mode') === 'local';
-
   if (isLocalMode) {
     showFilePicker();
   } else {

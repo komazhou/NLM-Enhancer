@@ -169,14 +169,16 @@ NLM.VideoWatermark = (() => {
             <option value="30" selected>${i18n.get('videoWmModeStandard')}</option>
           </select>
 
-          <div class="nlm-export-action" style="display: flex; gap: 10px; flex-direction: column;">
-            <!-- 仅在网页注入模式下显示主处理按钮 -->
-            <button class="nlm-export-confirm-btn" id="nlmStartProcess" style="${isLocal ? 'display: none;' : ''}">
-              ${i18n.get('videoWmStartBtn')}
-            </button>
+          <div class="nlm-modal-actions">
+            <!-- 仅在网页注入模式下显示主下载按钮 -->
+            ${!isLocal ? `
+              <button class="nlm-btn-primary" id="nlmStartProcess">
+                ${i18n.get('videoWmStartBtn')}
+              </button>
+            ` : ''}
             
-            <!-- 本地上传按钮：在 Local 模式下高亮 -->
-            <button class="nlm-export-confirm-btn" id="nlmPickFile" style="${isLocal ? 'background: #6366f1; color: #fff; border: none;' : 'background: rgba(99,102,241,0.08); color: #6366f1; border: 1px solid rgba(99,102,241,0.3);'} font-size: 13px;">
+            <!-- 选择本地文件按钮：在 Local 模式下作为 Primary，在 Web 模式下作为 Secondary -->
+            <button class="${isLocal ? 'nlm-btn-primary' : 'nlm-btn-secondary'}" id="nlmPickFile">
               📁 ${i18n.get('videoWmPickFile')}
             </button>
           </div>
