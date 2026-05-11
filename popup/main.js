@@ -184,8 +184,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   // === 工具箱：本地去水印入口 ===
   const localRemovalBtn = document.getElementById('btn-openLocalRemoval');
   if (localRemovalBtn) {
-    localRemovalBtn.addEventListener('click', () => {
-      chrome.tabs.create({ url: chrome.runtime.getURL('processing/index.html') });
+    localRemovalBtn.addEventListener('click', async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        // 尝试向当前页面的 Content Script 发送唤起指令
+        chrome.tabs.sendMessage(tab.id, { 
+          action: 'showWatermarkModal', 
+          context: { entry: 'local', mediaType: 'video' } 
+        }, () => {
+          if (chrome.runtime.lastError) {
+            // 兜底路径：如果发送失败（说明当前页没注入插件），则直接打开独立处理页
+            console.warn('[NLM] 无法在当前页唤起弹窗，正在打开独立处理页:', chrome.runtime.lastError.message);
+            chrome.tabs.create({ url: chrome.runtime.getURL('processing/index.html?mode=local') });
+          } else {
+            // 主路径：唤起成功，关闭 Popup
+            window.close();
+          }
+        });
+      } else {
+        chrome.tabs.create({ url: chrome.runtime.getURL('processing/index.html?mode=local') });
+      }
     });
   }
 });

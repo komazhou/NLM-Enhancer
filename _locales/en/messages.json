@@ -459,7 +459,7 @@
     "message": "Standard Mode (30FPS)"
   },
   "videoWmStartBtn": {
-    "message": "🚀 Start Processing"
+    "message": "🚀 Start Watermark-free Download"
   },
   "videoWmNoVideo": {
     "message": "No video element found"
@@ -477,7 +477,7 @@
     "message": "✗ Failed to fetch video data"
   },
   "videoWmPickFile": {
-    "message": "Select Local Video File (Downloaded Video)"
+    "message": "Select Local File"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ Auto fetch failed, please click Select Local Video File"
@@ -492,6 +492,6 @@
     "message": "AI watermark removal for local videos, images, and more."
   },
   "btnOpen": {
-    "message": "Open"
+    "message": "Local Removal"
   }
 }

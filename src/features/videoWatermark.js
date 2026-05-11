@@ -78,38 +78,49 @@ NLM.VideoWatermark = (() => {
   }
 
   /**
-   * 显示去水印选项弹窗（复用 nlm-modal 布局体系）
+   * 显示去水印选项弹窗（配置中枢）
+   * @param {HTMLElement} viewer 视频容器（网页注入模式下使用）
+   * @param {Object} context 上下文参数 { entry: 'web' | 'local', mediaType: 'video' }
    */
-  function showWatermarkModal(viewer) {
-    const videoEl = viewer.querySelector('video');
-    if (!videoEl) {
-      NLM.DOM.showToast(i18n.get('videoWmNoVideo'), window.innerWidth / 2, 100, false);
-      return;
-    }
+  function showWatermarkModal(viewer, context = { entry: 'web', mediaType: 'video' }) {
+    const isLocal = context.entry === 'local';
+    let videoEl = null;
+    let videoTitle = isLocal ? '本地文件' : '';
+    let duration = 0;
+    let videoWidth = 1920;
+    let videoHeight = 1080;
+    let videoSrc = null;
 
-    // 获取视频信息
-    const videoSrc = videoEl.src || videoEl.currentSrc;
-    const duration = videoEl.duration || 0;
-    const videoWidth = videoEl.videoWidth || 1920;
-    const videoHeight = videoEl.videoHeight || 1080;
+    if (!isLocal && viewer) {
+      videoEl = viewer.querySelector('video');
+      if (!videoEl) {
+        NLM.DOM.showToast(i18n.get('videoWmNoVideo'), window.innerWidth / 2, 100, false);
+        return;
+      }
 
-    // 尝试获取视频标题
-    const titleInput = viewer.querySelector('input.artifact-title');
-    let videoTitle = titleInput ? titleInput.value.trim() : '';
-    if (!videoTitle) {
-      videoTitle = document.title.replace(' - NotebookLM', '') || 'video';
+      // 获取视频信息
+      videoSrc = videoEl.src || videoEl.currentSrc;
+      duration = videoEl.duration || 0;
+      videoWidth = videoEl.videoWidth || 1920;
+      videoHeight = videoEl.videoHeight || 1080;
+
+      // 尝试获取视频标题
+      const titleInput = viewer.querySelector('input.artifact-title');
+      videoTitle = titleInput ? titleInput.value.trim() : '';
+      if (!videoTitle) {
+        videoTitle = document.title.replace(' - NotebookLM', '') || 'video';
+      }
     }
-    const fileSize = ''; // 可选：如果能获取
 
     // 构建弹窗
     const overlay = document.createElement('div');
-    overlay.className = 'nlm-modal-overlay';
+    overlay.className = 'nlm-modal-overlay nlm-media-config-overlay';
 
     overlay.innerHTML = `
-      <div class="nlm-modal">
+      <div class="nlm-modal nlm-media-modal" data-entry="${context.entry}" data-type="${context.mediaType}">
         <div class="nlm-modal-header">
           <div class="nlm-modal-title">
-            <span style="font-size: 18px;">🎬</span>
+            <span style="font-size: 18px;">${context.mediaType === 'video' ? '🎬' : '📄'}</span>
             <span>${i18n.get('videoWmModalTitle')}</span>
           </div>
           <div class="nlm-modal-close">
@@ -124,45 +135,48 @@ NLM.VideoWatermark = (() => {
             <span class="nlm-source-name">${videoTitle}</span>
           </div>
 
-          <!-- 开关选项 -->
-          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">${i18n.get('videoWmOptionsLabel')}</div>
+          <!-- 通用处理选项 -->
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: #64748b;">${i18n.get('videoWmOptionsLabel')}</div>
 
-          <div class="nlm-video-opt-list">
-            <label class="nlm-video-opt-item">
-              <div class="nlm-video-opt-info">
-                <span class="nlm-video-opt-name">${i18n.get('videoWmTrimEnd')}</span>
-                <span class="nlm-video-opt-desc">${i18n.get('videoWmTrimEndDesc')}</span>
+          <div class="nlm-media-opt-list">
+            <label class="nlm-media-opt-item">
+              <div class="nlm-media-opt-info">
+                <span class="nlm-media-opt-name">${i18n.get('videoWmTrimEnd')}</span>
+                <span class="nlm-media-opt-desc">${i18n.get('videoWmTrimEndDesc')}</span>
               </div>
-              <div class="nlm-video-toggle">
+              <div class="nlm-media-toggle">
                 <input type="checkbox" id="nlmOptTrim" checked>
-                <span class="nlm-video-toggle-slider"></span>
+                <span class="nlm-media-toggle-slider"></span>
               </div>
             </label>
 
-            <label class="nlm-video-opt-item">
-              <div class="nlm-video-opt-info">
-                <span class="nlm-video-opt-name">${i18n.get('videoWmRemoveFirst')}</span>
-                <span class="nlm-video-opt-desc">${i18n.get('videoWmRemoveFirstDesc')}</span>
+            <label class="nlm-media-opt-item">
+              <div class="nlm-media-opt-info">
+                <span class="nlm-media-opt-name">${i18n.get('videoWmRemoveFirst')}</span>
+                <span class="nlm-media-opt-desc">${i18n.get('videoWmRemoveFirstDesc')}</span>
               </div>
-              <div class="nlm-video-toggle">
+              <div class="nlm-media-toggle">
                 <input type="checkbox" id="nlmOptDelogo" checked>
-                <span class="nlm-video-toggle-slider"></span>
+                <span class="nlm-media-toggle-slider"></span>
               </div>
             </label>
           </div>
 
           <!-- 处理模式 -->
-          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px; color: #64748b;">${i18n.get('videoWmModeLabel')}</div>
-          <select class="nlm-video-mode-select" id="nlmFpsSelect">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px; color: #64748b;">${i18n.get('videoWmModeLabel')}</div>
+          <select class="nlm-media-mode-select" id="nlmFpsSelect">
             <option value="15">${i18n.get('videoWmModeFast')}</option>
             <option value="30" selected>${i18n.get('videoWmModeStandard')}</option>
           </select>
 
           <div class="nlm-export-action" style="display: flex; gap: 10px; flex-direction: column;">
-            <button class="nlm-export-confirm-btn" id="nlmStartProcess">
+            <!-- 仅在网页注入模式下显示主处理按钮 -->
+            <button class="nlm-export-confirm-btn" id="nlmStartProcess" style="${isLocal ? 'display: none;' : ''}">
               ${i18n.get('videoWmStartBtn')}
             </button>
-            <button class="nlm-export-confirm-btn" id="nlmPickFile" style="background: rgba(99,102,241,0.08); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); font-size: 13px;">
+            
+            <!-- 本地上传按钮：在 Local 模式下高亮 -->
+            <button class="nlm-export-confirm-btn" id="nlmPickFile" style="${isLocal ? 'background: #6366f1; color: #fff; border: none;' : 'background: rgba(99,102,241,0.08); color: #6366f1; border: 1px solid rgba(99,102,241,0.3);'} font-size: 13px;">
               📁 ${i18n.get('videoWmPickFile')}
             </button>
           </div>
@@ -204,22 +218,24 @@ NLM.VideoWatermark = (() => {
       NLM.DOM.showToast(i18n.get('videoWmProcessingStarted'), window.innerWidth / 2, 100, true);
     }
 
-    // ===「开始处理」按钮：将 URL 传给新标签页进行扩展特权抓取 ===
+    // ===「开始下载」按钮（仅 Web 模式） ===
     const startBtn = overlay.querySelector('#nlmStartProcess');
-    startBtn.onclick = () => {
-      const opts = getModalOptions();
-      if (!opts) return;
+    if (startBtn) {
+      startBtn.onclick = () => {
+        const opts = getModalOptions();
+        if (!opts) return;
 
-      if (!videoSrc) {
-        NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
-        return;
-      }
-      
-      startBtn.disabled = true;
-      processWithData(null, videoSrc, opts);
-    };
+        if (!videoSrc) {
+          NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
+          return;
+        }
+        
+        startBtn.disabled = true;
+        processWithData(null, videoSrc, opts);
+      };
+    }
 
-    // ===「选择本地视频」按钮：用户手动选择文件 ===
+    // ===「选择本地文件」按钮 ===
     const pickBtn = overlay.querySelector('#nlmPickFile');
     pickBtn.onclick = async () => {
       const opts = getModalOptions();
@@ -239,8 +255,6 @@ NLM.VideoWatermark = (() => {
   // =============================================
   // 视频文件选择器
   // =============================================
-
-
 
   /**
    * 手动选择本地视频文件
@@ -335,10 +349,18 @@ NLM.VideoWatermark = (() => {
     }, 30000);
   }
 
-  // === 生命周期 ===
+  // === 生命周期与消息监听 ===
 
   function init() {
     if (isInitialized) return;
+
+    // 监听来自 Popup 的唤起请求
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      if (msg.action === 'showWatermarkModal') {
+        showWatermarkModal(null, msg.context);
+        sendResponse({ success: true });
+      }
+    });
 
     observer = new MutationObserver(() => {
       clearTimeout(observer._debounce);
@@ -350,7 +372,7 @@ NLM.VideoWatermark = (() => {
     setTimeout(injectVideoButton, 1000);
 
     isInitialized = true;
-    console.log(LOG, '模块已初始化');
+    console.log(LOG, '中枢模块已初始化');
   }
 
   function destroy() {

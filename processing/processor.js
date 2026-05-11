@@ -354,10 +354,17 @@
     window.opener.postMessage({ type: 'NLM_PROCESSOR_READY' }, '*');
   }
 
-  // 如果 2秒内没有收到自动推送的数据，则显示手动上传按钮
-  setTimeout(() => {
-    if (!dataReceived) {
-      showFilePicker();
-    }
-  }, 2000);
+  // 检查是否为显式的本地模式
+  const isLocalMode = new URLSearchParams(window.location.search).get('mode') === 'local';
+
+  if (isLocalMode) {
+    showFilePicker();
+  } else {
+    // 自动抓取模式：如果 2秒内没有收到数据，则显示手动上传按钮作为防线
+    setTimeout(() => {
+      if (!dataReceived) {
+        showFilePicker();
+      }
+    }, 2000);
+  }
 })();

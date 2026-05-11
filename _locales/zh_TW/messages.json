@@ -457,7 +457,7 @@
     "message": "标准模式 (30FPS)"
   },
   "videoWmStartBtn": {
-    "message": "🚀 开始处理"
+    "message": "🚀 開始無水印下載"
   },
   "videoWmNoVideo": {
     "message": "未找到视频元素"
@@ -475,7 +475,7 @@
     "message": "✗ 获取视频数据失败"
   },
   "videoWmPickFile": {
-    "message": "选择本地视频文件（已下载的视频）"
+    "message": "選擇本地文件"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ 自動獲取失敗，請點擊下方選擇本地影片"
@@ -490,6 +490,6 @@
     "message": "支持本地影片、圖片等多種格式的無損去水印。"
   },
   "btnOpen": {
-    "message": "開啟"
+    "message": "本地去水印"
   }
 }
