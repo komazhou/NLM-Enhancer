@@ -531,5 +531,8 @@
     "message": "檔案 \"$NAME$\" 已自動下載",
     "placeholders": { "NAME": { "content": "$1" } }
   },
-  "procError": { "message": "處理出錯" }
+  "procError": { "message": "處理出錯" },
+  "footerText": { "message": "為 NotebookLM 精心打造 ❤️" },
+  "btnMermaidDiagram": { "message": "查看圖表" },
+  "btnMermaidCode": { "message": "查看源碼" }
 }

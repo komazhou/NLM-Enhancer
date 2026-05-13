@@ -534,5 +534,8 @@
     "message": "El archivo \"$NAME$\" se ha descargado automáticamente",
     "placeholders": { "NAME": { "content": "$1" } }
   },
-  "procError": { "message": "Error de procesamiento" }
+  "procError": { "message": "Error de procesamiento" },
+  "footerText": { "message": "Hecho con ❤️ para NotebookLM" },
+  "btnMermaidDiagram": { "message": "Ver diagrama" },
+  "btnMermaidCode": { "message": "Ver código" }
 }

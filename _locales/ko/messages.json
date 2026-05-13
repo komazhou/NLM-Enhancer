@@ -534,5 +534,8 @@
     "message": "\"$NAME$\" 파일이 자동 다운로드되었습니다",
     "placeholders": { "NAME": { "content": "$1" } }
   },
-  "procError": { "message": "처리 오류" }
+  "procError": { "message": "처리 오류" },
+  "footerText": { "message": "NotebookLM을 위해 ❤️로 제작됨" },
+  "btnMermaidDiagram": { "message": "다이어그램 보기" },
+  "btnMermaidCode": { "message": "코드 보기" }
 }

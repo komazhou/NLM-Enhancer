@@ -536,5 +536,8 @@
     "message": "File \"$NAME$\" has been automatically downloaded",
     "placeholders": { "NAME": { "content": "$1" } }
   },
-  "procError": { "message": "Processing Error" }
+  "procError": { "message": "Processing Error" },
+  "footerText": { "message": "Made with ❤️ for NotebookLM" },
+  "btnMermaidDiagram": { "message": "View Diagram" },
+  "btnMermaidCode": { "message": "View Code" }
 }

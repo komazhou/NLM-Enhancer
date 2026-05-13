@@ -535,5 +535,7 @@
     "placeholders": { "NAME": { "content": "$1" } }
   },
   "procError": { "message": "处理出错" },
-  "footerText": { "message": "为 NotebookLM 精心打造 ❤️" }
+  "footerText": { "message": "为 NotebookLM 精心打造 ❤️" },
+  "btnMermaidDiagram": { "message": "查看图表" },
+  "btnMermaidCode": { "message": "查看源码" }
 }

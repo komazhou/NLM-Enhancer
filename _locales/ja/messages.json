@@ -534,5 +534,8 @@
     "message": "ファイル「$NAME$」が自動的にダウンロードされました",
     "placeholders": { "NAME": { "content": "$1" } }
   },
-  "procError": { "message": "処理エラー" }
+  "procError": { "message": "処理エラー" },
+  "footerText": { "message": "NotebookLM のために ❤️ を込めて" },
+  "btnMermaidDiagram": { "message": "図を表示" },
+  "btnMermaidCode": { "message": "ソースを表示" }
 }
