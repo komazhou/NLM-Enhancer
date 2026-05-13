@@ -237,16 +237,9 @@ NLM.VideoWatermark = (() => {
         startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
 
         try {
-          console.log(LOG, '正在尝试获取视频数据 (含凭证模式)...', videoSrc);
+          console.log(LOG, '正在尝试获取视频数据...', videoSrc);
           
-          const response = await fetch(videoSrc, {
-            method: 'GET',
-            credentials: 'include', // 关键：强制携带 Cookie 解决 403
-            mode: 'cors',
-            headers: {
-              'Accept': 'video/*, */*'
-            }
-          });
+          const response = await fetch(videoSrc);
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -266,7 +259,7 @@ NLM.VideoWatermark = (() => {
           startBtn.textContent = originalText;
           
           // 弹窗提示用户
-          const errorMsg = `下载失败: ${err.message}\n\n请确保已登录 Google 账号并刷新页面重试。`;
+          const errorMsg = '浏览器严格的安全策略拦截了自动下载。\n\n💡 保底方案：请点击视频播放器右下角的“三个点”或右键视频，选择“下载/另存为”，然后使用本插件下方的“📁 选择本地视频文件”功能进行去水印。';
           alert(errorMsg);
           NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
         }
