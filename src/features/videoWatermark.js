@@ -232,37 +232,13 @@ NLM.VideoWatermark = (() => {
           return;
         }
         
-        startBtn.disabled = true;
-        const originalText = startBtn.textContent;
-        startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
-
-        try {
-          console.log(LOG, '正在尝试获取视频数据...', videoSrc);
-          
-          const response = await fetch(videoSrc);
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          const videoBlob = await response.blob();
-          const videoBuffer = await videoBlob.arrayBuffer();
-          
-          console.log(LOG, '视频获取成功，字节数:', videoBuffer.byteLength);
-          processWithData(videoBuffer, null, opts);
-          
-        } catch (err) {
-          console.error(LOG, '视频获取失败详情:', err);
-          
-          // 恢复按钮状态
-          startBtn.disabled = false;
-          startBtn.textContent = originalText;
-          
-          // 弹窗提示用户
-          const errorMsg = '浏览器严格的安全策略拦截了自动下载。\n\n💡 保底方案：请点击视频播放器右下角的“三个点”或右键视频，选择“下载/另存为”，然后使用本插件下方的“📁 选择本地视频文件”功能进行去水印。';
-          alert(errorMsg);
-          NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
+        if (!videoSrc) {
+          NLM.DOM.showToast(i18n.get('videoWmNoVideo'), window.innerWidth / 2, 100, false);
+          return;
         }
+        
+        // 直接将 URL 传给处理页面，由处理页面利用 DNR 规则进行获取
+        processWithData(null, videoSrc, opts);
       };
     }
 
