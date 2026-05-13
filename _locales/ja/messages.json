@@ -421,61 +421,58 @@
     "message": "フラッシュカードをエクスポート"
   },
   "featureVideoWatermark": {
-    "message": "视频无水印下载"
+    "message": "動画の透かしなしダウンロード"
   },
   "featureVideoWatermarkDesc": {
-    "message": "去除 NotebookLM 视频水印并下载"
+    "message": "NotebookLM動画の透かしを削除してダウンロード"
   },
   "videoWmBtnLabel": {
-    "message": "无水印下载"
+    "message": "透かしなしダウンロード"
   },
   "videoWmModalTitle": {
-    "message": "视频无水印下载"
+    "message": "動画の透かしなしダウンロード"
   },
   "videoWmOptionsLabel": {
-    "message": "处理选项"
+    "message": "処理オプション"
   },
   "videoWmTrimEnd": {
-    "message": "剪掉视频结尾水印"
+    "message": "動画末尾の透かしをカット"
   },
   "videoWmTrimEndDesc": {
-    "message": "移除最后 2.5 秒品牌片尾"
+    "message": "最後の2.5秒間のブランドエンディングを削除"
   },
   "videoWmRemoveFirst": {
-    "message": "消除右下角固定水印"
+    "message": "右下の固定透かしを消去"
   },
   "videoWmRemoveFirstDesc": {
-    "message": "使用 delogo 滤镜消除画面右下角的品牌水印"
+    "message": "delogoフィルタを使用して右下のブランド透かしを消去"
   },
   "videoWmModeLabel": {
-    "message": "处理模式"
+    "message": "処理モード"
   },
   "videoWmModeFast": {
-    "message": "极速模式 (15FPS, 适合 PPT)"
+    "message": "高速モード (15FPS、PPT向け)"
   },
   "videoWmModeStandard": {
-    "message": "标准模式 (30FPS)"
-  },
-  "videoWmStartBtn": {
-    "message": "🚀 开始处理"
+    "message": "標準モード (30FPS)"
   },
   "videoWmNoVideo": {
-    "message": "未找到视频元素"
+    "message": "動画要素が見つかりません"
   },
   "videoWmNoOption": {
-    "message": "请至少选择一个处理选项"
+    "message": "少なくとも1つの処理オプションを選択してください"
   },
   "videoWmFetching": {
-    "message": "正在获取视频数据..."
+    "message": "動画データを取得中..."
   },
   "videoWmProcessingStarted": {
-    "message": "✓ 已在新标签页中开始处理"
+    "message": "✓ 新しいタブで処理を開始しました"
   },
   "videoWmFetchError": {
-    "message": "✗ 获取视频数据失败"
+    "message": "✗ 動画データの取得に失敗しました"
   },
   "videoWmPickFile": {
-    "message": "选择本地视频文件（已下载的视频）"
+    "message": "ローカルファイルを選択"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ 自動取得に失敗しました。下のボタンをクリックしてローカル動画を選択してください"

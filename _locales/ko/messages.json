@@ -421,61 +421,58 @@
     "message": "플래시카드 내보내기"
   },
   "featureVideoWatermark": {
-    "message": "视频无水印下载"
+    "message": "비디오 워터마크 없는 다운로드"
   },
   "featureVideoWatermarkDesc": {
-    "message": "去除 NotebookLM 视频水印并下载"
+    "message": "NotebookLM 비디오 워터마크를 제거하고 다운로드"
   },
   "videoWmBtnLabel": {
-    "message": "无水印下载"
+    "message": "워터마크 없는 다운로드"
   },
   "videoWmModalTitle": {
-    "message": "视频无水印下载"
+    "message": "비디오 워터마크 없는 다운로드"
   },
   "videoWmOptionsLabel": {
-    "message": "处理选项"
+    "message": "처리 옵션"
   },
   "videoWmTrimEnd": {
-    "message": "剪掉视频结尾水印"
+    "message": "비디오 엔딩 워터마크 자르기"
   },
   "videoWmTrimEndDesc": {
-    "message": "移除最后 2.5 秒品牌片尾"
+    "message": "마지막 2.5초 브랜딩 엔딩 제거"
   },
   "videoWmRemoveFirst": {
-    "message": "消除右下角固定水印"
+    "message": "오른쪽 하단 고정 워터마크 지우기"
   },
   "videoWmRemoveFirstDesc": {
-    "message": "使用 delogo 滤镜消除画面右下角的品牌水印"
+    "message": "delogo 필터를 사용하여 오른쪽 하단의 브랜딩 워터마크를 제거"
   },
   "videoWmModeLabel": {
-    "message": "处理模式"
+    "message": "처리 모드"
   },
   "videoWmModeFast": {
-    "message": "极速模式 (15FPS, 适合 PPT)"
+    "message": "고속 모드 (15FPS, PPT용)"
   },
   "videoWmModeStandard": {
-    "message": "标准模式 (30FPS)"
-  },
-  "videoWmStartBtn": {
-    "message": "🚀 开始处理"
+    "message": "표준 모드 (30FPS)"
   },
   "videoWmNoVideo": {
-    "message": "未找到视频元素"
+    "message": "비디오 요소를 찾을 수 없습니다"
   },
   "videoWmNoOption": {
-    "message": "请至少选择一个处理选项"
+    "message": "하나 이상의 처리 옵션을 선택하십시오"
   },
   "videoWmFetching": {
-    "message": "正在获取视频数据..."
+    "message": "비디오 데이터를 가져오는 중..."
   },
   "videoWmProcessingStarted": {
-    "message": "✓ 已在新标签页中开始处理"
+    "message": "✓ 새 탭에서 처리가 시작되었습니다"
   },
   "videoWmFetchError": {
-    "message": "✗ 获取视频数据失败"
+    "message": "✗ 비디오 데이터를 가져오지 못했습니다"
   },
   "videoWmPickFile": {
-    "message": "选择本地视频文件（已下载的视频）"
+    "message": "로컬 파일 선택"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ 자동 가져오기에 실패했습니다. 아래 버튼을 눌러 로컬 동영상을 선택하세요"

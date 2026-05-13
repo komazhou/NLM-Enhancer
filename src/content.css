@@ -116,6 +116,7 @@
   white-space: normal;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -574,6 +575,7 @@
   white-space: normal;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   margin-top: 8px;
   line-height: 1.4;
@@ -1002,6 +1004,7 @@ mjx-container:hover::after,
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -1203,7 +1206,10 @@ mjx-container:hover::after,
 .nlm-cart-item-delete { width: 22px; height: 22px; border: none; border-radius: 50%; background: transparent; color: rgba(255,255,255,0.3); font-size: 16px; cursor: pointer; display: none; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; }
 .nlm-cart-item:hover .nlm-cart-item-delete { display: flex; }
 .nlm-cart-item-delete:hover { background: rgba(234,67,53,0.15); color: #f28b82; }
-.nlm-cart-item-summary { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.nlm-cart-item-summary { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical; }
 .nlm-cart-empty { padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.35); font-size: 13px; }
 
 .nlm-cart-panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.06); }

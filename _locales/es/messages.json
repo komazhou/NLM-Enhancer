@@ -421,61 +421,58 @@
     "message": "Exportar tarjetas"
   },
   "featureVideoWatermark": {
-    "message": "视频无水印下载"
+    "message": "Descarga de video sin marca de agua"
   },
   "featureVideoWatermarkDesc": {
-    "message": "去除 NotebookLM 视频水印并下载"
+    "message": "Elimine la marca de agua de los videos de NotebookLM y descárguelos"
   },
   "videoWmBtnLabel": {
-    "message": "无水印下载"
+    "message": "Descargar sin marca de agua"
   },
   "videoWmModalTitle": {
-    "message": "视频无水印下载"
+    "message": "Descarga de video sin marca de agua"
   },
   "videoWmOptionsLabel": {
-    "message": "处理选项"
+    "message": "Opciones de procesamiento"
   },
   "videoWmTrimEnd": {
-    "message": "剪掉视频结尾水印"
+    "message": "Recortar marca de agua al final del video"
   },
   "videoWmTrimEndDesc": {
-    "message": "移除最后 2.5 秒品牌片尾"
+    "message": "Elimina los últimos 2.5 segundos del final de marca"
   },
   "videoWmRemoveFirst": {
-    "message": "消除右下角固定水印"
+    "message": "Eliminar marca de agua fija abajo a la derecha"
   },
   "videoWmRemoveFirstDesc": {
-    "message": "使用 delogo 滤镜消除画面右下角的品牌水印"
+    "message": "Usa el filtro delogo para eliminar la marca de agua de marca abajo a la derecha"
   },
   "videoWmModeLabel": {
-    "message": "处理模式"
+    "message": "Modo de procesamiento"
   },
   "videoWmModeFast": {
-    "message": "极速模式 (15FPS, 适合 PPT)"
+    "message": "Modo rápido (15 FPS, para PPT)"
   },
   "videoWmModeStandard": {
-    "message": "标准模式 (30FPS)"
-  },
-  "videoWmStartBtn": {
-    "message": "🚀 开始处理"
+    "message": "Modo estándar (30 FPS)"
   },
   "videoWmNoVideo": {
-    "message": "未找到视频元素"
+    "message": "No se encontró el elemento de video"
   },
   "videoWmNoOption": {
-    "message": "请至少选择一个处理选项"
+    "message": "Por favor, seleccione al menos una opción de procesamiento"
   },
   "videoWmFetching": {
-    "message": "正在获取视频数据..."
+    "message": "Obteniendo datos del video..."
   },
   "videoWmProcessingStarted": {
-    "message": "✓ 已在新标签页中开始处理"
+    "message": "✓ El procesamiento ha comenzado en una nueva pestaña"
   },
   "videoWmFetchError": {
-    "message": "✗ 获取视频数据失败"
+    "message": "✗ Error al obtener los datos del video"
   },
   "videoWmPickFile": {
-    "message": "选择本地视频文件（已下载的视频）"
+    "message": "Seleccionar archivo local"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ Error al obtener el video, selecciona un archivo local abajo"
