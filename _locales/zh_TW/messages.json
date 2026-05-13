@@ -12,7 +12,7 @@
     "message": "🔧 核心功能"
   },
   "sectionInputExperience": {
-    "message": "⚙️ 輸入与體驗"
+    "message": "⚙️ 輸入與體驗"
   },
   "featureQuoteReply": {
     "message": "選中文字引用"
@@ -168,7 +168,7 @@
     "message": "⚡ 提示詞庫"
   },
   "btnAddPrompt": {
-    "message": "添加自定義提示詞"
+    "message": "新增自定義提示詞"
   },
   "btnDelete": {
     "message": "刪除"
@@ -180,10 +180,10 @@
     "message": "✓ 已插入"
   },
   "dialogAddPromptTitle": {
-    "message": "添加自定義提示詞"
+    "message": "新增自定義提示詞"
   },
   "dialogPromptTitlePlaceholder": {
-    "message": "標題（如：📌 代码審查）"
+    "message": "標題（如：📌 程式碼審查）"
   },
   "dialogPromptTextPlaceholder": {
     "message": "提示詞內容..."
@@ -344,7 +344,7 @@
     "message": "編輯提示詞"
   },
   "dialogPromptTagsPlaceholder": {
-    "message": "標籤（用逗號分隔，如：代码, 潤色）"
+    "message": "標籤（用逗號分隔，如：程式碼, 潤飾）"
   },
   "toastImportSuccess": {
     "message": "✓ 導入成功"
@@ -356,7 +356,7 @@
     "message": "複製"
   },
   "copyMsgTooltip": {
-    "message": "複製回答 (含公式适配)"
+    "message": "複製回答 (含公式適配)"
   },
   "copiedLabel": {
     "message": "已複製"
@@ -424,7 +424,7 @@
     "message": "影片無浮水印下載"
   },
   "featureVideoWatermarkDesc": {
-    "message": "去除 NotebookLM 影片浮水印并下載"
+    "message": "去除 NotebookLM 影片浮水印並下載"
   },
   "videoWmBtnLabel": {
     "message": "無浮水印下載"
@@ -472,7 +472,7 @@
     "message": "✗ 獲取影片數據失敗"
   },
   "videoWmPickFile": {
-    "message": "選擇本地文件"
+    "message": "本地檔案"
   },
   "videoWmAutoFetchFailed": {
     "message": "⚠ 自動獲取失敗，請點擊下方選擇本地影片"
@@ -499,17 +499,17 @@
   "wmOptTitle": { "message": "參數配置" },
   "wmTrimName": { "message": "剪掉片尾" },
   "wmTrimDesc": { "message": "自動剪除影片最後 2.5 秒的品牌片尾" },
-  "wmDelogoName": { "message": "去除水印" },
-  "wmDelogoDesc": { "message": "擦除畫面右下角的品牌水印區域" },
+  "wmDelogoName": { "message": "去除浮水印" },
+  "wmDelogoDesc": { "message": "擦除畫面右下角的品牌浮水印區域" },
   "wmModeTitle": { "message": "處理模式" },
   "wmModeStandard": { "message": "標準模式 (30 FPS)" },
-  "wmLocalSource": { "message": "本地文件" },
-  "wmPickBtnText": { "message": "選擇本地影片文件並開始" },
+  "wmLocalSource": { "message": "本地檔案" },
+  "wmPickBtnText": { "message": "選擇本地影片檔案並開始" },
   "wmProcessTitle": { "message": "NLM Enhancer · 影片處理" },
-  "wmProcessSubtitle": { "message": "請先配置處理參數，然後選擇本地影片文件" },
-  "wmLocalSourceText": { "message": "本地文件" },
-  "wmTagTrim": { "message": "✂️ 剪掉结尾 2.5s" },
-  "wmTagDelogo": { "message": "🧹 去除右下角水印" },
+  "wmProcessSubtitle": { "message": "請先配置處理參數，然後選擇本地影片檔案" },
+  "wmLocalSourceText": { "message": "本地檔案" },
+  "wmTagTrim": { "message": "✂️ 剪掉結尾 2.5s" },
+  "wmTagDelogo": { "message": "🧹 去除右下角浮水印" },
   "wmTagFps": { "message": "🎞️ 標準 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ 處理過程中請勿關閉此標籤頁。您可以切換回 NotebookLM 繼續使用。" },
   "wmStatusProcessing": { "message": "正在處理影片..." },
