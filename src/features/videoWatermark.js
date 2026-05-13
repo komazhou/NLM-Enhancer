@@ -236,42 +236,22 @@ NLM.VideoWatermark = (() => {
         const originalText = startBtn.textContent;
         startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
 
-        console.log(LOG, '🚀 [代理启动] 指令已发送至后台...', videoSrc);
+        console.log(LOG, '📡 [雷达请求] 正在向后台索要嗅探到的 URL...');
 
-        // 通过消息机制由后台脚本代为拉取，后台脚本具有更高的跨域权限且不受网页 CSP 限制
-        chrome.runtime.sendMessage({
-          type: 'fetchVideo',
-          url: videoSrc
-        }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error(LOG, '❌ [通信异常]', chrome.runtime.lastError);
-            handleError('扩展后台响应异常，请检查扩展状态或刷新页面。');
-            return;
-          }
-
-          if (response && response.success) {
-            console.log(LOG, '✅ [获取成功] 数据已通过代理返回', { size: response.data.byteLength });
-            
-            // 恢复按钮状态
-            startBtn.disabled = false;
-            startBtn.textContent = originalText;
-            
-            // 传输数据给处理页面
-            processWithData(response.data, null, opts);
-          } else {
-            console.error(LOG, '❌ [拉取失败]', response ? response.error : '未知错误');
-            handleError(response ? response.error : '未知错误');
-          }
-        });
-
-        function handleError(msg) {
+        // 向后台索要嗅探到的真实视频流 URL
+        chrome.runtime.sendMessage({ action: 'GET_SNIFFED_URL' }, (response) => {
           startBtn.disabled = false;
           startBtn.textContent = originalText;
-          
-          const errorMsg = `视频拉取失败：${msg}\n\n💡 这通常是因为 Google 媒体链接已失效。请刷新当前 NotebookLM 页面后再试。如果依然失败，请通过“选择本地视频文件”作为保底方案。`;
-          alert(errorMsg);
-          NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
-        }
+
+          if (response && response.url) {
+            console.log(LOG, '✅ [嗅探成功] 获得真实 URL:', response.url);
+            // 将真实 URL 传给处理页面进行拉取
+            processWithData(null, response.url, opts);
+          } else {
+            console.warn(LOG, '❌ [嗅探失败] 未找到视频流');
+            alert('未嗅探到视频流，请先在页面中点击播放视频（或点击视频一下）。');
+          }
+        });
       };
     }
 

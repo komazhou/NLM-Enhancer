@@ -1,10 +1,22 @@
 /**
- * NLM Enhancer Background Script - 上帝代理模式 (v1.7.12)
+ * NLM Enhancer Background Script - 嗅探雷达模式 (v1.7.13)
  */
 
-const extensionId = chrome.runtime.id;
+let latestSniffedVideoUrl = null;
 
-// 终极上帝模式：为所有拉取请求注入跨域许可并伪装来源
+// 嗅探雷达：监听真实的视频分片请求
+chrome.webRequest.onHeadersReceived.addListener(
+  (details) => {
+    // 捕获 Google 的视频播放流链接 (通常包含 videoplayback)
+    if (details.url.includes('videoplayback')) {
+      latestSniffedVideoUrl = details.url;
+      console.log('Background: 嗅探到真实视频流:', latestSniffedVideoUrl);
+    }
+  },
+  { urls: ["https://*.googlevideo.com/*"] }
+);
+
+// 终极上帝模式：为拉取请求注入跨域许可
 chrome.declarativeNetRequest.updateDynamicRules({
   removeRuleIds: [1, 2],
   addRules: [
@@ -13,10 +25,6 @@ chrome.declarativeNetRequest.updateDynamicRules({
       priority: 1,
       action: {
         type: "modifyHeaders",
-        requestHeaders: [
-          { header: "Referer", operation: "set", value: "https://notebooklm.google.com/" },
-          { header: "Origin", operation: "set", value: "https://notebooklm.google.com" }
-        ],
         responseHeaders: [
           { header: "Access-Control-Allow-Origin", operation: "set", value: "*" },
           { header: "Access-Control-Allow-Methods", operation: "set", value: "GET, POST, OPTIONS, HEAD" },
@@ -25,7 +33,6 @@ chrome.declarativeNetRequest.updateDynamicRules({
         ]
       },
       condition: {
-        // 覆盖谷歌所有媒体分发域名
         requestDomains: ["usercontent.goog", "googleusercontent.com", "googlevideo.com", "google.com"],
         resourceTypes: ["xmlhttprequest", "media", "other"]
       }
@@ -55,30 +62,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-// 代理拉取逻辑：由 Background 执行 fetch，绕过网页 CSP 和 Cookie 限制
+// 处理来自前台的消息
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'fetchVideo') {
-    console.log('Background: 收到拉取指令', message.url);
-    
-    fetch(message.url, {
-      method: 'GET',
-      mode: 'cors'
-      // 注意：不携带 credentials，利用 Signed URL 自身的鉴权能力
-    })
-    .then(async (response) => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const buffer = await response.arrayBuffer();
-      console.log('Background: 拉取成功，数据大小:', buffer.byteLength);
-      
-      // 将 ArrayBuffer 转换为可通过 sendMessage 传输的格式
-      // Chrome 扩展支持直接传输 ArrayBuffer
-      sendResponse({ success: true, data: buffer });
-    })
-    .catch((err) => {
-      console.error('Background: 拉取失败', err);
-      sendResponse({ success: false, error: err.message });
-    });
-    
-    return true; // 保持通道开启
+  if (message.action === 'GET_SNIFFED_URL') {
+    console.log('Background: 正在提供嗅探到的 URL', latestSniffedVideoUrl);
+    sendResponse({ url: latestSniffedVideoUrl });
   }
 });

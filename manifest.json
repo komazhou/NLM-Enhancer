@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.7.12",
+  "version": "1.7.13",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "icons": {
@@ -13,7 +13,8 @@
     "storage",
     "clipboardWrite",
     "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
+    "declarativeNetRequestWithHostAccess",
+    "webRequest"
   ],
   "host_permissions": [
     "https://notebooklm.google.com/*",
