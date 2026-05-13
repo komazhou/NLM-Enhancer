@@ -236,65 +236,40 @@ NLM.VideoWatermark = (() => {
         const originalText = startBtn.textContent;
         startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
 
-        try {
-          console.log(LOG, '🚀 [调试开始] 尝试拉取视频...', { videoSrc, context: window.location.href });
-          
-          // 在 Content Script 中 fetch，利用当前会话的 Cookie
-          const response = await fetch(videoSrc, {
-            method: 'GET',
-            credentials: 'include',
-            mode: 'cors',
-            cache: 'force-cache' // 优先命中浏览器已有的媒体缓存
-          });
+        console.log(LOG, '🚀 [代理启动] 指令已发送至后台...', videoSrc);
 
-          console.log(LOG, '📡 [响应状态]', { ok: response.ok, status: response.status, type: response.type });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // 通过消息机制由后台脚本代为拉取，后台脚本具有更高的跨域权限且不受网页 CSP 限制
+        chrome.runtime.sendMessage({
+          type: 'fetchVideo',
+          url: videoSrc
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(LOG, '❌ [通信异常]', chrome.runtime.lastError);
+            handleError('扩展后台响应异常，请检查扩展状态或刷新页面。');
+            return;
           }
 
-          const videoBlob = await response.blob();
-          const videoBuffer = await videoBlob.arrayBuffer();
-          
-          console.log(LOG, '✅ [获取成功] 字节数:', videoBuffer.byteLength);
-          
-          // 恢复按钮状态
-          startBtn.disabled = false;
-          startBtn.textContent = originalText;
-          
-          // 传输数据
-          processWithData(videoBuffer, null, opts);
-          
-        } catch (err) {
-          console.error(LOG, '❌ [下载异常详情]', err);
-          
-          // 恢复按钮状态
-          startBtn.disabled = false;
-          startBtn.textContent = originalText;
-          
-          const isNetworkError = err.message.includes('Failed to fetch');
-          let errorMsg = '视频拉取失败。Google 的安全策略可能已升级，阻断了插件的直接获取请求。';
-          
-          if (isNetworkError) {
-             errorMsg += '\n\n【自动降级方案】：点击“确定”后，插件将尝试唤起浏览器原生下载窗口。下载完成后，请点击下方的“📁 选择本地视频文件”按钮并上传刚才下载的文件，即可完成去水印。';
-             if (confirm(errorMsg)) {
-                chrome.runtime.sendMessage({
-                  type: 'downloadVideo',
-                  url: videoSrc,
-                  filename: (videoTitle || 'video') + '.mp4'
-                }, (response) => {
-                  if (response && response.success) {
-                    NLM.DOM.showToast('已唤起原生下载，请下载后手动上传', window.innerWidth / 2, 100, true);
-                  } else {
-                    alert('原生下载唤起失败：' + (response ? response.error : '未知错误'));
-                  }
-                });
-             }
+          if (response && response.success) {
+            console.log(LOG, '✅ [获取成功] 数据已通过代理返回', { size: response.data.byteLength });
+            
+            // 恢复按钮状态
+            startBtn.disabled = false;
+            startBtn.textContent = originalText;
+            
+            // 传输数据给处理页面
+            processWithData(response.data, null, opts);
           } else {
-             errorMsg += `\n\n错误信息：${err.message}`;
-             alert(errorMsg);
+            console.error(LOG, '❌ [拉取失败]', response ? response.error : '未知错误');
+            handleError(response ? response.error : '未知错误');
           }
+        });
+
+        function handleError(msg) {
+          startBtn.disabled = false;
+          startBtn.textContent = originalText;
           
+          const errorMsg = `视频拉取失败：${msg}\n\n💡 这通常是因为 Google 媒体链接已失效。请刷新当前 NotebookLM 页面后再试。如果依然失败，请通过“选择本地视频文件”作为保底方案。`;
+          alert(errorMsg);
           NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
         }
       };
