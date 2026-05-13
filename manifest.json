@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "icons": {
@@ -18,7 +18,8 @@
   "host_permissions": [
     "https://notebooklm.google.com/*",
     "https://*.usercontent.goog/*",
-    "https://*.googleusercontent.com/*"
+    "https://*.googleusercontent.com/*",
+    "https://*.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"
