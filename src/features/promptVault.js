@@ -136,9 +136,9 @@ NLM.PromptVault = (() => {
         <div class="nlm-header-left">
           <h3>${NLM.i18n.get('promptVaultPanelTitle')}</h3>
           <div class="nlm-view-toggles">
-            <button class="nlm-view-btn ${viewMode === 'detail' ? 'active' : ''}" data-mode="detail" title="详细列表">☰</button>
-            <button class="nlm-view-btn ${viewMode === 'compact' ? 'active' : ''}" data-mode="compact" title="紧凑列表">☲</button>
-            <button class="nlm-view-btn ${viewMode === 'grid' ? 'active' : ''}" data-mode="grid" title="网格视图">▦</button>
+            <button class="nlm-view-btn ${viewMode === 'detail' ? 'active' : ''}" data-mode="detail" title="${NLM.i18n.get('viewModeDetail')}">☰</button>
+            <button class="nlm-view-btn ${viewMode === 'compact' ? 'active' : ''}" data-mode="compact" title="${NLM.i18n.get('viewModeCompact')}">☲</button>
+            <button class="nlm-view-btn ${viewMode === 'grid' ? 'active' : ''}" data-mode="grid" title="${NLM.i18n.get('viewModeGrid')}">▦</button>
           </div>
         </div>
         <button class="nlm-prompt-add-btn" title="${NLM.i18n.get('btnAddPrompt')}">+</button>

@@ -516,5 +516,24 @@
   "wmTagFps": { "message": "🎞️ 标准 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ 处理过程中请勿关闭此标签页。您可以切换回 NotebookLM 继续使用。" },
   "wmStatusProcessing": { "message": "正在处理视频..." },
-  "wmStatusErasing": { "message": "正在擦除水印..." }
+  "wmStatusErasing": { "message": "正在擦除水印..." },
+  "btnPreciseDelete": { "message": "✂️ 精准删除模式" },
+  "btnPreciseDeleteDesc": { "message": "开启后可通过红色遮罩精准删除内容" },
+  "clickToEditTitle": { "message": "点击修改标题" },
+  "viewModeDetail": { "message": "详细列表" },
+  "viewModeCompact": { "message": "紧凑列表" },
+  "viewModeGrid": { "message": "网格视图" },
+  "statusWaitingData": { "message": "等待视频数据..." },
+  "statusReceiving": { "message": "正在从 NotebookLM 页面接收视频" },
+  "btnClosePage": { "message": "关闭页面" },
+  "statusProcessFailed": { "message": "处理失败" },
+  "localFileDefaultName": { "message": "本地文件" },
+  "sniffUrlAlert": { "message": "未嗅探到视频流，请先在页面中点击播放视频（或点击视频一下）。" },
+  "procDone": { "message": "处理完成！" },
+  "procAutoDownloaded": { 
+    "message": "文件 \"$NAME$\" 已自动下载",
+    "placeholders": { "NAME": { "content": "$1" } }
+  },
+  "procError": { "message": "处理出错" },
+  "footerText": { "message": "为 NotebookLM 精心打造 ❤️" }
 }

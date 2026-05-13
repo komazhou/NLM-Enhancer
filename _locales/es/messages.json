@@ -516,5 +516,23 @@
   "wmTagFps": { "message": "🎞️ Estándar 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ No cierre esta pestaña durante el procesamiento. Puede volver a NotebookLM." },
   "wmStatusProcessing": { "message": "Procesando video..." },
-  "wmStatusErasing": { "message": "Borrando marca de agua..." }
+  "wmStatusErasing": { "message": "Borrando marca de agua..." },
+  "btnPreciseDelete": { "message": "✂️ Modo de eliminación precisa" },
+  "btnPreciseDeleteDesc": { "message": "Cuando esté habilitado, haga clic para eliminar elementos con precisión" },
+  "clickToEditTitle": { "message": "Haga clic para editar el título" },
+  "viewModeDetail": { "message": "Vista detallada" },
+  "viewModeCompact": { "message": "Vista compacta" },
+  "viewModeGrid": { "message": "Vista de cuadrícula" },
+  "statusWaitingData": { "message": "Esperando datos de video..." },
+  "statusReceiving": { "message": "Recibiendo video de la página de NotebookLM" },
+  "btnClosePage": { "message": "Cerrar página" },
+  "statusProcessFailed": { "message": "Procesamiento fallido" },
+  "localFileDefaultName": { "message": "Archivo local" },
+  "sniffUrlAlert": { "message": "No se detectó flujo de video. Primero reproduzca el video (o haga clic en él)." },
+  "procDone": { "message": "¡Procesamiento completo!" },
+  "procAutoDownloaded": { 
+    "message": "El archivo \"$NAME$\" se ha descargado automáticamente",
+    "placeholders": { "NAME": { "content": "$1" } }
+  },
+  "procError": { "message": "Error de procesamiento" }
 }

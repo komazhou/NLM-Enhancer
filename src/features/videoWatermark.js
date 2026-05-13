@@ -85,7 +85,7 @@ NLM.VideoWatermark = (() => {
   function showWatermarkModal(viewer, context = { entry: 'web', mediaType: 'video' }) {
     const isLocal = context.entry === 'local';
     let videoEl = null;
-    let videoTitle = isLocal ? '本地文件' : '';
+    let videoTitle = isLocal ? i18n.get('localFileDefaultName') : '';
     let duration = 0;
     let videoWidth = 1920;
     let videoHeight = 1080;
@@ -247,7 +247,7 @@ NLM.VideoWatermark = (() => {
             processWithData(null, response.url, opts);
           } else {
             console.warn(LOG, '❌ [嗅探失败] 未找到视频流');
-            alert('未嗅探到视频流，请先在页面中点击播放视频（或点击视频一下）。');
+            alert(i18n.get('sniffUrlAlert'));
           }
         });
       };

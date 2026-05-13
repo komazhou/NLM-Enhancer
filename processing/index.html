@@ -335,8 +335,8 @@
     <div class="status-card" id="statusCard">
       <div class="spinner" id="spinner"></div>
       <div class="status-icon hidden" id="statusIcon"></div>
-      <div class="status-text" id="statusText">等待视频数据...</div>
-      <div class="status-detail" id="statusDetail">正在从 NotebookLM 页面接收视频</div>
+      <div class="status-text" id="statusText" data-i18n="statusWaitingData">等待视频数据...</div>
+      <div class="status-detail" id="statusDetail" data-i18n="statusReceiving">正在从 NotebookLM 页面接收视频</div>
       <div class="progress-bar-outer hidden" id="progressOuter">
         <div class="progress-bar-inner" id="progressInner"></div>
       </div>
@@ -345,17 +345,17 @@
 
     <!-- 完成操作 -->
     <div class="done-actions hidden" id="doneActions">
-      <button class="btn btn-secondary" onclick="window.close()">关闭页面</button>
+      <button class="btn btn-secondary" onclick="window.close()" data-i18n="btnClosePage">关闭页面</button>
     </div>
 
     <!-- 错误卡片 -->
     <div class="error-card" id="errorCard">
       <div class="status-icon">❌</div>
-      <div class="status-text">处理失败</div>
+      <div class="status-text" data-i18n="statusProcessFailed">处理失败</div>
       <div class="status-detail" id="errorMsg"></div>
       <div class="error-detail" id="errorDetail"></div>
       <div class="done-actions" style="display:flex; margin-top: 16px;">
-        <button class="btn btn-secondary" onclick="window.close()">关闭页面</button>
+        <button class="btn btn-secondary" onclick="window.close()" data-i18n="btnClosePage">关闭页面</button>
       </div>
     </div>
   </div>

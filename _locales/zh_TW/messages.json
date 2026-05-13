@@ -513,5 +513,23 @@
   "wmTagFps": { "message": "🎞️ 標準 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ 處理過程中請勿關閉此標籤頁。您可以切換回 NotebookLM 繼續使用。" },
   "wmStatusProcessing": { "message": "正在處理影片..." },
-  "wmStatusErasing": { "message": "正在擦除水印..." }
+  "wmStatusErasing": { "message": "正在擦除浮水印..." },
+  "btnPreciseDelete": { "message": "✂️ 精準刪除模式" },
+  "btnPreciseDeleteDesc": { "message": "開啟後可透過紅色遮罩精準刪除內容" },
+  "clickToEditTitle": { "message": "點擊修改標題" },
+  "viewModeDetail": { "message": "詳細列表" },
+  "viewModeCompact": { "message": "緊湊列表" },
+  "viewModeGrid": { "message": "網格視圖" },
+  "statusWaitingData": { "message": "等待影片數據..." },
+  "statusReceiving": { "message": "正在從 NotebookLM 頁面接收影片" },
+  "btnClosePage": { "message": "關閉頁面" },
+  "statusProcessFailed": { "message": "處理失敗" },
+  "localFileDefaultName": { "message": "本地檔案" },
+  "sniffUrlAlert": { "message": "未嗅探到影片流，請先在頁面中點擊播放影片（或點擊影片一下）。" },
+  "procDone": { "message": "處理完成！" },
+  "procAutoDownloaded": { 
+    "message": "檔案 \"$NAME$\" 已自動下載",
+    "placeholders": { "NAME": { "content": "$1" } }
+  },
+  "procError": { "message": "處理出錯" }
 }

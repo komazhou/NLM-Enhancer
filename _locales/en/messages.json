@@ -518,5 +518,23 @@
   "wmTagFps": { "message": "🎞️ Standard 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ Please do not close this tab during processing. You can switch back to NotebookLM." },
   "wmStatusProcessing": { "message": "Processing video..." },
-  "wmStatusErasing": { "message": "Erasing watermark..." }
+  "wmStatusErasing": { "message": "Erasing watermark..." },
+  "btnPreciseDelete": { "message": "✂️ Precise Delete Mode" },
+  "btnPreciseDeleteDesc": { "message": "When enabled, click to delete elements with precision" },
+  "clickToEditTitle": { "message": "Click to edit title" },
+  "viewModeDetail": { "message": "Detail View" },
+  "viewModeCompact": { "message": "Compact View" },
+  "viewModeGrid": { "message": "Grid View" },
+  "statusWaitingData": { "message": "Waiting for video data..." },
+  "statusReceiving": { "message": "Receiving video from NotebookLM page" },
+  "btnClosePage": { "message": "Close Page" },
+  "statusProcessFailed": { "message": "Processing Failed" },
+  "localFileDefaultName": { "message": "Local File" },
+  "sniffUrlAlert": { "message": "No video stream sniffed. Please play the video (or click it) first." },
+  "procDone": { "message": "Processing Complete!" },
+  "procAutoDownloaded": { 
+    "message": "File \"$NAME$\" has been automatically downloaded",
+    "placeholders": { "NAME": { "content": "$1" } }
+  },
+  "procError": { "message": "Processing Error" }
 }

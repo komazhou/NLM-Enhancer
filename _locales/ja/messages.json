@@ -516,5 +516,23 @@
   "wmTagFps": { "message": "🎞️ 標準 30FPS" },
   "wmWarnKeepOpen": { "message": "⚠️ 処理中はタブを閉じないでください。NotebookLMに戻って操作を続けられます。" },
   "wmStatusProcessing": { "message": "動画を処理しています..." },
-  "wmStatusErasing": { "message": "透かしを消去しています..." }
+  "wmStatusErasing": { "message": "透かしを消去中..." },
+  "btnPreciseDelete": { "message": "✂️ 精密削除モード" },
+  "btnPreciseDeleteDesc": { "message": "有効にすると、クリックして要素を精密に削除できます" },
+  "clickToEditTitle": { "message": "クリックしてタイトルを編集" },
+  "viewModeDetail": { "message": "詳細表示" },
+  "viewModeCompact": { "message": "コンパクト表示" },
+  "viewModeGrid": { "message": "グリッド表示" },
+  "statusWaitingData": { "message": "ビデオデータを待機中..." },
+  "statusReceiving": { "message": "NotebookLM ページからビデオを受信中" },
+  "btnClosePage": { "message": "ページを閉じる" },
+  "statusProcessFailed": { "message": "処理に失敗しました" },
+  "localFileDefaultName": { "message": "ローカルファイル" },
+  "sniffUrlAlert": { "message": "ビデオストリームが検出されませんでした。先にビデオを再生（またはクリック）してください。" },
+  "procDone": { "message": "処理が完了しました！" },
+  "procAutoDownloaded": { 
+    "message": "ファイル「$NAME$」が自動的にダウンロードされました",
+    "placeholders": { "NAME": { "content": "$1" } }
+  },
+  "procError": { "message": "処理エラー" }
 }

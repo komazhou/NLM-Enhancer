@@ -403,14 +403,14 @@ NLM.Export = (() => {
           <div class="toolbar">
             <div class="toolbar-title">${NLM.i18n.get('exportToolbarTitle')}</div>
             <div class="btn-group">
-              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="开启后可通过红色遮罩精准删除内容">✂️ 精准删除模式</button>
+              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="${NLM.i18n.get('btnPreciseDeleteDesc')}">${NLM.i18n.get('btnPreciseDelete')}</button>
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
               <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
             </div>
           </div>
           <div class="preview-container">
-            <h1 id="editableTitle" contenteditable="true" title="${NLM.i18n.get('clickToEdit', ['点击修改标题'])}">${defaultTitle}</h1>
+            <h1 id="editableTitle" contenteditable="true" title="${NLM.i18n.get('clickToEditTitle')}">${defaultTitle}</h1>
             <div class="meta">${NLM.i18n.get('exportTime', [new Date().toLocaleString()])}</div>
             <div id="messages-container">
     `;
@@ -746,14 +746,14 @@ NLM.Export = (() => {
           <div class="toolbar">
             <div class="toolbar-title">${NLM.i18n.get('cartPanelTitle')}</div>
             <div class="btn-group">
-              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="开启后可通过红色遮罩精准删除内容">✂️ 精准删除模式</button>
+              <button id="toggleDeleteMode" class="btn-mode-toggle active" title="${NLM.i18n.get('btnPreciseDeleteDesc')}">${NLM.i18n.get('btnPreciseDelete')}</button>
               <button class="btn-md" id="downloadMdBtn">${NLM.i18n.get('btnDownloadMd')}</button>
               <button class="btn-word" id="downloadWordBtn">${NLM.i18n.get('btnSaveWord')}</button>
               <button class="btn-pdf" id="downloadPdfBtn">${NLM.i18n.get('btnSavePdf')}</button>
             </div>
           </div>
           <div class="preview-container">
-            <h1 id="editableTitle" contenteditable="true" title="${NLM.i18n.get('clickToEdit', ['点击修改标题'])}">${defaultTitle}</h1>
+            <h1 id="editableTitle" contenteditable="true" title="${NLM.i18n.get('clickToEditTitle')}">${defaultTitle}</h1>
             <div class="meta">${NLM.i18n.get('exportTime', [new Date().toLocaleString()])} · ${NLM.i18n.get('stashItemCount', [String(stashItems.length)])}</div>
             <div id="messages-container">
     `;
