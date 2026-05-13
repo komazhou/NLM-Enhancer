@@ -54,3 +54,23 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.set({ nlmPendingUpdate: currentVersion });
   }
 });
+
+// 处理来自 Content Script 的指令
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'downloadVideo') {
+    // 使用浏览器原生下载接口，彻底绕过 CORS/CSP 限制
+    chrome.downloads.download({
+      url: message.url,
+      filename: message.filename || 'video.mp4',
+      saveAs: true
+    }, (downloadId) => {
+      if (chrome.runtime.lastError) {
+        console.error('下载失败:', chrome.runtime.lastError);
+        sendResponse({ success: false, error: chrome.runtime.lastError.message });
+      } else {
+        sendResponse({ success: true, id: downloadId });
+      }
+    });
+    return true; // 异步响应
+  }
+});

@@ -272,14 +272,29 @@ NLM.VideoWatermark = (() => {
           startBtn.disabled = false;
           startBtn.textContent = originalText;
           
-          let errorMsg = '视频下载失败。可能由于 Google 更改了安全策略。';
-          if (err.message.includes('Failed to fetch')) {
-             errorMsg += '\n\n检测到网络连接被阻断。请确认插件版本已更新至 v1.7.10，并刷新页面重试。';
+          const isNetworkError = err.message.includes('Failed to fetch');
+          let errorMsg = '视频拉取失败。Google 的安全策略可能已升级，阻断了插件的直接获取请求。';
+          
+          if (isNetworkError) {
+             errorMsg += '\n\n【自动降级方案】：点击“确定”后，插件将尝试唤起浏览器原生下载窗口。下载完成后，请点击下方的“📁 选择本地视频文件”按钮并上传刚才下载的文件，即可完成去水印。';
+             if (confirm(errorMsg)) {
+                chrome.runtime.sendMessage({
+                  type: 'downloadVideo',
+                  url: videoSrc,
+                  filename: (videoTitle || 'video') + '.mp4'
+                }, (response) => {
+                  if (response && response.success) {
+                    NLM.DOM.showToast('已唤起原生下载，请下载后手动上传', window.innerWidth / 2, 100, true);
+                  } else {
+                    alert('原生下载唤起失败：' + (response ? response.error : '未知错误'));
+                  }
+                });
+             }
+          } else {
+             errorMsg += `\n\n错误信息：${err.message}`;
+             alert(errorMsg);
           }
           
-          errorMsg += '\n\n💡 保底方案：请点击视频播放器右下角的“三个点”或右键视频，选择“下载/另存为”，然后使用本插件下方的“📁 选择本地视频文件”功能进行去水印。';
-          
-          alert(errorMsg);
           NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
         }
       };
