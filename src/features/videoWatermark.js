@@ -236,8 +236,6 @@ NLM.VideoWatermark = (() => {
         const originalText = startBtn.textContent;
         startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
 
-        console.log(LOG, '📡 [雷达请求] 正在向后台索要嗅探到的 URL...');
-
         // 向后台索要嗅探到的真实视频流 URL
         chrome.runtime.sendMessage({ action: 'GET_SNIFFED_URL' }, (response) => {
           startBtn.disabled = false;
@@ -245,7 +243,7 @@ NLM.VideoWatermark = (() => {
 
           if (response && response.url) {
             console.log(LOG, '✅ [嗅探成功] 获得真实 URL:', response.url);
-            // 将真实 URL 传给处理页面进行拉取
+            // 确立唯一架构：将真实 URL 传给处理页面进行纯净拉取
             processWithData(null, response.url, opts);
           } else {
             console.warn(LOG, '❌ [嗅探失败] 未找到视频流');

@@ -284,12 +284,7 @@
   window.addEventListener('message', async (event) => {
     if (dataReceived) return;
 
-    if (event.data && event.data.type === 'NLM_VIDEO_DATA') {
-      dataReceived = true;
-      ui.setStatus(null, chrome.i18n.getMessage('procLoaded') || '视频数据已接收', chrome.i18n.getMessage('procWaitPatiently') || '准备开始处理...');
-      main(event.data.data);
-    } 
-    else if (event.data && event.data.type === 'NLM_VIDEO_URL') {
+    if (event.data && event.data.type === 'NLM_VIDEO_URL') {
       dataReceived = true;
       ui.setStatus(null, chrome.i18n.getMessage('procFetchOriginal') || '正在获取原视频...', chrome.i18n.getMessage('procDownloading') || '准备下载...');
       try {
