@@ -490,12 +490,12 @@
     "message": "本地去水印"
   },
   "updateTitle": { 
-    "message": "🚀 緊急修復完成 (v[VERSION])",
+    "message": "🚀 緊急修復 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "影片無浮水印下載功能現已恢復正常" },
-  "updateFeature1Desc": { "message": "我們引入了零拷貝技術，處理大文件更穩定、更快速！" },
-  "updateBtn": { "message": "我知道了" },
+  "updateFeature1": { "message": "嘗試修復影片下載問題" },
+  "updateFeature1Desc": { "message": "我們已對影片下載邏輯進行了緊急修復。如問題依然存在或有其他 Bug，歡迎隨時向我們回饋。" },
+  "updateBtn": { "message": "好的" },
   "wmOptTitle": { "message": "參數配置" },
   "wmTrimName": { "message": "剪掉片尾" },
   "wmTrimDesc": { "message": "自動剪除影片最後 2.5 秒的品牌片尾" },

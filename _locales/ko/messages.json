@@ -490,12 +490,12 @@
     "message": "열기"
   },
   "updateTitle": { 
-    "message": "🚀 긴급 수정 완료 (v[VERSION])",
+    "message": "🚀 긴급 수정 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "워터마크 없는 다운로드 기능이 복구되었습니다" },
-  "updateFeature1Desc": { "message": "제로 카피 기술로 대용량 파일 처리가 더 빠르고 안정해졌습니다." },
-  "updateBtn": { "message": "확인했습니다" },
+  "updateFeature1": { "message": "비디오 다운로드 문제 수정 시도" },
+  "updateFeature1Desc": { "message": "비디오 다운로드 로직에 대한 긴급 수정을 실시했습니다. 문제가 계속되거나 다른 버그가 발견되면 언제든지 피드백을 보내주세요." },
+  "updateBtn": { "message": "확인" },
   "wmOptTitle": { "message": "매개변수 설정" },
   "wmTrimName": { "message": "엔딩 자르기" },
   "wmTrimDesc": { "message": "마지막 2.5초 브랜딩 자동 제거" },

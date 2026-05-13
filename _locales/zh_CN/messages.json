@@ -493,12 +493,12 @@
     "message": "本地去水印"
   },
   "updateTitle": { 
-    "message": "🚀 紧急修复完成 (v[VERSION])",
+    "message": "🚀 紧急修复 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "视频无水印下载功能现已恢复正常" },
-  "updateFeature1Desc": { "message": "我们引入了零拷贝技术，处理大文件更稳定、更快速！" },
-  "updateBtn": { "message": "我知道了" },
+  "updateFeature1": { "message": "尝试修复视频下载问题" },
+  "updateFeature1Desc": { "message": "我们已对视频下载逻辑进行了紧急修复。如问题依然存在或有其他 Bug，欢迎随时向我们反馈。" },
+  "updateBtn": { "message": "好的" },
   "wmOptTitle": { "message": "参数配置" },
   "wmTrimName": { "message": "剪掉片尾" },
   "wmTrimDesc": { "message": "自动剪除视频最后 2.5 秒的品牌片尾" },

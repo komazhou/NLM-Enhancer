@@ -490,11 +490,11 @@
     "message": "開く"
   },
   "updateTitle": { 
-    "message": "🚀 緊急修正完了 (v[VERSION])",
+    "message": "🚀 緊急修正 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "ウォーターマーク除去機能が復旧しました" },
-  "updateFeature1Desc": { "message": "ゼロコピー技術により、大容量ファイルもより高速かつ安定して処理できます。" },
+  "updateFeature1": { "message": "ビデオダウンロードの問題の修正を試みました" },
+  "updateFeature1Desc": { "message": "ビデオダウンロードのロジックに緊急修正を加えました。問題が解決しない場合や他のバグがある場合は、フィードバックをお待ちしております。" },
   "updateBtn": { "message": "了解しました" },
   "wmOptTitle": { "message": "パラメータ設定" },
   "wmTrimName": { "message": "末尾をカット" },

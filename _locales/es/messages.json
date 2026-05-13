@@ -490,11 +490,11 @@
     "message": "Abrir"
   },
   "updateTitle": { 
-    "message": "🚀 Corrección lista (v[VERSION])",
+    "message": "🚀 Corrección de emergencia (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "La descarga sin marca de agua ha vuelto" },
-  "updateFeature1Desc": { "message": "Usamos tecnología Cero-copia para un procesamiento más rápido y estable." },
+  "updateFeature1": { "message": "Intento de corregir problemas de descarga de video" },
+  "updateFeature1Desc": { "message": "Hemos implementado una corrección de emergencia para la lógica de descarga de video. Si el problema persiste o encuentra otros errores, sus comentarios son bienvenidos." },
   "updateBtn": { "message": "Entendido" },
   "wmOptTitle": { "message": "Configuración" },
   "wmTrimName": { "message": "Recortar final" },

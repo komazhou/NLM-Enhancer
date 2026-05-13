@@ -498,9 +498,9 @@
     "message": "🚀 Emergency Fix (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "Video watermark-free download is restored" },
-  "updateFeature1Desc": { "message": "We've added Zero-copy tech for faster, more stable processing." },
-  "updateBtn": { "message": "Got it" },
+  "updateFeature1": { "message": "Attempted fix for video download issues" },
+  "updateFeature1Desc": { "message": "We have implemented an emergency fix for video download logic. If the issue persists or other bugs are found, feedback is welcome." },
+  "updateBtn": { "message": "OK" },
   "wmOptTitle": { "message": "Configuration" },
   "wmTrimName": { "message": "Trim End" },
   "wmTrimDesc": { "message": "Auto-trim the last 2.5s brand ending" },
