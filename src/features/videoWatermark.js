@@ -237,12 +237,17 @@ NLM.VideoWatermark = (() => {
         startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
 
         try {
-          console.log(LOG, '正在尝试获取视频数据 (使用 Content Script Fetch)...', videoSrc);
+          console.log(LOG, '🚀 [调试开始] 尝试拉取视频...', { videoSrc, context: window.location.href });
           
-          // 在 Content Script 中 fetch 能够完美携带 NotebookLM 的身份 Cookie
+          // 在 Content Script 中 fetch，利用当前会话的 Cookie
           const response = await fetch(videoSrc, {
-            credentials: 'include'
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            cache: 'force-cache' // 优先命中浏览器已有的媒体缓存
           });
+
+          console.log(LOG, '📡 [响应状态]', { ok: response.ok, status: response.status, type: response.type });
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -251,24 +256,29 @@ NLM.VideoWatermark = (() => {
           const videoBlob = await response.blob();
           const videoBuffer = await videoBlob.arrayBuffer();
           
-          console.log(LOG, '视频获取成功，字节数:', videoBuffer.byteLength);
+          console.log(LOG, '✅ [获取成功] 字节数:', videoBuffer.byteLength);
           
           // 恢复按钮状态
           startBtn.disabled = false;
           startBtn.textContent = originalText;
           
-          // 使用零拷贝方式传输数据给处理页面
+          // 传输数据
           processWithData(videoBuffer, null, opts);
           
         } catch (err) {
-          console.error(LOG, '视频获取失败详情:', err);
+          console.error(LOG, '❌ [下载异常详情]', err);
           
           // 恢复按钮状态
           startBtn.disabled = false;
           startBtn.textContent = originalText;
           
-          // 弹窗提示用户
-          const errorMsg = '视频下载失败。可能由于 Google 更改了安全策略。\n\n💡 保底方案：请点击视频播放器右下角的“三个点”或右键视频，选择“下载/另存为”，然后使用本插件下方的“📁 选择本地视频文件”功能进行去水印。';
+          let errorMsg = '视频下载失败。可能由于 Google 更改了安全策略。';
+          if (err.message.includes('Failed to fetch')) {
+             errorMsg += '\n\n检测到网络连接被阻断。请确认插件版本已更新至 v1.7.10，并刷新页面重试。';
+          }
+          
+          errorMsg += '\n\n💡 保底方案：请点击视频播放器右下角的“三个点”或右键视频，选择“下载/另存为”，然后使用本插件下方的“📁 选择本地视频文件”功能进行去水印。';
+          
           alert(errorMsg);
           NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
         }
