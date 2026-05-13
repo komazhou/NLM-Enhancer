@@ -223,17 +223,53 @@ NLM.VideoWatermark = (() => {
     // ===「开始下载」按钮（仅 Web 模式） ===
     const startBtn = overlay.querySelector('#nlmStartProcess');
     if (startBtn) {
-      startBtn.onclick = () => {
+      startBtn.onclick = async () => {
         const opts = getModalOptions();
         if (!opts) return;
 
         if (!videoSrc) {
-          NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
+          NLM.DOM.showToast(i18n.get('videoWmNoVideo'), window.innerWidth / 2, 100, false);
           return;
         }
         
         startBtn.disabled = true;
-        processWithData(null, videoSrc, opts);
+        const originalText = startBtn.textContent;
+        startBtn.textContent = i18n.get('videoWmFetching') || 'Fetching...';
+
+        try {
+          console.log(LOG, '正在尝试获取视频数据 (含凭证模式)...', videoSrc);
+          
+          const response = await fetch(videoSrc, {
+            method: 'GET',
+            credentials: 'include', // 关键：强制携带 Cookie 解决 403
+            mode: 'cors',
+            headers: {
+              'Accept': 'video/*, */*'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const videoBlob = await response.blob();
+          const videoBuffer = await videoBlob.arrayBuffer();
+          
+          console.log(LOG, '视频获取成功，字节数:', videoBuffer.byteLength);
+          processWithData(videoBuffer, null, opts);
+          
+        } catch (err) {
+          console.error(LOG, '视频获取失败详情:', err);
+          
+          // 恢复按钮状态
+          startBtn.disabled = false;
+          startBtn.textContent = originalText;
+          
+          // 弹窗提示用户
+          const errorMsg = `下载失败: ${err.message}\n\n请确保已登录 Google 账号并刷新页面重试。`;
+          alert(errorMsg);
+          NLM.DOM.showToast(i18n.get('videoWmFetchError'), window.innerWidth / 2, 100, false);
+        }
       };
     }
 

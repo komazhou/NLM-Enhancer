@@ -493,11 +493,11 @@
     "message": "開く"
   },
   "updateTitle": { 
-    "message": "🚀 NLM Enhancer v[VERSION] 大型アップデート！",
+    "message": "🚀 緊急修正完了 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "独立したローカルツールを追加：NotebookLM動画の完全ローカル・透かしなしダウンロードに対応" },
-  "updateFeature1Desc": { "message": "プライバシーは100%安全。処理はすべてブラウザ内でローカルに完了し、サーバーを経由しません。" },
+  "updateFeature1": { "message": "ウォーターマーク除去機能が復旧しました" },
+  "updateFeature1Desc": { "message": "ゼロコピー技術により、大容量ファイルもより高速かつ安定して処理できます。" },
   "updateBtn": { "message": "了解しました" },
   "wmOptTitle": { "message": "パラメータ設定" },
   "wmTrimName": { "message": "末尾をカット" },

@@ -493,11 +493,11 @@
     "message": "本地去水印"
   },
   "updateTitle": { 
-    "message": "🚀 NLM Enhancer v[VERSION] 重磅更新！",
+    "message": "🚀 紧急修复完成 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "新增独立本地工具：支持 NotebookLM 视频全本地无水印下载" },
-  "updateFeature1Desc": { "message": "隐私 100% 安全，处理过程完全在浏览器本地完成，不经过任何服务器。" },
+  "updateFeature1": { "message": "视频无水印下载功能现已恢复正常" },
+  "updateFeature1Desc": { "message": "我们引入了零拷贝技术，处理大文件更稳定、更快速！" },
   "updateBtn": { "message": "我知道了" },
   "wmOptTitle": { "message": "参数配置" },
   "wmTrimName": { "message": "剪掉片尾" },

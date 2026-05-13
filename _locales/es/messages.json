@@ -493,11 +493,11 @@
     "message": "Abrir"
   },
   "updateTitle": { 
-    "message": "🚀 ¡Gran actualización de NLM Enhancer v[VERSION]!",
+    "message": "🚀 Corrección lista (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "Nueva herramienta local independiente: Soporte para descarga de videos de NotebookLM sin marca de agua totalmente local" },
-  "updateFeature1Desc": { "message": "Privacidad 100% segura. El procesamiento se completa íntegramente de forma local en su navegador, sin servidores involucrados." },
+  "updateFeature1": { "message": "La descarga sin marca de agua ha vuelto" },
+  "updateFeature1Desc": { "message": "Usamos tecnología Cero-copia para un procesamiento más rápido y estable." },
   "updateBtn": { "message": "Entendido" },
   "wmOptTitle": { "message": "Configuración" },
   "wmTrimName": { "message": "Recortar final" },

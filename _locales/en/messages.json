@@ -495,11 +495,11 @@
     "message": "Local Removal"
   },
   "updateTitle": { 
-    "message": "🚀 NLM Enhancer v[VERSION] Major Update!",
+    "message": "🚀 Emergency Fix (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "New Standalone Local Tool: Support for watermark-free video downloads" },
-  "updateFeature1Desc": { "message": "100% Privacy Secure. Processing is completed entirely locally in your browser, no servers involved." },
+  "updateFeature1": { "message": "Video watermark-free download is restored" },
+  "updateFeature1Desc": { "message": "We've added Zero-copy tech for faster, more stable processing." },
   "updateBtn": { "message": "Got it" },
   "wmOptTitle": { "message": "Configuration" },
   "wmTrimName": { "message": "Trim End" },

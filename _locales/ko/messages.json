@@ -493,11 +493,11 @@
     "message": "열기"
   },
   "updateTitle": { 
-    "message": "🚀 NLM Enhancer v[VERSION] 주요 업데이트!",
+    "message": "🚀 긴급 수정 완료 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "독립형 로컬 도구 추가: NotebookLM 동영상 완전 로컬 워터마크 제거 다운로드 지원" },
-  "updateFeature1Desc": { "message": "개인정보 100% 안전. 모든 처리는 브라우저 내에서 로컬로 완료되며 서버를 거치지 않습니다." },
+  "updateFeature1": { "message": "워터마크 없는 다운로드 기능이 복구되었습니다" },
+  "updateFeature1Desc": { "message": "제로 카피 기술로 대용량 파일 처리가 더 빠르고 안정해졌습니다." },
   "updateBtn": { "message": "확인했습니다" },
   "wmOptTitle": { "message": "매개변수 설정" },
   "wmTrimName": { "message": "엔딩 자르기" },
