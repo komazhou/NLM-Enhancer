@@ -293,7 +293,7 @@
       dataReceived = true;
       ui.setStatus(null, chrome.i18n.getMessage('procFetchOriginal') || '正在获取原视频...', chrome.i18n.getMessage('procDownloading') || '准备下载...');
       try {
-        const response = await fetch(event.data.url, { credentials: 'include' });
+        const response = await fetch(event.data.url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const contentLength = response.headers.get('content-length');

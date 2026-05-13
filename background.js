@@ -15,15 +15,12 @@ chrome.declarativeNetRequest.updateDynamicRules({
         { header: "Referer", operation: "set", value: "https://notebooklm.google.com/" },
         { header: "Origin", operation: "set", value: "https://notebooklm.google.com" }
       ],
-      // 强制改写 Google 的响应头，给浏览器发“通行证”
       responseHeaders: [
-        { header: "Access-Control-Allow-Origin", operation: "set", value: `chrome-extension://${extensionId}` },
-        { header: "Access-Control-Allow-Credentials", operation: "set", value: "true" }
+        { header: "Access-Control-Allow-Origin", operation: "set", value: "*" }
       ]
     },
     condition: {
-      // 拦截该扩展页面发出的所有请求
-      initiatorDomains: [extensionId],
+      requestDomains: ["usercontent.goog", "googleusercontent.com", "googlevideo.com"],
       resourceTypes: ["xmlhttprequest", "media"]
     }
   }]
