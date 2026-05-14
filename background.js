@@ -16,27 +16,10 @@ chrome.webRequest.onHeadersReceived.addListener(
   { urls: ["https://*.googlevideo.com/*"] }
 );
 
-// 终极上帝模式：为拉取请求注入跨域许可
+// NotebookLM CSP 解除：移除 CSP 头以允许扩展脚本正常运行
 chrome.declarativeNetRequest.updateDynamicRules({
   removeRuleIds: [1, 2],
   addRules: [
-    {
-      id: 1,
-      priority: 1,
-      action: {
-        type: "modifyHeaders",
-        responseHeaders: [
-          { header: "Access-Control-Allow-Origin", operation: "set", value: "*" },
-          { header: "Access-Control-Allow-Methods", operation: "set", value: "GET, POST, OPTIONS, HEAD" },
-          { header: "Access-Control-Allow-Headers", operation: "set", value: "*" },
-          { header: "Access-Control-Expose-Headers", operation: "set", value: "*" }
-        ]
-      },
-      condition: {
-        requestDomains: ["usercontent.goog", "googleusercontent.com", "googlevideo.com", "google.com"],
-        resourceTypes: ["xmlhttprequest", "media", "other"]
-      }
-    },
     {
       id: 2,
       priority: 1,
