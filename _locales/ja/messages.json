@@ -493,8 +493,8 @@
     "message": "🚀 緊急修正 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "ビデオダウンロードの問題の修正を試みました" },
-  "updateFeature1Desc": { "message": "ビデオダウンロードのロジックに緊急修正を加えました。問題が解決しない場合や他のバグがある場合は、フィードバックをお待ちしております。" },
+  "updateFeature1": { "message": "Gemini ファイルアップロードの競合を修正" },
+  "updateFeature1Desc": { "message": "一部の環境で Google Gemini のファイルアップロードが失敗する問題を修正しました。バグを見つけた場合は積極的にフィードバックをお願いします。迅速に修正対応いたします。" },
   "updateBtn": { "message": "了解しました" },
   "wmOptTitle": { "message": "パラメータ設定" },
   "wmTrimName": { "message": "末尾をカット" },

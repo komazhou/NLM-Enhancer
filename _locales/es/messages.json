@@ -493,8 +493,8 @@
     "message": "🚀 Corrección de emergencia (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "Intento de corregir problemas de descarga de video" },
-  "updateFeature1Desc": { "message": "Hemos implementado una corrección de emergencia para la lógica de descarga de video. Si el problema persiste o encuentra otros errores, sus comentarios son bienvenidos." },
+  "updateFeature1": { "message": "Corregir conflicto de carga de archivos en Gemini" },
+  "updateFeature1Desc": { "message": "Se solucionó un problema por el cual Google Gemini no podía cargar archivos en algunos entornos. Informe cualquier error que encuentre; lo corregiremos lo más rápido posible." },
   "updateBtn": { "message": "Entendido" },
   "wmOptTitle": { "message": "Configuración" },
   "wmTrimName": { "message": "Recortar final" },

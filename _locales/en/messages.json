@@ -498,8 +498,8 @@
     "message": "🚀 Emergency Fix (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "Attempted fix for video download issues" },
-  "updateFeature1Desc": { "message": "We have implemented an emergency fix for video download logic. If the issue persists or other bugs are found, feedback is welcome." },
+  "updateFeature1": { "message": "Fix Gemini File Upload Conflict" },
+  "updateFeature1Desc": { "message": "Fixed an issue where Google Gemini failed to upload files in some environments. Please report any bugs you find; we will fix them as quickly as possible." },
   "updateBtn": { "message": "OK" },
   "wmOptTitle": { "message": "Configuration" },
   "wmTrimName": { "message": "Trim End" },

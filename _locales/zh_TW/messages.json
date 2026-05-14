@@ -493,8 +493,8 @@
     "message": "🚀 緊急修復 (v[VERSION])",
     "placeholders": { "VERSION": { "content": "$1" } }
   },
-  "updateFeature1": { "message": "嘗試修復影片下載問題" },
-  "updateFeature1Desc": { "message": "我們已對影片下載邏輯進行了緊急修復。如問題依然存在或有其他 Bug，歡迎隨時向我們回饋。" },
+  "updateFeature1": { "message": "修復 Gemini 文件上傳衝突" },
+  "updateFeature1Desc": { "message": "解決了部分環境下 Google Gemini 無法上傳文件的問題。請大家遇到 Bug 積極反饋，我們將以最快的速度進行修復。" },
   "updateBtn": { "message": "好的" },
   "wmOptTitle": { "message": "參數配置" },
   "wmTrimName": { "message": "剪掉片尾" },
